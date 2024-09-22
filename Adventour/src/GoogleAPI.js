@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Use your actual API key here
-const GOOGLE_PLACES_API_KEY = 'iHPmoIIMKxjYeM4eooD8E';  
+const GOOGLE_PLACES_API_KEY = 'AIzaSyD5ywCTflow8-iHPmoIIMKxjYeM4eooD8E';  
 
 export const fetchPlaces = async (selectedTags, location) => {
   try {
