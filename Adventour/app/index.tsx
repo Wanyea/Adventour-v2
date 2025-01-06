@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Alert } from 'react-native';
 import TagSelection from '../src/TagSelection'; // Adjust the path if needed
 import PlaceList from '../src/PlaceList'; // Adjust the path if needed
-import { fetchPlaces } from '../src/GoogleAPI'; // Update to the new file name
+import { fetchPlaces } from '../src/GoogleAPI'; 
 import * as Location from 'expo-location';
 
 const Index = () => {
@@ -44,7 +44,7 @@ const Index = () => {
       {loading ? <Text>Loading...</Text> : places.length > 0 ? (
         <PlaceList places={places} />
       ) : (
-        <Text>No places found.</Text>
+        <Text>No places found...</Text>
       )}
     </View>
   );

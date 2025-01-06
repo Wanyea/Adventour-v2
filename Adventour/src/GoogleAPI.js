@@ -13,7 +13,7 @@ export const fetchPlaces = async (selectedTags, location) => {
       {
         params: {
           location: `${location.latitude},${location.longitude}`, // User's current location
-          radius: 5000, // Radius in meters (adjust based on how far you want to search)
+          radius: 10000, // Radius in meters (adjust based on how far you want to search)
           type: selectedTags.join('|'), // Tags to filter by
           key: GOOGLE_PLACES_API_KEY, // Your API key
         }
