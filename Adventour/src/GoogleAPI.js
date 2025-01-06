@@ -1,7 +1,6 @@
 import axios from 'axios';
 
-// Use your actual API key here
-const GOOGLE_PLACES_API_KEY = 'AIzaSyD5ywCTflow8-iHPmoIIMKxjYeM4eooD8E';  
+const GOOGLE_PLACES_API_KEY = 'AIzaSyD-RpERPi4HTQl3oiTWtbgZTXVu-kyN4as';  
 
 export const fetchPlaces = async (selectedTags, location) => {
   try {
@@ -15,7 +14,7 @@ export const fetchPlaces = async (selectedTags, location) => {
           location: `${location.latitude},${location.longitude}`, // User's current location
           radius: 10000, // Radius in meters (adjust based on how far you want to search)
           type: selectedTags.join('|'), // Tags to filter by
-          key: GOOGLE_PLACES_API_KEY, // Your API key
+          key: GOOGLE_PLACES_API_KEY, 
         }
       }
     );
