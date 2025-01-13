@@ -19,7 +19,7 @@ export const fetchPlaces = async (selectedTags, location) => {
       }
     );
 
-    console.log("API Response:", response.data.results); // Log the response data
+    // console.log("API Response:", response.data.results); // Log the response data
     return response.data.results; // Return list of places
   } catch (error) {
     console.error('Error fetching places:', error); // Log any errors
