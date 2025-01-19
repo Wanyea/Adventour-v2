@@ -47,7 +47,7 @@ class GooglePlacesServices:
     @staticmethod
     def reverse_geocode(latitude, longitude):
         """
-        Reverse geocode coordinates to get a city or address.
+        Reverse geocode coordinates to get a city and state.
         """
         try:
             response = requests.get(f"{GooglePlacesServices.BASE_URL}/geocode/json", params={
@@ -60,12 +60,26 @@ class GooglePlacesServices:
                 print(f"No results from Geocoding API for coordinates: {latitude}, {longitude}")
                 return None
 
-            # Extract the city from the formatted address components
+            city = None
+            state = None
+
+            # Extract city and state from address components
             for result in results:
                 for component in result["address_components"]:
                     if "locality" in component["types"]:  # Look for city/locality
-                        return component["long_name"]
-            return results[0]["formatted_address"]  # Fallback to the full address
+                        city = component["long_name"]
+                    if "administrative_area_level_1" in component["types"]:  # Look for state
+                        state = component["long_name"]
+                if city and state:
+                    break  # Exit the loop once both city and state are found
+
+            if not city:
+                print(f"City not found in results for coordinates: {latitude}, {longitude}")
+            if not state:
+                print(f"State not found in results for coordinates: {latitude}, {longitude}")
+
+            return {"city": city, "state": state}
         except requests.exceptions.RequestException as e:
             print(f"Error reverse geocoding coordinates: {e}")
             raise
+

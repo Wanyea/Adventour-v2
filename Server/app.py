@@ -31,7 +31,6 @@ def save_feedback():
     db.session.commit()
     return jsonify({"message": "Feedback saved successfully!"}), 201
 
-
 @app.route('/geocode', methods=['GET'])
 def geocode():
     """
@@ -42,24 +41,25 @@ def geocode():
     longitude = request.args.get('longitude')  # Longitude for reverse geocoding
 
     if address:
+        # Geocode the address to coordinates
         try:
             coordinates = GooglePlacesServices.fetch_city_coordinates(address)
             if not coordinates:
                 return jsonify({"error": "Unable to resolve address to coordinates"}), 404
-            return jsonify(coordinates)
+            return jsonify(coordinates)  # Return latitude and longitude
         except Exception as e:
             return jsonify({"error": f"Error resolving address: {str(e)}"}), 500
     elif latitude and longitude:
+        # Reverse geocode the coordinates to a city and state
         try:
-            address = GooglePlacesServices.reverse_geocode(latitude, longitude)
-            if not address:
-                return jsonify({"error": "Unable to resolve coordinates to an address"}), 404
-            return jsonify({"city": address})
+            location = GooglePlacesServices.reverse_geocode(latitude, longitude)
+            if not location:
+                return jsonify({"error": "Unable to resolve coordinates to a city and state"}), 404
+            return jsonify(location)  # Return city and state
         except Exception as e:
             return jsonify({"error": f"Error resolving coordinates: {str(e)}"}), 500
     else:
         return jsonify({"error": "Either address or coordinates must be provided"}), 400
-
 
 @app.route('/recommendations', methods=['GET'])
 def get_recommendations():

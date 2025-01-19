@@ -130,19 +130,16 @@ const Index = () => {
       const location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
   
-      // Reverse geocode the current location to get the city name
+      // Reverse geocode the current location to get the city and state
       const response = await axios.get('http://127.0.0.1:5000/geocode', {
         params: { latitude, longitude },
       });
   
-      console.log("Reverse geocode response:", response.data);
-  
-      const resolvedCity = response.data?.city || '';
-      if (resolvedCity) {
-        setCity(resolvedCity); // Update the city text box
-        console.log("City set to:", resolvedCity);
+      const { city, state } = response.data;
+      if (city && state) {
+        setCity(`${city}, ${state}`); // Update the text box with city and state
       } else {
-        Alert.alert('Error', 'Unable to resolve location to a city.');
+        Alert.alert('Error', 'Unable to resolve location to a city and state.');
       }
     } catch (error) {
       console.error('Error fetching current location:', error);
