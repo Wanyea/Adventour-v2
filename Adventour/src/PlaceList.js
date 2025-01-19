@@ -2,8 +2,7 @@ import React from 'react';
 import { View, Text, FlatList, Button, StyleSheet } from 'react-native';
 
 const PlaceList = ({ places, onFeedback }) => {
-  console.log("onFeedback prop in PlaceList:", onFeedback); // Debug log
-
+  
   return (
     <FlatList
       data={places}
