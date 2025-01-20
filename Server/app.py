@@ -1,7 +1,8 @@
+import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from models import db, Feedback
-from google_places_services import GooglePlacesServices  
+from google_services_api import GoogleServicesAPI  
 
 app = Flask(__name__)
 CORS(app)
@@ -43,7 +44,7 @@ def geocode():
     if address:
         # Geocode the address to coordinates
         try:
-            coordinates = GooglePlacesServices.fetch_city_coordinates(address)
+            coordinates = GoogleServicesAPI.fetch_city_coordinates(address)
             if not coordinates:
                 return jsonify({"error": "Unable to resolve address to coordinates"}), 404
             return jsonify(coordinates)  # Return latitude and longitude
@@ -52,7 +53,7 @@ def geocode():
     elif latitude and longitude:
         # Reverse geocode the coordinates to a city and state
         try:
-            location = GooglePlacesServices.reverse_geocode(latitude, longitude)
+            location = GoogleServicesAPI.reverse_geocode(latitude, longitude)
             if not location:
                 return jsonify({"error": "Unable to resolve coordinates to a city and state"}), 404
             return jsonify(location)  # Return city and state
@@ -61,10 +62,34 @@ def geocode():
     else:
         return jsonify({"error": "Either address or coordinates must be provided"}), 400
 
+@app.route('/fetch-places', methods=['POST'])
+def fetch_places():
+    """
+    Fetch places from Google Places API based on tags and location.
+    """
+    data = request.json  # Extract the JSON payload
+    print("Incoming data:", data)  # Debug log
+
+    tags = data.get("tags", [])
+    location = data.get("location")
+
+    if not tags or not location:
+        print("Missing parameters: tags or location")
+        return jsonify({"error": "Tags and location are required"}), 400
+
+    try:
+        # Fetch places using GoogleServicesAPI
+        places = GoogleServicesAPI.fetch_places(tags, location)
+        return jsonify(places)
+    except Exception as e:
+        print(f"Error in fetch_places: {e}")
+        return jsonify({"error": f"Error fetching places: {str(e)}"}), 500
+
 @app.route('/recommendations', methods=['GET'])
 def get_recommendations():
     """
-    Generate recommendations based on user feedback.
+    Generate recommendations based on user feedback with weighted tags,
+    penalized rejected tags, and excluded rejected places.
     """
     user_id = request.args.get('user_id')
     address = request.args.get('address')
@@ -74,6 +99,7 @@ def get_recommendations():
     if not user_id:
         return jsonify({"error": "User ID is required"}), 400
 
+    # Determine coordinates
     if latitude and longitude:
         try:
             lat, lng = float(latitude), float(longitude)
@@ -82,7 +108,7 @@ def get_recommendations():
         coordinates = {"latitude": lat, "longitude": lng}
     elif address:
         try:
-            coordinates = GooglePlacesServices.fetch_city_coordinates(address)
+            coordinates = GoogleServicesAPI.fetch_city_coordinates(address)
             if not coordinates:
                 return jsonify({"error": "Unable to resolve address to coordinates"}), 404
         except Exception as e:
@@ -90,24 +116,59 @@ def get_recommendations():
     else:
         return jsonify({"error": "Either coordinates or address must be provided"}), 400
 
+    # Retrieve user feedback
     feedback = Feedback.query.filter_by(user_id=user_id).all()
-    accepted_tags = set()
-    rejected_tags = set()
+
+    # Track rejected place IDs and calculate tag scores
+    rejected_place_ids = set()
+    tag_scores = {}
     for fb in feedback:
         tags = fb.tags.split(',')
         if fb.feedback == 'accept':
-            accepted_tags.update(tags)
+            weight = 3  # Positive weight for accepted places
         elif fb.feedback == 'reject':
-            rejected_tags.update(tags)
+            weight = -1  # Negative weight for rejected places
+            rejected_place_ids.add(fb.place_id)  # Track rejected place IDs
+        else:
+            continue  # Skip unknown feedback types
 
-    filtered_tags = accepted_tags - rejected_tags
+        for i, tag in enumerate(tags[:3]):  # Consider top 3 tags
+            score_adjustment = (3 - i) * weight  # Higher weight for first tag
+            if tag in tag_scores:
+                tag_scores[tag] += score_adjustment
+            else:
+                tag_scores[tag] = score_adjustment
 
+    # Normalize tag scores (optional for consistency)
+    max_score = max(tag_scores.values(), default=1)
+    tag_scores = {tag: score / max_score for tag, score in tag_scores.items()}
+
+    # Fetch places using Google Places API
     try:
-        places = GooglePlacesServices.fetch_places(list(filtered_tags), coordinates)
-        return jsonify(places)
+        places = GoogleServicesAPI.fetch_places(list(tag_scores.keys()), coordinates)
     except Exception as e:
         return jsonify({"error": f"Error fetching places: {str(e)}"}), 500
 
+    # Score and filter places
+    scored_places = []
+    for place in places:
+        place_id = place.get('place_id')
+        place_tags = place.get('types', [])
+        rating = place.get('rating', 0)  # Default to 0 if no rating is available
+
+        if place_id in rejected_place_ids or rating < 4.0:  # Exclude rejected places and low-rated places
+            continue
+
+        score = sum(tag_scores.get(tag, 0) for tag in place_tags)
+        if score > 0:
+            scored_places.append({"place": place, "score": score})
+
+    # Sort places by score in descending order
+    scored_places.sort(key=lambda x: x["score"], reverse=True)
+
+    # Return the top recommendations
+    return jsonify([sp["place"] for sp in scored_places])
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5005)
+

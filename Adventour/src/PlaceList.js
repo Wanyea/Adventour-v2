@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, FlatList, Button, StyleSheet } from 'react-native';
 
 const PlaceList = ({ places, onFeedback }) => {
-  
   return (
     <FlatList
       data={places}
@@ -11,6 +10,9 @@ const PlaceList = ({ places, onFeedback }) => {
         <View style={styles.item}>
           <Text style={styles.name}>{item.name}</Text>
           <Text style={styles.vicinity}>{item.vicinity}</Text>
+          <Text style={styles.rating}>
+            Rating: {item.rating ? `${item.rating} / 5` : 'N/A'}
+          </Text>
           <View style={styles.buttonContainer}>
             <Button
               title="Accept"
@@ -42,6 +44,11 @@ const styles = StyleSheet.create({
   vicinity: {
     fontSize: 14,
     color: '#555',
+  },
+  rating: {
+    fontSize: 14,
+    color: '#888',
+    marginTop: 5,
   },
   buttonContainer: {
     flexDirection: 'row',

@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import TagSelection from '../src/TagSelection';
 import PlaceList from '../src/PlaceList';
-import GoogleAutocompleteService from '../src/GoogleAutocompleteService'; // Updated import
+import GoogleAutocompleteService from '../src/GoogleAutocompleteService'; 
 import * as Location from 'expo-location';
 import axios from 'axios';
 
@@ -23,6 +23,7 @@ type Place = {
 };
 
 const Index = () => {
+  const backendBaseURL = 'http://192.168.0.18:5005';
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(false);
   const [userFeedback, setUserFeedback] = useState<{ place_id: string; feedback: string; tags: string[] }[]>([]);
@@ -37,7 +38,7 @@ const Index = () => {
       { place_id: place.place_id, feedback, tags: place.types },
     ]);
     try {
-      const response = await axios.post('http://127.0.0.1:5000/feedback', {
+      const response = await axios.post(`${backendBaseURL}/feedback`, {
         user_id: userId,
         place_id: place.place_id,
         feedback,
@@ -75,7 +76,7 @@ const Index = () => {
         return;
       }
 
-      const response = await axios.get('http://127.0.0.1:5000/recommendations', { params });
+      const response = await axios.get(`${backendBaseURL}/recommendations`, { params });
       setPlaces(response.data); // Update places with recommendations
       Alert.alert('Recommendations loaded!', 'Displaying recommended places based on your preferences.');
     } catch (error) {
@@ -85,39 +86,48 @@ const Index = () => {
   };
 
   const handleTagSubmit = async (selectedTags: string[]) => {
+    // Check if at least one tag is selected
+    if (selectedTags.length === 0) {
+      Alert.alert('No Tags Selected', 'Please select at least one tag before proceeding.');
+      return; // Stop the function here
+    }
+  
     setLoading(true);
-
+  
     try {
       if (!city) {
         Alert.alert('Error', 'Please enter a location.');
         setLoading(false);
         return;
       }
-
-      const response = await axios.get('http://127.0.0.1:5000/geocode', {
+  
+      // Geocode the address to get location coordinates
+      const response = await axios.get(`${backendBaseURL}/geocode`, {
         params: { address: city },
       });
-
-      const location = response.data;
+  
+      const location = response.data; // Expected { latitude, longitude }
       if (!location) {
         Alert.alert('Error', 'Unable to determine location from city.');
         setLoading(false);
         return;
       }
-
-      const placesResponse = await axios.post('http://127.0.0.1:5000/fetch-places', {
+    
+      // Send the selected tags and location to the backend
+      const placesResponse = await axios.post(`${backendBaseURL}/fetch-places`, {
         tags: selectedTags,
         location,
       });
-
-      setPlaces(placesResponse.data); // Update the places state
+  
+      setPlaces(placesResponse.data); 
     } catch (error) {
       console.error('Error fetching places:', error);
       Alert.alert('Error fetching data');
     }
-
+  
     setLoading(false);
   };
+  
 
   const useCurrentLocation = async () => {
     try {
@@ -131,13 +141,13 @@ const Index = () => {
       const { latitude, longitude } = location.coords;
   
       // Reverse geocode the current location to get the city and state
-      const response = await axios.get('http://127.0.0.1:5000/geocode', {
+      const response = await axios.get(`${backendBaseURL}/geocode`, {
         params: { latitude, longitude },
       });
   
       const { city, state } = response.data;
       if (city && state) {
-        setCity(`${city}, ${state}`); // Update the text box with city and state
+        setCity(`${city}, ${state}`); 
       } else {
         Alert.alert('Error', 'Unable to resolve location to a city and state.');
       }

@@ -2,7 +2,7 @@ import requests
 
 GOOGLE_API_KEY = "AIzaSyD-RpERPi4HTQl3oiTWtbgZTXVu-kyN4as"  
 
-class GooglePlacesServices:
+class GoogleServicesAPI:
     BASE_URL = "https://maps.googleapis.com/maps/api"
 
     @staticmethod
@@ -11,7 +11,7 @@ class GooglePlacesServices:
         Fetch places based on tags and location coordinates.
         """
         try:
-            response = requests.get(f"{GooglePlacesServices.BASE_URL}/place/nearbysearch/json", params={
+            response = requests.get(f"{GoogleServicesAPI.BASE_URL}/place/nearbysearch/json", params={
                 "location": f"{location['latitude']},{location['longitude']}",
                 "radius": 10000,  # Search radius in meters
                 "type": "|".join(selected_tags),
@@ -29,7 +29,7 @@ class GooglePlacesServices:
         Get latitude and longitude for a given city or address.
         """
         try:
-            response = requests.get(f"{GooglePlacesServices.BASE_URL}/geocode/json", params={
+            response = requests.get(f"{GoogleServicesAPI.BASE_URL}/geocode/json", params={
                 "address": city,
                 "key": GOOGLE_API_KEY,
             })
@@ -50,7 +50,7 @@ class GooglePlacesServices:
         Reverse geocode coordinates to get a city and state.
         """
         try:
-            response = requests.get(f"{GooglePlacesServices.BASE_URL}/geocode/json", params={
+            response = requests.get(f"{GoogleServicesAPI.BASE_URL}/geocode/json", params={
                 "latlng": f"{latitude},{longitude}",
                 "key": GOOGLE_API_KEY,
             })
