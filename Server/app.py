@@ -1,15 +1,39 @@
 import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
+from dotenv import load_dotenv
+from urllib.parse import quote_plus
+from google_services_api import GoogleServicesAPI  # Custom module
 from models import db, Feedback
-from google_services_api import GoogleServicesAPI  
+
+# Load environment variables from .env file (if available)
+load_dotenv()
+
+# Debug environment variables
+print(f"DB_USER: {os.getenv('DB_USER')}")
+print(f"DB_PASSWORD: {os.getenv('DB_PASSWORD')}")
+print(f"DB_NAME: {os.getenv('DB_NAME')}")
+print(f"CLOUD_SQL_CONNECTION_NAME: {os.getenv('CLOUD_SQL_CONNECTION_NAME')}")
+
+# URL-encode the password to handle special characters
+encoded_password = quote_plus(os.getenv('DB_PASSWORD'))
 
 app = Flask(__name__)
 CORS(app)
 
 # Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///feedback.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+if os.getenv("FLASK_ENV") == "development":
+    app.config["SQLALCHEMY_DATABASE_URI"] = (
+        f"mysql+pymysql://{os.getenv('DB_USER')}:{encoded_password}@127.0.0.1:3306/{os.getenv('DB_NAME')}"
+    )
+else:
+    app.config["SQLALCHEMY_DATABASE_URI"] = (
+        f"mysql+pymysql://{os.getenv('DB_USER')}:{encoded_password}@/"
+        f"{os.getenv('DB_NAME')}?unix_socket=/cloudsql/{os.getenv('CLOUD_SQL_CONNECTION_NAME')}"
+    )
+
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
 # Initialize the database
@@ -42,7 +66,6 @@ def geocode():
     longitude = request.args.get('longitude')  # Longitude for reverse geocoding
 
     if address:
-        # Geocode the address to coordinates
         try:
             coordinates = GoogleServicesAPI.fetch_city_coordinates(address)
             if not coordinates:
@@ -51,7 +74,6 @@ def geocode():
         except Exception as e:
             return jsonify({"error": f"Error resolving address: {str(e)}"}), 500
     elif latitude and longitude:
-        # Reverse geocode the coordinates to a city and state
         try:
             location = GoogleServicesAPI.reverse_geocode(latitude, longitude)
             if not location:
@@ -67,22 +89,17 @@ def fetch_places():
     """
     Fetch places from Google Places API based on tags and location.
     """
-    data = request.json  # Extract the JSON payload
-    print("Incoming data:", data)  # Debug log
-
+    data = request.json
     tags = data.get("tags", [])
     location = data.get("location")
 
     if not tags or not location:
-        print("Missing parameters: tags or location")
         return jsonify({"error": "Tags and location are required"}), 400
 
     try:
-        # Fetch places using GoogleServicesAPI
         places = GoogleServicesAPI.fetch_places(tags, location)
         return jsonify(places)
     except Exception as e:
-        print(f"Error in fetch_places: {e}")
         return jsonify({"error": f"Error fetching places: {str(e)}"}), 500
 
 @app.route('/recommendations', methods=['GET'])
@@ -99,13 +116,12 @@ def get_recommendations():
     if not user_id:
         return jsonify({"error": "User ID is required"}), 400
 
-    # Determine coordinates
     if latitude and longitude:
         try:
             lat, lng = float(latitude), float(longitude)
+            coordinates = {"latitude": lat, "longitude": lng}
         except ValueError:
             return jsonify({"error": "Invalid latitude or longitude format"}), 400
-        coordinates = {"latitude": lat, "longitude": lng}
     elif address:
         try:
             coordinates = GoogleServicesAPI.fetch_city_coordinates(address)
@@ -116,59 +132,36 @@ def get_recommendations():
     else:
         return jsonify({"error": "Either coordinates or address must be provided"}), 400
 
-    # Retrieve user feedback
     feedback = Feedback.query.filter_by(user_id=user_id).all()
-
-    # Track rejected place IDs and calculate tag scores
     rejected_place_ids = set()
     tag_scores = {}
     for fb in feedback:
         tags = fb.tags.split(',')
-        if fb.feedback == 'accept':
-            weight = 3  # Positive weight for accepted places
-        elif fb.feedback == 'reject':
-            weight = -1  # Negative weight for rejected places
-            rejected_place_ids.add(fb.place_id)  # Track rejected place IDs
-        else:
-            continue  # Skip unknown feedback types
+        weight = 3 if fb.feedback == 'accept' else -1
+        for i, tag in enumerate(tags[:3]):
+            tag_scores[tag] = tag_scores.get(tag, 0) + (3 - i) * weight
+        if fb.feedback == 'reject':
+            rejected_place_ids.add(fb.place_id)
 
-        for i, tag in enumerate(tags[:3]):  # Consider top 3 tags
-            score_adjustment = (3 - i) * weight  # Higher weight for first tag
-            if tag in tag_scores:
-                tag_scores[tag] += score_adjustment
-            else:
-                tag_scores[tag] = score_adjustment
-
-    # Normalize tag scores (optional for consistency)
     max_score = max(tag_scores.values(), default=1)
     tag_scores = {tag: score / max_score for tag, score in tag_scores.items()}
 
-    # Fetch places using Google Places API
     try:
         places = GoogleServicesAPI.fetch_places(list(tag_scores.keys()), coordinates)
     except Exception as e:
         return jsonify({"error": f"Error fetching places: {str(e)}"}), 500
 
-    # Score and filter places
     scored_places = []
     for place in places:
         place_id = place.get('place_id')
-        place_tags = place.get('types', [])
-        rating = place.get('rating', 0)  # Default to 0 if no rating is available
-
-        if place_id in rejected_place_ids or rating < 4.0:  # Exclude rejected places and low-rated places
+        if place_id in rejected_place_ids:
             continue
-
-        score = sum(tag_scores.get(tag, 0) for tag in place_tags)
+        score = sum(tag_scores.get(tag, 0) for tag in place.get('types', []))
         if score > 0:
             scored_places.append({"place": place, "score": score})
 
-    # Sort places by score in descending order
     scored_places.sort(key=lambda x: x["score"], reverse=True)
-
-    # Return the top recommendations
     return jsonify([sp["place"] for sp in scored_places])
 
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5005)
-
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
