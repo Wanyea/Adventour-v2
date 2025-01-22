@@ -8,7 +8,8 @@ from google_services_api import GoogleServicesAPI  # Custom module
 from models import db, Feedback
 
 # Load environment variables from .env file (if available)
-load_dotenv()
+if os.getenv("FLASK_ENV") == "development":
+    load_dotenv()
 
 # Debug environment variables
 print(f"DB_USER: {os.getenv('DB_USER')}")
@@ -39,6 +40,15 @@ db.init_app(app)
 # Initialize the database
 with app.app_context():
     db.create_all()
+
+@app.route('/')
+def home():
+    """
+    Root route to inform users about API usage.
+    """
+    return jsonify({
+        "message": "This is the Adventour API. Refer to the documentation for available endpoints."
+    })
 
 @app.route('/feedback', methods=['POST'])
 def save_feedback():
@@ -88,6 +98,7 @@ def geocode():
 def fetch_places():
     """
     Fetch places from Google Places API based on tags and location.
+    Only return places with business_status 'OPERATIONAL'.
     """
     data = request.json
     tags = data.get("tags", [])
@@ -97,8 +108,16 @@ def fetch_places():
         return jsonify({"error": "Tags and location are required"}), 400
 
     try:
-        places = GoogleServicesAPI.fetch_places(tags, location)
-        return jsonify(places)
+        # Fetch places using GoogleServicesAPI
+        all_places = GoogleServicesAPI.fetch_places(tags, location)
+
+        # Filter places with 'business_status' as 'OPERATIONAL'
+        operational_places = [
+            place for place in all_places
+            if place.get('business_status') == 'OPERATIONAL'
+        ]
+
+        return jsonify(operational_places)
     except Exception as e:
         return jsonify({"error": f"Error fetching places: {str(e)}"}), 500
 

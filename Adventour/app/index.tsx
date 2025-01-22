@@ -1,3 +1,4 @@
+import { BACKEND_BASE_URL } from '@env';
 import React, { useState } from 'react';
 import {
   View,
@@ -23,8 +24,7 @@ type Place = {
 };
 
 const Index = () => {
-  const backendBaseURL = 'http://192.168.0.18:5005';
-  //  const backendBaseURL = 'https://adventour-73dfb.ue.r.appspot.com';
+  const backendBaseURL = BACKEND_BASE_URL;
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(false);
   const [userFeedback, setUserFeedback] = useState<{ place_id: string; feedback: string; tags: string[] }[]>([]);
