@@ -1,38 +1,26 @@
-import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
-from dotenv import load_dotenv
 from urllib.parse import quote_plus
 from google_services_api import GoogleServicesAPI  # Custom module
 from models import db, Feedback
 
-# Load environment variables from .env file (if available)
-load_dotenv()
+# Cloud SQL configuration
+DB_USER = "root"
+DB_PASSWORD = "[(BYC0eJx3myR@|8"  
+DB_NAME = "adventour"
+CLOUD_SQL_CONNECTION_NAME = "adventour-73dfb:us-east1:adventour-sql"
+DATABASE_URI = (
+    f"mysql+pymysql://{DB_USER}:{quote_plus(DB_PASSWORD)}@34.74.250.90:3306/{DB_NAME}"
+)
 
-# Debug environment variables
-print(f"DB_USER: {os.getenv('DB_USER')}")
-print(f"DB_PASSWORD: {os.getenv('DB_PASSWORD')}")
-print(f"DB_NAME: {os.getenv('DB_NAME')}")
-print(f"CLOUD_SQL_CONNECTION_NAME: {os.getenv('CLOUD_SQL_CONNECTION_NAME')}")
+# Debug: Verify the connection string
+print(f"Connecting to database: {DATABASE_URI}")
 
-# URL-encode the password to handle special characters
-encoded_password = quote_plus(os.getenv('DB_PASSWORD'))
-
+# Flask app setup
 app = Flask(__name__)
 CORS(app)
-
-# Database configuration
-if os.getenv("FLASK_ENV") == "development":
-    app.config["SQLALCHEMY_DATABASE_URI"] = (
-        f"mysql+pymysql://{os.getenv('DB_USER')}:{encoded_password}@127.0.0.1:3306/{os.getenv('DB_NAME')}"
-    )
-else:
-    app.config["SQLALCHEMY_DATABASE_URI"] = (
-        f"mysql+pymysql://{os.getenv('DB_USER')}:{encoded_password}@/"
-        f"{os.getenv('DB_NAME')}?unix_socket=/cloudsql/{os.getenv('CLOUD_SQL_CONNECTION_NAME')}"
-    )
-
+app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
@@ -40,11 +28,9 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
+
 @app.route('/feedback', methods=['POST'])
 def save_feedback():
-    """
-    Save user feedback (accept/reject) with tags to the database.
-    """
     data = request.json
     feedback = Feedback(
         user_id=data['user_id'],
@@ -56,21 +42,19 @@ def save_feedback():
     db.session.commit()
     return jsonify({"message": "Feedback saved successfully!"}), 201
 
+
 @app.route('/geocode', methods=['GET'])
 def geocode():
-    """
-    Handle geocoding for an address or reverse geocoding for coordinates.
-    """
-    address = request.args.get('address')  # Address for geocoding
-    latitude = request.args.get('latitude')  # Latitude for reverse geocoding
-    longitude = request.args.get('longitude')  # Longitude for reverse geocoding
+    address = request.args.get('address')
+    latitude = request.args.get('latitude')
+    longitude = request.args.get('longitude')
 
     if address:
         try:
             coordinates = GoogleServicesAPI.fetch_city_coordinates(address)
             if not coordinates:
                 return jsonify({"error": "Unable to resolve address to coordinates"}), 404
-            return jsonify(coordinates)  # Return latitude and longitude
+            return jsonify(coordinates)
         except Exception as e:
             return jsonify({"error": f"Error resolving address: {str(e)}"}), 500
     elif latitude and longitude:
@@ -78,17 +62,15 @@ def geocode():
             location = GoogleServicesAPI.reverse_geocode(latitude, longitude)
             if not location:
                 return jsonify({"error": "Unable to resolve coordinates to a city and state"}), 404
-            return jsonify(location)  # Return city and state
+            return jsonify(location)
         except Exception as e:
             return jsonify({"error": f"Error resolving coordinates: {str(e)}"}), 500
     else:
         return jsonify({"error": "Either address or coordinates must be provided"}), 400
 
+
 @app.route('/fetch-places', methods=['POST'])
 def fetch_places():
-    """
-    Fetch places from Google Places API based on tags and location.
-    """
     data = request.json
     tags = data.get("tags", [])
     location = data.get("location")
@@ -102,12 +84,9 @@ def fetch_places():
     except Exception as e:
         return jsonify({"error": f"Error fetching places: {str(e)}"}), 500
 
+
 @app.route('/recommendations', methods=['GET'])
 def get_recommendations():
-    """
-    Generate recommendations based on user feedback with weighted tags,
-    penalized rejected tags, and excluded rejected places.
-    """
     user_id = request.args.get('user_id')
     address = request.args.get('address')
     latitude = request.args.get('latitude')
@@ -163,5 +142,6 @@ def get_recommendations():
     scored_places.sort(key=lambda x: x["score"], reverse=True)
     return jsonify([sp["place"] for sp in scored_places])
 
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+    app.run(host="0.0.0.0", port=8080)
