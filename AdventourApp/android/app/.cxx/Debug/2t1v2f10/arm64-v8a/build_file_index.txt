@@ -1,9 +1,0 @@
-D:\source\Adventour-v2\AdventourApp\node_modules\@react-native-async-storage\async-storage\android\build\generated\source\codegen\jni\CMakeLists.txt
-D:\source\Adventour-v2\AdventourApp\node_modules\@react-native-community\geolocation\android\build\generated\source\codegen\jni\CMakeLists.txt
-<<<<<<< Updated upstream
-=======
-D:\source\Adventour-v2\AdventourApp\node_modules\react-native-gesture-handler\android\build\generated\source\codegen\jni\CMakeLists.txt
-D:\source\Adventour-v2\AdventourApp\node_modules\react-native-safe-area-context\android\src\main\jni\CMakeLists.txt
-D:\source\Adventour-v2\AdventourApp\node_modules\react-native-screens\android\src\main\jni\CMakeLists.txt
->>>>>>> Stashed changes
-D:\source\Adventour-v2\AdventourApp\node_modules\react-native\ReactAndroid\cmake-utils\default-app-setup\CMakeLists.txt
