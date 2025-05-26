@@ -13,7 +13,7 @@ import TagSelection from './src/TagSelection';
 import PlaceList from './src/PlaceList';
 import GoogleAutocompleteService from './src/GoogleAutocompleteService';
 import Config from './src/Config';
-import * as Location from 'expo-location';
+import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import 'react-native-get-random-values';
@@ -146,32 +146,35 @@ const HomeScreen: React.FC = () => {
     setLoading(false);
   };
 
-  const useCurrentLocation = async () => {
-    try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission to access location was denied');
-        return;
-      }
+  const useCurrentLocation = () => {
+    Geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
 
-      const location = await Location.getCurrentPositionAsync({});
-      const { latitude, longitude } = location.coords;
+        try {
+          const response = await axios.get(`${backendBaseURL}/geocode`, {
+            params: { latitude, longitude },
+          });
 
-      const response = await axios.get(`${backendBaseURL}/geocode`, {
-        params: { latitude, longitude },
-      });
-
-      const { city, state } = response.data;
-      if (city && state) {
-        setCity(`${city}, ${state}`);
-      } else {
-        Alert.alert('Error', 'Unable to resolve location to a city and state.');
-      }
-    } catch (error) {
-      console.error('Error fetching current location:', error);
-      Alert.alert('Error', 'Unable to fetch current location.');
-    }
+          const { city, state } = response.data;
+          if (city && state) {
+            setCity(`${city}, ${state}`);
+          } else {
+            Alert.alert('Error', 'Unable to resolve location to a city and state.');
+          }
+        } catch (error) {
+          console.error('Error fetching geocoded location:', error);
+          Alert.alert('Error', 'Unable to resolve location.');
+        }
+      },
+      (error) => {
+        console.error('Geolocation error:', error);
+        Alert.alert('Location Error', 'Unable to get current location.');
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+    );
   };
+
 
   return (
     <View style={{ flex: 1, padding: 20 }}>

@@ -1,0 +1,21 @@
+# ninja log v5
+2	25	0	D:/source/Adventour-v2/AdventourApp/android/app/.cxx/Debug/2t1v2f10/armeabi-v7a/CMakeFiles/cmake.verify_globs	ec458b04528f4625
+36	4580	7699433380517109	rnasyncstorage_autolinked_build/CMakeFiles/react_codegen_rnasyncstorage.dir/react/renderer/components/rnasyncstorage/States.cpp.o	d5ecd4575e970d9b
+37	439	7699451078085395	build.ninja	4523e717ebeb41d3
+11	5492	7699433389685796	rnasyncstorage_autolinked_build/CMakeFiles/react_codegen_rnasyncstorage.dir/react/renderer/components/rnasyncstorage/EventEmitters.cpp.o	da21dd3b11025408
+65	5697	7699433391486103	RNCGeolocationSpec_autolinked_build/CMakeFiles/react_codegen_RNCGeolocationSpec.dir/react/renderer/components/RNCGeolocationSpec/EventEmitters.cpp.o	a439575e7611b988
+53	6219	7699433396743608	RNCGeolocationSpec_autolinked_build/CMakeFiles/react_codegen_RNCGeolocationSpec.dir/react/renderer/components/RNCGeolocationSpec/Props.cpp.o	cb8e14d1967df47a
+23	3377	7699439109762398	CMakeFiles/appmodules.dir/D_/source/Adventour-v2/AdventourApp/android/app/build/generated/autolinking/src/main/jni/autolinking.cpp.o	5ebb071a5a7f2a1d
+20	6266	7699433397295342	rnasyncstorage_autolinked_build/CMakeFiles/react_codegen_rnasyncstorage.dir/react/renderer/components/rnasyncstorage/Props.cpp.o	d22986c74a4bfde5
+59	6273	7699433397360557	RNCGeolocationSpec_autolinked_build/CMakeFiles/react_codegen_RNCGeolocationSpec.dir/react/renderer/components/RNCGeolocationSpec/RNCGeolocationSpecJSI-generated.cpp.o	53fe8b50d03a65f4
+16	6426	7699433399215622	rnasyncstorage_autolinked_build/CMakeFiles/react_codegen_rnasyncstorage.dir/react/renderer/components/rnasyncstorage/ShadowNodes.cpp.o	5e657f86bf01f10
+8	6505	7699433399701907	rnasyncstorage_autolinked_build/CMakeFiles/react_codegen_rnasyncstorage.dir/react/renderer/components/rnasyncstorage/ComponentDescriptors.cpp.o	cfe2366e8ac0bdba
+25	6632	7699433401171321	rnasyncstorage_autolinked_build/CMakeFiles/react_codegen_rnasyncstorage.dir/rnasyncstorage-generated.cpp.o	b9b462d12199fadf
+30	6665	7699433401517074	rnasyncstorage_autolinked_build/CMakeFiles/react_codegen_rnasyncstorage.dir/react/renderer/components/rnasyncstorage/rnasyncstorageJSI-generated.cpp.o	b51a538fb7166ffd
+47	6738	7699433402289225	RNCGeolocationSpec_autolinked_build/CMakeFiles/react_codegen_RNCGeolocationSpec.dir/react/renderer/components/RNCGeolocationSpec/ComponentDescriptors.cpp.o	4ed2193e93fab69a
+42	6854	7699433403371689	RNCGeolocationSpec_autolinked_build/CMakeFiles/react_codegen_RNCGeolocationSpec.dir/RNCGeolocationSpec-generated.cpp.o	ecd7162c8b3ebdb8
+28	3746	7699439113418533	CMakeFiles/appmodules.dir/OnLoad.cpp.o	731b627b0ec8cf18
+5493	8370	7699433418706285	RNCGeolocationSpec_autolinked_build/CMakeFiles/react_codegen_RNCGeolocationSpec.dir/react/renderer/components/RNCGeolocationSpec/States.cpp.o	bca8c46a85dba399
+4591	8807	7699433423039343	RNCGeolocationSpec_autolinked_build/CMakeFiles/react_codegen_RNCGeolocationSpec.dir/react/renderer/components/RNCGeolocationSpec/ShadowNodes.cpp.o	7f214b8d217d5fb9
+3747	3871	7699439114736488	D:/source/Adventour-v2/AdventourApp/android/app/build/intermediates/cxx/Debug/2t1v2f10/obj/armeabi-v7a/libappmodules.so	de7a16a85bba8270
+2	27	0	D:/source/Adventour-v2/AdventourApp/android/app/.cxx/Debug/2t1v2f10/armeabi-v7a/CMakeFiles/cmake.verify_globs	ec458b04528f4625

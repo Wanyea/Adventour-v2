@@ -1,26 +1,26 @@
 {
-  "root": "/Users/wanyeabarbel/Documents/GitHub/Adventour-v2/AdventourApp",
-  "reactNativePath": "/Users/wanyeabarbel/Documents/GitHub/Adventour-v2/AdventourApp/node_modules/react-native",
+  "root": "D:\\source\\Adventour-v2\\AdventourApp",
+  "reactNativePath": "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\react-native",
   "reactNativeVersion": "0.77",
   "dependencies": {
     "@react-native-async-storage/async-storage": {
-      "root": "/Users/wanyeabarbel/Documents/GitHub/Adventour-v2/AdventourApp/node_modules/@react-native-async-storage/async-storage",
+      "root": "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\@react-native-async-storage\\async-storage",
       "name": "@react-native-async-storage/async-storage",
       "platforms": {
         "ios": {
-          "podspecPath": "/Users/wanyeabarbel/Documents/GitHub/Adventour-v2/AdventourApp/node_modules/@react-native-async-storage/async-storage/RNCAsyncStorage.podspec",
-          "version": "2.1.1",
+          "podspecPath": "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\@react-native-async-storage\\async-storage\\RNCAsyncStorage.podspec",
+          "version": "2.1.2",
           "configurations": [],
           "scriptPhases": []
         },
         "android": {
-          "sourceDir": "/Users/wanyeabarbel/Documents/GitHub/Adventour-v2/AdventourApp/node_modules/@react-native-async-storage/async-storage/android",
+          "sourceDir": "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\@react-native-async-storage\\async-storage\\android",
           "packageImportPath": "import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;",
           "packageInstance": "new AsyncStoragePackage()",
           "buildTypes": [],
           "libraryName": "rnasyncstorage",
           "componentDescriptors": [],
-          "cmakeListsPath": "/Users/wanyeabarbel/Documents/GitHub/Adventour-v2/AdventourApp/node_modules/@react-native-async-storage/async-storage/android/build/generated/source/codegen/jni/CMakeLists.txt",
+          "cmakeListsPath": "D:/source/Adventour-v2/AdventourApp/node_modules/@react-native-async-storage/async-storage/android/build/generated/source/codegen/jni/CMakeLists.txt",
           "cxxModuleCMakeListsModuleName": null,
           "cxxModuleCMakeListsPath": null,
           "cxxModuleHeaderName": null,
@@ -29,23 +29,23 @@
       }
     },
     "@react-native-community/geolocation": {
-      "root": "/Users/wanyeabarbel/Documents/GitHub/Adventour-v2/AdventourApp/node_modules/@react-native-community/geolocation",
+      "root": "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\@react-native-community\\geolocation",
       "name": "@react-native-community/geolocation",
       "platforms": {
         "ios": {
-          "podspecPath": "/Users/wanyeabarbel/Documents/GitHub/Adventour-v2/AdventourApp/node_modules/@react-native-community/geolocation/react-native-geolocation.podspec",
+          "podspecPath": "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\@react-native-community\\geolocation\\react-native-geolocation.podspec",
           "version": "3.4.0",
           "configurations": [],
           "scriptPhases": []
         },
         "android": {
-          "sourceDir": "/Users/wanyeabarbel/Documents/GitHub/Adventour-v2/AdventourApp/node_modules/@react-native-community/geolocation/android",
+          "sourceDir": "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\@react-native-community\\geolocation\\android",
           "packageImportPath": "import com.reactnativecommunity.geolocation.GeolocationPackage;",
           "packageInstance": "new GeolocationPackage()",
           "buildTypes": [],
           "libraryName": "RNCGeolocationSpec",
           "componentDescriptors": [],
-          "cmakeListsPath": "/Users/wanyeabarbel/Documents/GitHub/Adventour-v2/AdventourApp/node_modules/@react-native-community/geolocation/android/build/generated/source/codegen/jni/CMakeLists.txt",
+          "cmakeListsPath": "D:/source/Adventour-v2/AdventourApp/node_modules/@react-native-community/geolocation/android/build/generated/source/codegen/jni/CMakeLists.txt",
           "cxxModuleCMakeListsModuleName": null,
           "cxxModuleCMakeListsPath": null,
           "cxxModuleHeaderName": null,
@@ -54,22 +54,46 @@
       }
     },
     "react-native-config": {
-      "root": "/Users/wanyeabarbel/Documents/GitHub/Adventour-v2/AdventourApp/node_modules/react-native-config",
+      "root": "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\react-native-config",
       "name": "react-native-config",
       "platforms": {
         "ios": {
-          "podspecPath": "/Users/wanyeabarbel/Documents/GitHub/Adventour-v2/AdventourApp/node_modules/react-native-config/react-native-config.podspec",
-          "version": "1.5.3",
+          "podspecPath": "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\react-native-config\\react-native-config.podspec",
+          "version": "1.5.5",
           "configurations": [],
           "scriptPhases": []
         },
         "android": {
-          "sourceDir": "/Users/wanyeabarbel/Documents/GitHub/Adventour-v2/AdventourApp/node_modules/react-native-config/android",
+          "sourceDir": "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\react-native-config\\android",
           "packageImportPath": "import com.lugg.RNCConfig.RNCConfigPackage;",
           "packageInstance": "new RNCConfigPackage()",
           "buildTypes": [],
           "componentDescriptors": [],
-          "cmakeListsPath": "/Users/wanyeabarbel/Documents/GitHub/Adventour-v2/AdventourApp/node_modules/react-native-config/android/build/generated/source/codegen/jni/CMakeLists.txt",
+          "cmakeListsPath": "D:/source/Adventour-v2/AdventourApp/node_modules/react-native-config/android/build/generated/source/codegen/jni/CMakeLists.txt",
+          "cxxModuleCMakeListsModuleName": null,
+          "cxxModuleCMakeListsPath": null,
+          "cxxModuleHeaderName": null,
+          "isPureCxxDependency": false
+        }
+      }
+    },
+    "react-native-get-random-values": {
+      "root": "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\react-native-get-random-values",
+      "name": "react-native-get-random-values",
+      "platforms": {
+        "ios": {
+          "podspecPath": "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\react-native-get-random-values\\react-native-get-random-values.podspec",
+          "version": "1.11.0",
+          "configurations": [],
+          "scriptPhases": []
+        },
+        "android": {
+          "sourceDir": "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\react-native-get-random-values\\android",
+          "packageImportPath": "import org.linusu.RNGetRandomValuesPackage;",
+          "packageInstance": "new RNGetRandomValuesPackage()",
+          "buildTypes": [],
+          "componentDescriptors": [],
+          "cmakeListsPath": "D:/source/Adventour-v2/AdventourApp/node_modules/react-native-get-random-values/android/build/generated/source/codegen/jni/CMakeLists.txt",
           "cxxModuleCMakeListsModuleName": null,
           "cxxModuleCMakeListsPath": null,
           "cxxModuleHeaderName": null,
@@ -235,7 +259,7 @@
         {
           "name": "--path <path>",
           "description": "Path to the React Native project root.",
-          "default": "/Users/wanyeabarbel/Documents/GitHub/Adventour-v2/AdventourApp"
+          "default": "D:\\source\\Adventour-v2\\AdventourApp"
         },
         {
           "name": "--platform <string>",
@@ -286,7 +310,8 @@
         },
         {
           "name": "--terminal <string>",
-          "description": "Launches the Metro Bundler in a new window using the specified terminal path."
+          "description": "Launches the Metro Bundler in a new window using the specified terminal path.",
+          "default": "cmd.exe"
         },
         {
           "name": "--binary-path <string>",
@@ -445,7 +470,8 @@
         },
         {
           "name": "--terminal <string>",
-          "description": "Launches the Metro Bundler in a new window using the specified terminal path."
+          "description": "Launches the Metro Bundler in a new window using the specified terminal path.",
+          "default": "cmd.exe"
         },
         {
           "name": "--appId <string>",
@@ -520,7 +546,7 @@
   "assets": [],
   "project": {
     "ios": {
-      "sourceDir": "/Users/wanyeabarbel/Documents/GitHub/Adventour-v2/AdventourApp/ios",
+      "sourceDir": "D:\\source\\Adventour-v2\\AdventourApp\\ios",
       "xcodeProject": {
         "name": "AdventourApp.xcworkspace",
         "path": ".",
@@ -529,7 +555,7 @@
       "assets": []
     },
     "android": {
-      "sourceDir": "/Users/wanyeabarbel/Documents/GitHub/Adventour-v2/AdventourApp/android",
+      "sourceDir": "D:\\source\\Adventour-v2\\AdventourApp\\android",
       "appName": "app",
       "packageName": "com.adventourapp",
       "applicationId": "com.adventourapp",

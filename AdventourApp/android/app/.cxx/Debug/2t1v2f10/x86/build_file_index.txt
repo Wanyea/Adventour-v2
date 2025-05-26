@@ -1,0 +1,3 @@
+D:\source\Adventour-v2\AdventourApp\node_modules\@react-native-async-storage\async-storage\android\build\generated\source\codegen\jni\CMakeLists.txt
+D:\source\Adventour-v2\AdventourApp\node_modules\@react-native-community\geolocation\android\build\generated\source\codegen\jni\CMakeLists.txt
+D:\source\Adventour-v2\AdventourApp\node_modules\react-native\ReactAndroid\cmake-utils\default-app-setup\CMakeLists.txt
