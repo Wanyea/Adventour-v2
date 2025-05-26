@@ -68,3 +68,6 @@ android/app/.cxx/
 android/build/
 android/app/build/
 
+# Gradle cache
+android/.gradle/
+.gradle/
