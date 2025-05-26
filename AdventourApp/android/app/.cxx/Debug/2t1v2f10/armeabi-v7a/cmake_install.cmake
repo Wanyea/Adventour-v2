@@ -46,6 +46,12 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("D:/source/Adventour-v2/AdventourApp/android/app/.cxx/Debug/2t1v2f10/armeabi-v7a/rnasyncstorage_autolinked_build/cmake_install.cmake")
   include("D:/source/Adventour-v2/AdventourApp/android/app/.cxx/Debug/2t1v2f10/armeabi-v7a/RNCGeolocationSpec_autolinked_build/cmake_install.cmake")
+<<<<<<< Updated upstream
+=======
+  include("D:/source/Adventour-v2/AdventourApp/android/app/.cxx/Debug/2t1v2f10/armeabi-v7a/rngesturehandler_codegen_autolinked_build/cmake_install.cmake")
+  include("D:/source/Adventour-v2/AdventourApp/android/app/.cxx/Debug/2t1v2f10/armeabi-v7a/safeareacontext_autolinked_build/cmake_install.cmake")
+  include("D:/source/Adventour-v2/AdventourApp/android/app/.cxx/Debug/2t1v2f10/armeabi-v7a/rnscreens_autolinked_build/cmake_install.cmake")
+>>>>>>> Stashed changes
 
 endif()
 

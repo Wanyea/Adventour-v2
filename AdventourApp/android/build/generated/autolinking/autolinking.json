@@ -77,6 +77,37 @@
         }
       }
     },
+<<<<<<< Updated upstream
+=======
+    "react-native-gesture-handler": {
+      "root": "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\react-native-gesture-handler",
+      "name": "react-native-gesture-handler",
+      "platforms": {
+        "ios": {
+          "podspecPath": "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\react-native-gesture-handler\\RNGestureHandler.podspec",
+          "version": "2.25.0",
+          "configurations": [],
+          "scriptPhases": []
+        },
+        "android": {
+          "sourceDir": "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\react-native-gesture-handler\\android",
+          "packageImportPath": "import com.swmansion.gesturehandler.RNGestureHandlerPackage;",
+          "packageInstance": "new RNGestureHandlerPackage()",
+          "buildTypes": [],
+          "libraryName": "rngesturehandler_codegen",
+          "componentDescriptors": [
+            "RNGestureHandlerButtonComponentDescriptor",
+            "RNGestureHandlerRootViewComponentDescriptor"
+          ],
+          "cmakeListsPath": "D:/source/Adventour-v2/AdventourApp/node_modules/react-native-gesture-handler/android/build/generated/source/codegen/jni/CMakeLists.txt",
+          "cxxModuleCMakeListsModuleName": null,
+          "cxxModuleCMakeListsPath": null,
+          "cxxModuleHeaderName": null,
+          "isPureCxxDependency": false
+        }
+      }
+    },
+>>>>>>> Stashed changes
     "react-native-get-random-values": {
       "root": "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\react-native-get-random-values",
       "name": "react-native-get-random-values",
@@ -94,6 +125,74 @@
           "buildTypes": [],
           "componentDescriptors": [],
           "cmakeListsPath": "D:/source/Adventour-v2/AdventourApp/node_modules/react-native-get-random-values/android/build/generated/source/codegen/jni/CMakeLists.txt",
+<<<<<<< Updated upstream
+=======
+          "cxxModuleCMakeListsModuleName": null,
+          "cxxModuleCMakeListsPath": null,
+          "cxxModuleHeaderName": null,
+          "isPureCxxDependency": false
+        }
+      }
+    },
+    "react-native-safe-area-context": {
+      "root": "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\react-native-safe-area-context",
+      "name": "react-native-safe-area-context",
+      "platforms": {
+        "ios": {
+          "podspecPath": "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\react-native-safe-area-context\\react-native-safe-area-context.podspec",
+          "version": "5.4.1",
+          "configurations": [],
+          "scriptPhases": []
+        },
+        "android": {
+          "sourceDir": "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\react-native-safe-area-context\\android",
+          "packageImportPath": "import com.th3rdwave.safeareacontext.SafeAreaContextPackage;",
+          "packageInstance": "new SafeAreaContextPackage()",
+          "buildTypes": [],
+          "libraryName": "safeareacontext",
+          "componentDescriptors": [
+            "RNCSafeAreaProviderComponentDescriptor",
+            "RNCSafeAreaViewComponentDescriptor"
+          ],
+          "cmakeListsPath": "D:/source/Adventour-v2/AdventourApp/node_modules/react-native-safe-area-context/android/src/main/jni/CMakeLists.txt",
+          "cxxModuleCMakeListsModuleName": null,
+          "cxxModuleCMakeListsPath": null,
+          "cxxModuleHeaderName": null,
+          "isPureCxxDependency": false
+        }
+      }
+    },
+    "react-native-screens": {
+      "root": "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\react-native-screens",
+      "name": "react-native-screens",
+      "platforms": {
+        "ios": {
+          "podspecPath": "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\react-native-screens\\RNScreens.podspec",
+          "version": "4.10.0",
+          "configurations": [],
+          "scriptPhases": []
+        },
+        "android": {
+          "sourceDir": "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\react-native-screens\\android",
+          "packageImportPath": "import com.swmansion.rnscreens.RNScreensPackage;",
+          "packageInstance": "new RNScreensPackage()",
+          "buildTypes": [],
+          "libraryName": "rnscreens",
+          "componentDescriptors": [
+            "RNSFullWindowOverlayComponentDescriptor",
+            "RNSScreenContainerComponentDescriptor",
+            "RNSScreenNavigationContainerComponentDescriptor",
+            "RNSScreenStackHeaderConfigComponentDescriptor",
+            "RNSScreenStackHeaderSubviewComponentDescriptor",
+            "RNSScreenStackComponentDescriptor",
+            "RNSSearchBarComponentDescriptor",
+            "RNSScreenComponentDescriptor",
+            "RNSScreenFooterComponentDescriptor",
+            "RNSScreenContentWrapperComponentDescriptor",
+            "RNSModalScreenComponentDescriptor"
+          ],
+          "cmakeListsPath": "D:/source/Adventour-v2/AdventourApp/node_modules/react-native-screens/android/src/main/jni/CMakeLists.txt",
+>>>>>>> Stashed changes
           "cxxModuleCMakeListsModuleName": null,
           "cxxModuleCMakeListsPath": null,
           "cxxModuleHeaderName": null,

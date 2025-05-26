@@ -2,6 +2,12 @@
   "buildFiles": [
     "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\@react-native-async-storage\\async-storage\\android\\build\\generated\\source\\codegen\\jni\\CMakeLists.txt",
     "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\@react-native-community\\geolocation\\android\\build\\generated\\source\\codegen\\jni\\CMakeLists.txt",
+<<<<<<< Updated upstream
+=======
+    "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\react-native-gesture-handler\\android\\build\\generated\\source\\codegen\\jni\\CMakeLists.txt",
+    "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\react-native-safe-area-context\\android\\src\\main\\jni\\CMakeLists.txt",
+    "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\react-native-screens\\android\\src\\main\\jni\\CMakeLists.txt",
+>>>>>>> Stashed changes
     "D:\\source\\Adventour-v2\\AdventourApp\\node_modules\\react-native\\ReactAndroid\\cmake-utils\\default-app-setup\\CMakeLists.txt"
   ],
   "cleanCommandsComponents": [
@@ -25,6 +31,11 @@
       "artifactName": "appmodules",
       "output": "D:\\source\\Adventour-v2\\AdventourApp\\android\\app\\build\\intermediates\\cxx\\Debug\\2t1v2f10\\obj\\x86\\libappmodules.so",
       "runtimeFiles": [
+<<<<<<< Updated upstream
+=======
+        "D:\\source\\Adventour-v2\\AdventourApp\\android\\app\\build\\intermediates\\cxx\\Debug\\2t1v2f10\\obj\\x86\\libreact_codegen_safeareacontext.so",
+        "D:\\source\\Adventour-v2\\AdventourApp\\android\\app\\build\\intermediates\\cxx\\Debug\\2t1v2f10\\obj\\x86\\libreact_codegen_rnscreens.so",
+>>>>>>> Stashed changes
         "C:\\Users\\wanye\\.gradle\\caches\\8.10.2\\transforms\\d7d422c0963f92aa7b8a765f3bd54231\\transformed\\fbjni-0.7.0\\prefab\\modules\\fbjni\\libs\\android.x86\\libfbjni.so",
         "C:\\Users\\wanye\\.gradle\\caches\\8.10.2\\transforms\\ffe8bc820e361c19e57c6796da86db29\\transformed\\react-android-0.77.0-debug\\prefab\\modules\\jsi\\libs\\android.x86\\libjsi.so",
         "C:\\Users\\wanye\\.gradle\\caches\\8.10.2\\transforms\\ffe8bc820e361c19e57c6796da86db29\\transformed\\react-android-0.77.0-debug\\prefab\\modules\\reactnative\\libs\\android.x86\\libreactnative.so"
@@ -39,6 +50,36 @@
       "toolchain": "toolchain",
       "abi": "x86",
       "artifactName": "react_codegen_rnasyncstorage"
+<<<<<<< Updated upstream
+=======
+    },
+    "react_codegen_rngesturehandler_codegen::@39f233abcd2c728bc6ec": {
+      "toolchain": "toolchain",
+      "abi": "x86",
+      "artifactName": "react_codegen_rngesturehandler_codegen"
+    },
+    "react_codegen_rnscreens::@25bcbd507e98d3a854ad": {
+      "toolchain": "toolchain",
+      "abi": "x86",
+      "artifactName": "react_codegen_rnscreens",
+      "output": "D:\\source\\Adventour-v2\\AdventourApp\\android\\app\\build\\intermediates\\cxx\\Debug\\2t1v2f10\\obj\\x86\\libreact_codegen_rnscreens.so",
+      "runtimeFiles": [
+        "C:\\Users\\wanye\\.gradle\\caches\\8.10.2\\transforms\\ffe8bc820e361c19e57c6796da86db29\\transformed\\react-android-0.77.0-debug\\prefab\\modules\\reactnative\\libs\\android.x86\\libreactnative.so",
+        "C:\\Users\\wanye\\.gradle\\caches\\8.10.2\\transforms\\ffe8bc820e361c19e57c6796da86db29\\transformed\\react-android-0.77.0-debug\\prefab\\modules\\jsi\\libs\\android.x86\\libjsi.so",
+        "C:\\Users\\wanye\\.gradle\\caches\\8.10.2\\transforms\\d7d422c0963f92aa7b8a765f3bd54231\\transformed\\fbjni-0.7.0\\prefab\\modules\\fbjni\\libs\\android.x86\\libfbjni.so"
+      ]
+    },
+    "react_codegen_safeareacontext::@7984cd80db47aa7b952a": {
+      "toolchain": "toolchain",
+      "abi": "x86",
+      "artifactName": "react_codegen_safeareacontext",
+      "output": "D:\\source\\Adventour-v2\\AdventourApp\\android\\app\\build\\intermediates\\cxx\\Debug\\2t1v2f10\\obj\\x86\\libreact_codegen_safeareacontext.so",
+      "runtimeFiles": [
+        "C:\\Users\\wanye\\.gradle\\caches\\8.10.2\\transforms\\d7d422c0963f92aa7b8a765f3bd54231\\transformed\\fbjni-0.7.0\\prefab\\modules\\fbjni\\libs\\android.x86\\libfbjni.so",
+        "C:\\Users\\wanye\\.gradle\\caches\\8.10.2\\transforms\\ffe8bc820e361c19e57c6796da86db29\\transformed\\react-android-0.77.0-debug\\prefab\\modules\\jsi\\libs\\android.x86\\libjsi.so",
+        "C:\\Users\\wanye\\.gradle\\caches\\8.10.2\\transforms\\ffe8bc820e361c19e57c6796da86db29\\transformed\\react-android-0.77.0-debug\\prefab\\modules\\reactnative\\libs\\android.x86\\libreactnative.so"
+      ]
+>>>>>>> Stashed changes
     }
   },
   "toolchains": {

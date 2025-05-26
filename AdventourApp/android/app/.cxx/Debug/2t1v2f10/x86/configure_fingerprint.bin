@@ -2,6 +2,7 @@ C/C++ Structured Logh
 f
 dD:\source\Adventour-v2\AdventourApp\android\app\.cxx\Debug\2t1v2f10\x86\additional_project_files.txtC
 A
+<<<<<<< Updated upstream
 ?com.android.build.gradle.internal.cxx.io.EncodedFileFingerPrint	­—ÚÚð2‘ ²•ÚÚð2e
 c
 aD:\source\Adventour-v2\AdventourApp\android\app\.cxx\Debug\2t1v2f10\x86\android_gradle_build.json	­—ÚÚð2 ´•ÚÚð2j
@@ -30,3 +31,39 @@ _D:\source\Adventour-v2\AdventourApp\android\app\.cxx\Debug\2t1v2f10\x86\symbol_
 ŽD:\source\Adventour-v2\AdventourApp\node_modules\@react-native-community\geolocation\android\build\generated\source\codegen\jni\CMakeLists.txt	®—ÚÚð2Ý ¾¶çÙð2{
 y
 wD:\source\Adventour-v2\AdventourApp\node_modules\react-native\ReactAndroid\cmake-utils\default-app-setup\CMakeLists.txt	®—ÚÚð2ð àê©Öð2
+=======
+?com.android.build.gradle.internal.cxx.io.EncodedFileFingerPrint	ûåÒÛð2ø# ¯À§Ûð2e
+c
+aD:\source\Adventour-v2\AdventourApp\android\app\.cxx\Debug\2t1v2f10\x86\android_gradle_build.json	ûåÒÛð2ø* ±À§Ûð2j
+h
+fD:\source\Adventour-v2\AdventourApp\android\app\.cxx\Debug\2t1v2f10\x86\android_gradle_build_mini.json	ûåÒÛð2Ô& ¿Á§Ûð2W
+U
+SD:\source\Adventour-v2\AdventourApp\android\app\.cxx\Debug\2t1v2f10\x86\build.ninja	ûåÒÛð2Àõ	 ‚¼§Ûð2[
+Y
+WD:\source\Adventour-v2\AdventourApp\android\app\.cxx\Debug\2t1v2f10\x86\build.ninja.txt	ûåÒÛð2`
+^
+\D:\source\Adventour-v2\AdventourApp\android\app\.cxx\Debug\2t1v2f10\x86\build_file_index.txt	ûåÒÛð2† ÁÁ§Ûð2a
+_
+]D:\source\Adventour-v2\AdventourApp\android\app\.cxx\Debug\2t1v2f10\x86\compile_commands.json	ûåÒÛð2˜Ž €¼§Ûð2e
+c
+aD:\source\Adventour-v2\AdventourApp\android\app\.cxx\Debug\2t1v2f10\x86\compile_commands.json.bin	ûåÒÛð2	›¨ €¼§Ûð2k
+i
+gD:\source\Adventour-v2\AdventourApp\android\app\.cxx\Debug\2t1v2f10\x86\metadata_generation_command.txt	ûåÒÛð2
+ã è»îÙð2^
+\
+ZD:\source\Adventour-v2\AdventourApp\android\app\.cxx\Debug\2t1v2f10\x86\prefab_config.json	ûåÒÛð2ò è»îÙð2c
+a
+_D:\source\Adventour-v2\AdventourApp\android\app\.cxx\Debug\2t1v2f10\x86\symbol_folder_index.txt	ûåÒÛð2^ é»îÙð2š
+—
+”D:\source\Adventour-v2\AdventourApp\node_modules\@react-native-async-storage\async-storage\android\build\generated\source\codegen\jni\CMakeLists.txt	ûåÒÛð2Å ó¸žÛð2”
+‘
+ŽD:\source\Adventour-v2\AdventourApp\node_modules\@react-native-community\geolocation\android\build\generated\source\codegen\jni\CMakeLists.txt	ûåÒÛð2Ý Ã¿žÛð2
+Š
+‡D:\source\Adventour-v2\AdventourApp\node_modules\react-native-gesture-handler\android\build\generated\source\codegen\jni\CMakeLists.txt	ûåÒÛð2 òÆžÛð2w
+u
+sD:\source\Adventour-v2\AdventourApp\node_modules\react-native-safe-area-context\android\src\main\jni\CMakeLists.txt	ûåÒÛð2à Ð¨Öð2m
+k
+iD:\source\Adventour-v2\AdventourApp\node_modules\react-native-screens\android\src\main\jni\CMakeLists.txt	ûåÒÛð2Ÿ ïú¨Öð2{
+y
+wD:\source\Adventour-v2\AdventourApp\node_modules\react-native\ReactAndroid\cmake-utils\default-app-setup\CMakeLists.txt	ûåÒÛð2ð àê©Öð2
+>>>>>>> Stashed changes
