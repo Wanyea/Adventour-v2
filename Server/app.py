@@ -1,21 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flask_sqlalchemy import SQLAlchemy
-from urllib.parse import quote_plus
 from google_services_api import GoogleServicesAPI  # Custom module
-from models import db, Feedback
+from models import db, Feedback, User
 
-# Load environment variables from .env file (if available)
-if os.getenv("FLASK_ENV") == "development":
-    load_dotenv()
-# Cloud SQL configuration
-DB_USER = "root"
-DB_PASSWORD = "[(BYC0eJx3myR@|8"  
-DB_NAME = "adventour"
-CLOUD_SQL_CONNECTION_NAME = "adventour-73dfb:us-east1:adventour-sql"
-DATABASE_URI = (
-    f"mysql+pymysql://{DB_USER}:{quote_plus(DB_PASSWORD)}@34.74.250.90:3306/{DB_NAME}"
-)
+DATABASE_URI = "sqlite:///local_adventour.db"
 
 # Debug: Verify the connection string
 print(f"Connecting to database: {DATABASE_URI}")
@@ -43,8 +31,16 @@ def home():
 @app.route('/feedback', methods=['POST'])
 def save_feedback():
     data = request.json
+    user_uuid = data['user_id']
+
+    user = User.query.filter_by(uuid=user_uuid).first()
+    if not user:
+        user = User(uuid=user_uuid)
+        db.session.add(user)
+        db.session.commit()
+
     feedback = Feedback(
-        user_id=data['user_id'],
+        user_id=user.id,
         place_id=data['place_id'],
         feedback=data['feedback'],
         tags=",".join(data['tags']),
@@ -52,7 +48,6 @@ def save_feedback():
     db.session.add(feedback)
     db.session.commit()
     return jsonify({"message": "Feedback saved successfully!"}), 201
-
 
 @app.route('/geocode', methods=['GET'])
 def geocode():
@@ -134,7 +129,11 @@ def get_recommendations():
     else:
         return jsonify({"error": "Either coordinates or address must be provided"}), 400
 
-    feedback = Feedback.query.filter_by(user_id=user_id).all()
+    user = User.query.filter_by(uuid=user_id).first()
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    feedback = Feedback.query.filter_by(user_id=user.id).all()
+
     rejected_place_ids = set()
     tag_scores = {}
     for fb in feedback:

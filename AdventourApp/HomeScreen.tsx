@@ -15,6 +15,10 @@ import GoogleAutocompleteService from './src/GoogleAutocompleteService';
 import Config from './src/Config';
 import * as Location from 'expo-location';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import 'react-native-get-random-values';
+import { v4 as uuidv4 } from 'uuid';
+import { useEffect } from 'react';
 
 type Place = {
   place_id: string;
@@ -28,10 +32,26 @@ const HomeScreen: React.FC = () => {
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(false);
   const [userFeedback, setUserFeedback] = useState<{ place_id: string; feedback: string; tags: string[] }[]>([]);
-  const [userId, setUserId] = useState<string>('test_user'); // Default user ID
+  const [userId, setUserId] = useState<string>('');
   const [city, setCity] = useState<string>(''); // City input
   const [currentCoords, setCurrentCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   const [suggestions, setSuggestions] = useState<any[]>([]); // Autocomplete suggestions
+
+  useEffect(() => {
+  const getOrCreateUserId = async () => {
+    try {
+      let id = await AsyncStorage.getItem('user_id');
+      if (!id) {
+        id = uuidv4();
+        await AsyncStorage.setItem('user_id', id);
+      }
+      setUserId(id);
+    } catch (e) {
+      console.error("Failed to initialize user ID", e);
+    }
+  };
+  getOrCreateUserId();
+}, []);
 
   const handleFeedback = async (place: Place, feedback: string) => {
     setUserFeedback((prev) => [
