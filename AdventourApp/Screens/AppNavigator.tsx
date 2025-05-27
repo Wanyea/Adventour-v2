@@ -1,60 +1,61 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { ActivityIndicator, View } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import LoginScreen from './LoginScreen';
 import OnboardingScreen from './OnboardingScreen';
 import HomeScreen from '../HomeScreen';
+import axios from 'axios';
+import Config from '../src/Config';
 
-export type RootStackParamList = {
-  Onboarding: undefined;
-  Home: undefined;
-};
+const Stack = createStackNavigator();
 
-const Stack = createStackNavigator<RootStackParamList>();
-
-const AppNavigator: React.FC = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [onboarded, setOnboarded] = useState(false);
+const AppNavigator = () => {
+  const [userId, setUserId] = useState<string | null>(null);
+  const [onboarded, setOnboarded] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const checkOnboarding = async () => {
-      try {
-        const value = await AsyncStorage.getItem('onboarded');
-        setOnboarded(value === 'true');
-      } catch (error) {
-        console.error("Error checking onboarding status:", error);
+    const loadUser = async () => {
+      const id = await AsyncStorage.getItem('user_id');
+      if (!id) {
+        setUserId(null);
+        setLoading(false);
+        return;
       }
-      setIsLoading(false);
+
+      setUserId(id);
+
+      try {
+        const response = await axios.get(`${Config.BACKEND_BASE_URL}/user/${id}`);
+        setOnboarded(response.data.onboarded);
+        console.log("User loaded from backend:", response.data);
+      } catch (e) {
+        console.error("Error checking onboarding:", e);
+        setOnboarded(false);
+      }
+
+      setLoading(false);
     };
-    checkOnboarding();
+
+    loadUser();
   }, []);
 
-  if (isLoading) {
-    return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
+  if (loading) return null;
 
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {onboarded ? (
-          <Stack.Screen name="Home" component={HomeScreen} />
-        ) : (
-          <Stack.Screen name="Onboarding">
-            {(props) => (
-              <OnboardingScreen
-                {...props}
-                onComplete={async () => {
-                  await AsyncStorage.setItem('onboarded', 'true');
-                  setOnboarded(true);
-                }}
-              />
-            )}
+        {!userId ? (
+          <Stack.Screen name="Login">
+            {props => <LoginScreen {...props} onLogin={() => setUserId('dummy')} />}
           </Stack.Screen>
+        ) : !onboarded ? (
+          <Stack.Screen name="Onboarding">
+            {props => <OnboardingScreen {...props} onComplete={() => setOnboarded(true)} />}
+          </Stack.Screen>
+        ) : (
+          <Stack.Screen name="Home" component={HomeScreen} />
         )}
       </Stack.Navigator>
     </NavigationContainer>

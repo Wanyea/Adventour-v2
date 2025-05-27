@@ -9,7 +9,6 @@ import {
   Image,
   FlatList,
 } from 'react-native';
-import TagSelection from './src/TagSelection';
 import PlaceList from './src/PlaceList';
 import GoogleAutocompleteService from './src/GoogleAutocompleteService';
 import Config from './src/Config';
@@ -19,13 +18,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 import { useEffect } from 'react';
-
-type Place = {
-  place_id: string;
-  name: string;
-  vicinity: string;
-  types: string[];
-};
+import { PermissionsAndroid, Platform } from 'react-native';
+import { Place } from './src/types/Place';
 
 const HomeScreen: React.FC = () => {
   const backendBaseURL = Config.BACKEND_BASE_URL;
@@ -33,25 +27,25 @@ const HomeScreen: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [userFeedback, setUserFeedback] = useState<{ place_id: string; feedback: string; tags: string[] }[]>([]);
   const [userId, setUserId] = useState<string>('');
-  const [city, setCity] = useState<string>(''); // City input
+  const [city, setCity] = useState<string>(''); 
   const [currentCoords, setCurrentCoords] = useState<{ latitude: number; longitude: number } | null>(null);
-  const [suggestions, setSuggestions] = useState<any[]>([]); // Autocomplete suggestions
+  const [suggestions, setSuggestions] = useState<any[]>([]); 
 
   useEffect(() => {
-  const getOrCreateUserId = async () => {
-    try {
-      let id = await AsyncStorage.getItem('user_id');
-      if (!id) {
-        id = uuidv4();
-        await AsyncStorage.setItem('user_id', id);
+    const getOrCreateUserId = async () => {
+      try {
+        let id = await AsyncStorage.getItem('user_id');
+        if (!id) {
+          id = uuidv4();
+          await AsyncStorage.setItem('user_id', id);
+        }
+        setUserId(id);
+      } catch (e) {
+        console.error("Failed to initialize user ID", e);
       }
-      setUserId(id);
-    } catch (e) {
-      console.error("Failed to initialize user ID", e);
-    }
-  };
-  getOrCreateUserId();
-}, []);
+    };
+    getOrCreateUserId();
+  }, []);
 
   const handleFeedback = async (place: Place, feedback: string) => {
     setUserFeedback((prev) => [
@@ -79,11 +73,9 @@ const HomeScreen: React.FC = () => {
     }
   };
 
-  const fetchRecommendations = async () => {
-    if (!userId) {
-      Alert.alert('Error', 'User ID is required.');
-      return;
-    }
+  const handleFindPlaces = async () => {
+    setLoading(true);
+    setPlaces([]);
 
     try {
       const params: any = { user_id: userId };
@@ -93,66 +85,56 @@ const HomeScreen: React.FC = () => {
       } else if (city) {
         params.address = city;
       } else {
-        Alert.alert('Error', 'Please provide a location.');
+        Alert.alert('Error', 'Please enter a location or enable GPS.');
+        setLoading(false);
         return;
       }
 
-      const response = await axios.get(`${backendBaseURL}/recommendations`, { params });
-      setPlaces(response.data);
-      Alert.alert('Recommendations loaded!', 'Displaying recommended places based on your preferences.');
+      const response = await axios.get(`${Config.BACKEND_BASE_URL}/recommendations`, { params });
+
+      const results = response.data.map((item: any) => ({
+        ...item.place,
+        relevance: item.relevance
+      }));
+
+      setPlaces(results);
+      Alert.alert('Places loaded!', 'We found some matches for you.');
     } catch (error) {
       console.error('Error fetching recommendations:', error);
-      Alert.alert('Error', 'Unable to fetch recommendations.');
-    }
-  };
-
-  const handleTagSubmit = async (selectedTags: string[]) => {
-    if (selectedTags.length === 0) {
-      Alert.alert('No Tags Selected', 'Please select at least one tag before proceeding.');
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      if (!city) {
-        Alert.alert('Error', 'Please enter a location.');
-        setLoading(false);
-        return;
-      }
-
-      const response = await axios.get(`${backendBaseURL}/geocode`, {
-        params: { address: city },
-      });
-
-      const location = response.data;
-      if (!location) {
-        Alert.alert('Error', 'Unable to determine location from city.');
-        setLoading(false);
-        return;
-      }
-
-      const placesResponse = await axios.post(`${backendBaseURL}/fetch-places`, {
-        tags: selectedTags,
-        location,
-      });
-
-      setPlaces(placesResponse.data);
-    } catch (error) {
-      console.error('Error fetching places:', error);
-      Alert.alert('Error fetching data');
+      Alert.alert('Error', 'Unable to load recommendations.');
     }
 
     setLoading(false);
   };
 
-  const useCurrentLocation = () => {
+  const requestLocationPermission = async () => {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: "Location Permission",
+          message: "Adventour needs access to your location.",
+          buttonPositive: "OK"
+        }
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    }
+    return true;
+  };
+
+  const useCurrentLocation = async () => {
+    const granted = await requestLocationPermission();
+    if (!granted) {
+      Alert.alert("Permission Denied", "Location access is required.");
+      return;
+    }
+
     Geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
 
         try {
-          const response = await axios.get(`${backendBaseURL}/geocode`, {
+          const response = await axios.get(`${Config.BACKEND_BASE_URL}/geocode`, {
             params: { latitude, longitude },
           });
 
@@ -169,12 +151,11 @@ const HomeScreen: React.FC = () => {
       },
       (error) => {
         console.error('Geolocation error:', error);
-        Alert.alert('Location Error', 'Unable to get current location.');
+        Alert.alert("Location Error", error.message);
       },
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
     );
   };
-
 
   return (
     <View style={{ flex: 1, padding: 20 }}>
@@ -218,10 +199,9 @@ const HomeScreen: React.FC = () => {
           )}
         />
       )}
-      <TouchableOpacity style={styles.button} onPress={fetchRecommendations}>
-        <Text style={styles.buttonText}>Get Recommendations</Text>
+      <TouchableOpacity style={styles.button} onPress={handleFindPlaces}>
+        <Text style={styles.buttonText}>Find Places</Text>
       </TouchableOpacity>
-      <TagSelection onSubmit={handleTagSubmit} />
       {loading ? (
         <Text>Loading...</Text>
       ) : places.length > 0 ? (

@@ -1,7 +1,7 @@
-// src/OnboardingScreen.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Config from '../src/Config';
 
 interface OnboardingScreenProps {
@@ -11,6 +11,15 @@ interface OnboardingScreenProps {
 const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
   const availableTags = ['cafe', 'restaurant', 'museum', 'park', 'theater'];
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadUserId = async () => {
+      const storedId = await AsyncStorage.getItem('user_id');
+      setUserId(storedId);
+    };
+    loadUserId();
+  }, []);
 
   const toggleTag = (tag: string) => {
     if (selectedTags.includes(tag)) {
@@ -21,13 +30,19 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
   };
 
   const submitOnboarding = async () => {
+    if (!userId) {
+      Alert.alert("Error", "User ID is missing.");
+      return;
+    }
+
     if (selectedTags.length === 0) {
       Alert.alert("Please select at least one preference.");
       return;
     }
+
     try {
       const response = await axios.post(`${Config.BACKEND_BASE_URL}/onboarding`, {
-        user_id: 'test_user',
+        user_id: userId,
         initial_tags: selectedTags,
       });
       console.log("Onboarding response:", response.data);

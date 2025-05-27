@@ -1,6 +1,9 @@
 import requests
+import os
+from dotenv import load_dotenv 
 
-GOOGLE_API_KEY = "AIzaSyD-RpERPi4HTQl3oiTWtbgZTXVu-kyN4as"  
+load_dotenv()
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 class GoogleServicesAPI:
     BASE_URL = "https://maps.googleapis.com/maps/api"
@@ -46,40 +49,35 @@ class GoogleServicesAPI:
 
     @staticmethod
     def reverse_geocode(latitude, longitude):
-        """
-        Reverse geocode coordinates to get a city and state.
-        """
-        try:
-            response = requests.get(f"{GoogleServicesAPI.BASE_URL}/geocode/json", params={
-                "latlng": f"{latitude},{longitude}",
-                "key": GOOGLE_API_KEY,
-            })
-            response.raise_for_status()
-            results = response.json().get("results", [])
-            if not results:
-                print(f"No results from Geocoding API for coordinates: {latitude}, {longitude}")
-                return None
+        url = "https://maps.googleapis.com/maps/api/geocode/json"
+        params = {
+            "latlng": f"{latitude},{longitude}",
+            "key": GOOGLE_API_KEY
+        }
 
-            city = None
-            state = None
+        response = requests.get(url, params=params)
+        data = response.json()
 
-            # Extract city and state from address components
-            for result in results:
-                for component in result["address_components"]:
-                    if "locality" in component["types"]:  # Look for city/locality
-                        city = component["long_name"]
-                    if "administrative_area_level_1" in component["types"]:  # Look for state
-                        state = component["long_name"]
-                if city and state:
-                    break  # Exit the loop once both city and state are found
+        if not data.get("results"):
+            print(f"[Geocode] No results for {latitude}, {longitude}")
+            return None
 
-            if not city:
-                print(f"City not found in results for coordinates: {latitude}, {longitude}")
-            if not state:
-                print(f"State not found in results for coordinates: {latitude}, {longitude}")
+        city = None
+        state = None
 
-            return {"city": city, "state": state}
-        except requests.exceptions.RequestException as e:
-            print(f"Error reverse geocoding coordinates: {e}")
-            raise
+        for result in data["results"]:
+            for component in result["address_components"]:
+                types = component.get("types", [])
+                if "locality" in types and not city:
+                    city = component["long_name"]
+                elif "administrative_area_level_1" in types and not state:
+                    state = component["short_name"]
+            if city and state:
+                break
 
+        # Fallbacks
+        city = city or "Unknown"
+        state = state or "Unknown"
+
+        print(f"[Geocode] Resolved to city: {city}, state: {state}")
+        return {"city": city, "state": state}

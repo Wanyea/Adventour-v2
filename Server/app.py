@@ -1,7 +1,10 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from google_services_api import GoogleServicesAPI  # Custom module
-from models import db, Feedback, User
+from models import db, User, UserTagFeedback
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 DATABASE_URI = "sqlite:///local_adventour.db"
 
@@ -27,6 +30,36 @@ def home():
     return jsonify({
         "message": "This is the Adventour API. Refer to the documentation for available endpoints."
     })
+    
+@app.route('/onboarding', methods=['POST'])
+def onboarding():
+    data = request.json
+    user_id = data.get('user_id')
+    tags = data.get('initial_tags', [])
+
+    if not user_id or not tags:
+        return jsonify({"error": "Missing user_id or tags"}), 400
+
+    user = User.query.filter_by(uuid=user_id).first()
+
+    if not user:
+        user = User(uuid=user_id, preferences=",".join(tags))
+        db.session.add(user)
+    else:
+        user.preferences = ",".join(tags)
+
+    db.session.commit()
+    return jsonify({"message": "Onboarding preferences saved"}), 200
+
+@app.route('/user/<user_id>', methods=['GET'])
+def get_user_info(user_id):
+    user = User.query.filter_by(uuid=user_id).first()
+    if not user:
+        return jsonify({"onboarded": False}), 200
+    return jsonify({
+        "onboarded": bool(user.preferences),
+        "preferences": user.preferences.split(',') if user.preferences else []
+    }), 200
 
 @app.route('/feedback', methods=['POST'])
 def save_feedback():
@@ -50,10 +83,12 @@ def save_feedback():
     return jsonify({"message": "Feedback saved successfully!"}), 201
 
 @app.route('/geocode', methods=['GET'])
-def geocode():
+def geocode():    
     address = request.args.get('address')
     latitude = request.args.get('latitude')
     longitude = request.args.get('longitude')
+
+    logger.info("Received geocode request: %s, %s", latitude, longitude)
 
     if address:
         try:
@@ -70,10 +105,10 @@ def geocode():
                 return jsonify({"error": "Unable to resolve coordinates to a city and state"}), 404
             return jsonify(location)
         except Exception as e:
-            return jsonify({"error": f"Error resolving coordinates: {str(e)}"}), 500
+                logger.exception("Error resolving coordinates")
+                return jsonify({"error": f"Error resolving coordinates: {str(e)}"}), 500
     else:
         return jsonify({"error": "Either address or coordinates must be provided"}), 400
-
 
 @app.route('/fetch-places', methods=['POST'])
 def fetch_places():
@@ -102,7 +137,6 @@ def fetch_places():
     except Exception as e:
         return jsonify({"error": f"Error fetching places: {str(e)}"}), 500
 
-
 @app.route('/recommendations', methods=['GET'])
 def get_recommendations():
     user_id = request.args.get('user_id')
@@ -113,6 +147,7 @@ def get_recommendations():
     if not user_id:
         return jsonify({"error": "User ID is required"}), 400
 
+    # Resolve coordinates
     if latitude and longitude:
         try:
             lat, lng = float(latitude), float(longitude)
@@ -129,24 +164,36 @@ def get_recommendations():
     else:
         return jsonify({"error": "Either coordinates or address must be provided"}), 400
 
+    # Get user
     user = User.query.filter_by(uuid=user_id).first()
     if not user:
         return jsonify({"error": "User not found"}), 404
-    feedback = Feedback.query.filter_by(user_id=user.id).all()
 
-    rejected_place_ids = set()
+    feedback_entries = UserTagFeedback.query.filter_by(user_id=user.id).all()
+
     tag_scores = {}
-    for fb in feedback:
-        tags = fb.tags.split(',')
-        weight = 3 if fb.feedback == 'accept' else -1
-        for i, tag in enumerate(tags[:3]):
-            tag_scores[tag] = tag_scores.get(tag, 0) + (3 - i) * weight
-        if fb.feedback == 'reject':
-            rejected_place_ids.add(fb.place_id)
+    rejected_place_ids = set()
 
-    max_score = max(tag_scores.values(), default=1)
-    tag_scores = {tag: score / max_score for tag, score in tag_scores.items()}
+    if feedback_entries:
+        for fb in feedback_entries:
+            tags = fb.place_tags.split(',')
+            weight = 3 if fb.verdict == 'accept' else -1
+            for i, tag in enumerate(tags[:3]):
+                tag_scores[tag] = tag_scores.get(tag, 0) + (3 - i) * weight
+            if fb.verdict == 'reject':
+                rejected_place_ids.add(fb.place_id)
 
+        max_score = max(tag_scores.values(), default=1)
+        tag_scores = {tag: score / max_score for tag, score in tag_scores.items()}
+    else:
+        # Fallback to onboarding preferences
+        if user.preferences:
+            tags = user.preferences.split(',')
+            tag_scores = {tag: 1.0 for tag in tags}
+        else:
+            return jsonify({"error": "No feedback or preferences available"}), 404
+
+    # Fetch and score places
     try:
         places = GoogleServicesAPI.fetch_places(list(tag_scores.keys()), coordinates)
     except Exception as e:
@@ -157,12 +204,20 @@ def get_recommendations():
         place_id = place.get('place_id')
         if place_id in rejected_place_ids:
             continue
-        score = sum(tag_scores.get(tag, 0) for tag in place.get('types', []))
-        if score > 0:
-            scored_places.append({"place": place, "score": score})
 
-    scored_places.sort(key=lambda x: x["score"], reverse=True)
-    return jsonify([sp["place"] for sp in scored_places])
+        types = place.get('types', [])
+        raw_score = sum(tag_scores.get(tag, 0) for tag in types)
+        max_possible = len(types) * max(tag_scores.values(), default=1)
+        relevance = raw_score / max_possible if max_possible else 0
+
+        if relevance > 0:
+            scored_places.append({
+                "place": place,
+                "relevance": round(relevance, 2)
+            })
+
+    scored_places.sort(key=lambda x: x["relevance"], reverse=True)
+    return jsonify(scored_places)
 
 
 if __name__ == "__main__":
