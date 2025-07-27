@@ -7,7 +7,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 from utils import is_chain, is_hidden_gem, review_sentiment_score
 
-DATABASE_URI = "sqlite:///local_adventour.db"
+DATABASE_URI = "sqlite:////tmp/local_adventour.db"
 
 # Debug: Verify the connection string
 print(f"Connecting to database: {DATABASE_URI}")
