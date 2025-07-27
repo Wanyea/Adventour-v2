@@ -8,4 +8,5 @@ export type Place = {
   user_ratings_total?: number;
   price_level?: number;
   photos?: any[]; 
+  likelihood?: number;
 };

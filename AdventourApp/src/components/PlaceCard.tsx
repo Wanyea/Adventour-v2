@@ -7,7 +7,14 @@ type Props = {
   onFeedback: (place: Place, verdict: 'accept' | 'reject') => void;
 };
 
-const PlaceCard: React.FC<Props> = ({ place, onFeedback }) => {
+const getFunLabel = (likelihood: number) => {
+  if (likelihood >= 0.9) return "Perfect for you! 😍";
+  if (likelihood >= 0.7) return "Great match! 👍";
+  if (likelihood >= 0.5) return "Worth a try! 🤔";
+  return "Maybe not your vibe 😐";
+};
+
+const PlaceCard: React.FC<Props> = ({ place, onFeedback }: Props) => {
   return (
     <View style={styles.card}>
       <Text style={styles.name}>{place.name}</Text>
@@ -16,6 +23,10 @@ const PlaceCard: React.FC<Props> = ({ place, onFeedback }) => {
         <Text style={styles.score}>
           Match Score: {(place.relevance * 100).toFixed(0)}%
         </Text>
+      )}
+      {/* Fun label based on likelihood */}
+      {place.likelihood !== undefined && (
+        <Text style={styles.funLabel}>{getFunLabel(place.likelihood)}</Text>
       )}
       <Text style={styles.rating}>
         Rating: {place.rating ? `${place.rating} / 5` : 'N/A'}
@@ -68,6 +79,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 10,
+  },
+  funLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#ff9800',
+    marginBottom: 4,
   },
 });
 

@@ -5,6 +5,7 @@ from models import db, User, UserTagFeedback
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+from utils import is_chain, is_hidden_gem, review_sentiment_score
 
 DATABASE_URI = "sqlite:///local_adventour.db"
 
@@ -72,11 +73,11 @@ def save_feedback():
         db.session.add(user)
         db.session.commit()
 
-    feedback = Feedback(
+    feedback = UserTagFeedback(
         user_id=user.id,
         place_id=data['place_id'],
-        feedback=data['feedback'],
-        tags=",".join(data['tags']),
+        verdict=data['feedback'],  # 'accept' or 'reject'
+        place_tags=",".join(data['tags']),
     )
     db.session.add(feedback)
     db.session.commit()
@@ -210,10 +211,50 @@ def get_recommendations():
         max_possible = len(types) * max(tag_scores.values(), default=1)
         relevance = raw_score / max_possible if max_possible else 0
 
-        if relevance > 0:
+        # Authenticity & sentiment boosts
+        boost = 1.0
+        if is_hidden_gem(place):
+            boost = 2.0  # Highest boost for hidden gems
+        else:
+            # Sentiment analysis on reviews (if available)
+            sentiment = 0
+            if 'reviews' in place:
+                sentiment = review_sentiment_score(place['reviews'])
+            if sentiment > 0.1:  # threshold for positive sentiment
+                boost = 1.5  # Slightly lower than hidden gem
+
+        # Down-rank if chain
+        if is_chain(place.get('name', '')):
+            boost *= 0.5
+
+        final_score = relevance * boost
+
+        # --- Composite likelihood score ---
+        likelihood = relevance
+        if is_hidden_gem(place):
+            likelihood += 0.4
+        likelihood += 0.3 * (sentiment if 'sentiment' in locals() else 0)
+        if is_chain(place.get('name', '')):
+            likelihood -= 0.3
+        likelihood = max(0, min(likelihood, 1))
+
+        # --- Fun label ---
+        if likelihood >= 0.9:
+            fun_label = "Perfect for you! 😍"
+        elif likelihood >= 0.7:
+            fun_label = "Great match! 👍"
+        elif likelihood >= 0.5:
+            fun_label = "Worth a try! 🤔"
+        else:
+            fun_label = "Maybe not your vibe 😐"
+
+        if final_score > 0:
             scored_places.append({
                 "place": place,
-                "relevance": round(relevance, 2)
+                "relevance": round(final_score, 2),
+                "hidden_gem": is_hidden_gem(place),
+                "sentiment_score": sentiment if 'sentiment' in locals() else 0,
+                "likelihood": round(likelihood, 2)
             })
 
     scored_places.sort(key=lambda x: x["relevance"], reverse=True)

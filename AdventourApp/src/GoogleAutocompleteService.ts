@@ -15,7 +15,7 @@ class GoogleAutocompleteService {
         params: {
           input,
           location: `${location.latitude},${location.longitude}`,
-          radius: 10000,
+          radius: 3200, // Search radius in meters (approximately 2 miles)
           key: Config.GOOGLE_API_KEY,
         },
       });

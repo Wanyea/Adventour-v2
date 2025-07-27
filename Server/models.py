@@ -15,3 +15,12 @@ class UserTagFeedback(db.Model):
     place_id = db.Column(db.String(50), nullable=False)
     verdict = db.Column(db.String(10), nullable=False)  # 'accept' or 'reject'
     place_tags = db.Column(db.String(500))  # comma-separated Google types
+    rating = db.Column(db.Integer)  # 1-5, nullable
+
+class UserPlaceInteraction(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    place_id = db.Column(db.String(50), nullable=False)
+    interaction_type = db.Column(db.String(20), nullable=False)  # 'view', 'accept', 'reject', 'rate'
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    rating = db.Column(db.Integer)  # nullable, only for 'rate'

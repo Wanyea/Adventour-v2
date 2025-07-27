@@ -1,25 +1,34 @@
 @echo off
 setlocal
 
-set AVD_NAME=Pixel_7_Pro_API_30
+set AVD_NAME=Pixel_7_Pro
 set LOG_FILE=build-log.txt
 
 echo ====================================
 echo AdventourApp Dev Launcher
 echo ====================================
 
+:: Check if ANDROID_HOME is set
+if "%ANDROID_HOME%"=="" (
+    echo ERROR: ANDROID_HOME environment variable is not set!
+    echo Please set ANDROID_HOME to your Android SDK location.
+    pause
+    exit /b 1
+)
+
 :: 1. Start Metro if not already running
 echo [1/4] Starting Metro bundler...
 start "" cmd /k "npx react-native start"
 
-timeout /t 2
+timeout /t 30
 
 :: 2. Check for running emulator
 echo [2/4] Checking for running emulator...
 adb devices | findstr /R /C:"device$" >nul
 IF ERRORLEVEL 1 (
     echo No emulator found. Launching emulator: %AVD_NAME%
-    start "" /D "%ANDROID_HOME%\emulator" cmd /c "emulator.exe -avd %AVD_NAME% -no-snapshot-load -gpu auto -feature AllowSnapshotMigration"
+    echo Using ANDROID_HOME: %ANDROID_HOME%
+    "%ANDROID_HOME%\emulator\emulator.exe" -avd %AVD_NAME% -no-snapshot-load -gpu auto -feature AllowSnapshotMigration
     timeout /t 10
 ) ELSE (
     echo Emulator is already running.

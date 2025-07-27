@@ -16,7 +16,7 @@ class GoogleServicesAPI:
         try:
             response = requests.get(f"{GoogleServicesAPI.BASE_URL}/place/nearbysearch/json", params={
                 "location": f"{location['latitude']},{location['longitude']}",
-                "radius": 10000,  # Search radius in meters
+                "radius": 3200,  # Search radius in meters (approximately 2 miles)
                 "type": "|".join(selected_tags),
                 "key": GOOGLE_API_KEY,
             })

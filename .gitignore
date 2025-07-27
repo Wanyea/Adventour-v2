@@ -29,3 +29,5 @@ yarn-error.log*
 # Metro / React Native cache
 .expo/
 .expo-shared/
+
+/AdventourApp/android/local.properties
