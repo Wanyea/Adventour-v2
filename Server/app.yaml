@@ -1,8 +1,12 @@
 runtime: python39
-entrypoint: gunicorn -w 4 -b :$PORT app:app
+entrypoint: gunicorn -b :$PORT app:app
 
 env_variables:
-  GOOGLE_API_KEY: "AIzaSyD-RpERPi4HTQl3oiTWtbgZTXVu-kyN4as"
+  DB_USER: root
+  DB_PASSWORD: s^i%nA8rHl<)@Z1e
+  DB_NAME: adventour
+  DB_CONNECTION_NAME: adventour-73dfb:us-east1:adventour-sql
+  GOOGLE_API_KEY: AIzaSyD-RpERPi4HTQl3oiTWtbgZTXVu-kyN4as
 
 instance_class: F1
 automatic_scaling:

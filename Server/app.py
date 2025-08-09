@@ -2,20 +2,41 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from google_services_api import GoogleServicesAPI  # Custom module
 from models import db, User, UserTagFeedback
-import logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 from utils import is_chain, is_hidden_gem, review_sentiment_score
 
-DATABASE_URI = "sqlite:////tmp/local_adventour.db"
+from dotenv import load_dotenv
+from urllib.parse import quote_plus
+import os
 
-# Debug: Verify the connection string
+load_dotenv()
+
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = quote_plus(os.getenv("DB_PASSWORD"))
+DB_NAME = os.getenv("DB_NAME")
+CONNECTION_NAME = os.getenv("DB_CONNECTION_NAME")
+
+if os.getenv("GAE_ENV", "").startswith("standard"):
+    DB_HOST = "localhost"
+    DATABASE_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
+else:
+    DB_HOST = "127.0.0.1"
+    DATABASE_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:3306/{DB_NAME}"
+
+# Debug
 print(f"Connecting to database: {DATABASE_URI}")
 
 # Flask app setup
 app = Flask(__name__)
 CORS(app)
+
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
+if os.getenv("GAE_ENV", "").startswith("standard"):
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+        "connect_args": {
+            "unix_socket": f"/cloudsql/{CONNECTION_NAME}"
+        }
+    }
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
@@ -238,7 +259,7 @@ def get_recommendations():
             likelihood -= 0.3
         likelihood = max(0, min(likelihood, 1))
 
-        # --- Fun label ---
+        # --- Fun label --- (not in use yet)
         if likelihood >= 0.9:
             fun_label = "Perfect for you! 😍"
         elif likelihood >= 0.7:

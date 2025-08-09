@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-set AVD_NAME=Pixel_7_Pro
+set AVD_NAME=Pixel_7_API_30
 set LOG_FILE=build-log.txt
 
 echo ====================================
@@ -26,15 +26,23 @@ adb devices | findstr /R /C:"device$" >nul
 IF ERRORLEVEL 1 (
     echo No emulator found. Launching emulator: %AVD_NAME%
     echo Using ANDROID_HOME: %ANDROID_HOME%
-    "%ANDROID_HOME%\emulator\emulator.exe" -avd %AVD_NAME% -no-snapshot-load -gpu auto -feature AllowSnapshotMigration
-    timeout /t 10
+    start "" "%ANDROID_HOME%\emulator\emulator.exe" -avd %AVD_NAME% -no-snapshot-load -gpu auto
+
+    echo Waiting for emulator to boot...
+    :wait_loop
+    adb shell getprop sys.boot_completed 2>nul | findstr "1" >nul
+    if errorlevel 1 (
+        timeout /t 5 >nul
+        goto wait_loop
+    )
+    echo Emulator booted.
 ) ELSE (
     echo Emulator is already running.
 )
 
 :: 3. Build and install the app
 echo [3/4] Installing app to emulator...
-call npx react-native run-android > %LOG_FILE% 2>&1
+call npx react-native run-android
 
 :: 4. Launch app manually (to avoid hanging)
 echo [4/4] Launching app...
