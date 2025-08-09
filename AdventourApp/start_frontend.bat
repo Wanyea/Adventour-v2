@@ -20,8 +20,6 @@ if "%ANDROID_HOME%"=="" (
 echo [1/4] Starting Metro bundler...
 start "" cmd /k "npx react-native start"
 
-timeout /t 30
-
 :: 2. Check for running emulator
 echo [2/4] Checking for running emulator...
 adb devices | findstr /R /C:"device$" >nul
