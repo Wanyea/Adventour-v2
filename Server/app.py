@@ -1,11 +1,14 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, g
 from flask_cors import CORS
 from google_services_api import GoogleServicesAPI  # Custom module
-from models import db, User, UserTagFeedback
+from models import db, User, UserTagFeedback, PlaceRating
 from utils import is_chain, is_hidden_gem, review_sentiment_score
+from auth import require_auth, optional_auth
+from social_routes import social_bp
 
 from dotenv import load_dotenv
 from urllib.parse import quote_plus
+from datetime import datetime
 import os
 
 load_dotenv()
@@ -40,6 +43,9 @@ if os.getenv("GAE_ENV", "").startswith("standard"):
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
+# Register blueprints
+app.register_blueprint(social_bp, url_prefix='/api')
+
 # Initialize the database
 with app.app_context():
     db.create_all()
@@ -54,45 +60,129 @@ def home():
     })
     
 @app.route('/onboarding', methods=['POST'])
+@optional_auth
 def onboarding():
     data = request.json
-    user_id = data.get('user_id')
     tags = data.get('initial_tags', [])
 
-    if not user_id or not tags:
-        return jsonify({"error": "Missing user_id or tags"}), 400
+    if not tags:
+        return jsonify({"error": "Missing tags"}), 400
 
-    user = User.query.filter_by(uuid=user_id).first()
-
-    if not user:
-        user = User(uuid=user_id, preferences=",".join(tags))
-        db.session.add(user)
+    # Try to get authenticated user first
+    user = None
+    if hasattr(g, 'current_user'):
+        user = g.current_user
     else:
-        user.preferences = ",".join(tags)
+        # Fallback to old user_id parameter
+        user_id = data.get('user_id')
+        if user_id:
+            user = User.query.filter_by(uuid=user_id).first()
+            if not user:
+                user = User(uuid=user_id, preferences=",".join(tags))
+                db.session.add(user)
+    
+    if not user:
+        return jsonify({"error": "User authentication required"}), 401
 
+    user.preferences = ",".join(tags)
     db.session.commit()
     return jsonify({"message": "Onboarding preferences saved"}), 200
 
 @app.route('/user/<user_id>', methods=['GET'])
+@optional_auth
 def get_user_info(user_id):
-    user = User.query.filter_by(uuid=user_id).first()
+    # Try to get authenticated user first
+    user = None
+    if hasattr(g, 'current_user'):
+        user = g.current_user
+    else:
+        # Fallback to user_id parameter
+        user = User.query.filter_by(uuid=user_id).first()
+    
     if not user:
         return jsonify({"onboarded": False}), 200
+    
     return jsonify({
         "onboarded": bool(user.preferences),
-        "preferences": user.preferences.split(',') if user.preferences else []
+        "preferences": user.preferences.split(',') if user.preferences else [],
+        "user_id": user.id,
+        "username": user.username,
+        "display_name": user.display_name
+    }), 200
+
+@app.route('/user', methods=['POST'])
+@require_auth
+def create_user():
+    """Create a new user from Firebase data"""
+    data = request.json
+    user = g.current_user
+    
+    # Update user with provided data
+    if data.get('display_name'):
+        user.display_name = data['display_name']
+    if data.get('profile_picture'):
+        user.profile_picture = data['profile_picture']
+    
+    db.session.commit()
+    
+    return jsonify({
+        "message": "User created successfully",
+        "user": {
+            "id": user.id,
+            "firebase_uid": user.firebase_uid,
+            "email": user.email,
+            "username": user.username,
+            "display_name": user.display_name,
+            "profile_picture": user.profile_picture
+        }
+    }), 201
+
+@app.route('/user/profile', methods=['PUT'])
+@require_auth
+def update_user_profile():
+    """Update user profile"""
+    data = request.json
+    user = g.current_user
+    
+    if data.get('display_name'):
+        user.display_name = data['display_name']
+    if data.get('profile_picture'):
+        user.profile_picture = data['profile_picture']
+    
+    db.session.commit()
+    
+    return jsonify({
+        "message": "Profile updated successfully",
+        "user": {
+            "id": user.id,
+            "firebase_uid": user.firebase_uid,
+            "email": user.email,
+            "username": user.username,
+            "display_name": user.display_name,
+            "profile_picture": user.profile_picture
+        }
     }), 200
 
 @app.route('/feedback', methods=['POST'])
+@optional_auth
 def save_feedback():
     data = request.json
-    user_uuid = data['user_id']
-
-    user = User.query.filter_by(uuid=user_uuid).first()
+    user_uuid = data.get('user_id')
+    
+    # Try to get authenticated user first
+    user = None
+    if hasattr(g, 'current_user'):
+        user = g.current_user
+    elif user_uuid:
+        # Fallback to old UUID-based system
+        user = User.query.filter_by(uuid=user_uuid).first()
+        if not user:
+            user = User(uuid=user_uuid)
+            db.session.add(user)
+            db.session.commit()
+    
     if not user:
-        user = User(uuid=user_uuid)
-        db.session.add(user)
-        db.session.commit()
+        return jsonify({"error": "User authentication required"}), 401
 
     feedback = UserTagFeedback(
         user_id=user.id,
@@ -103,6 +193,82 @@ def save_feedback():
     db.session.add(feedback)
     db.session.commit()
     return jsonify({"message": "Feedback saved successfully!"}), 201
+
+@app.route('/places/rate', methods=['POST'])
+@require_auth
+def rate_place():
+    """Rate a place with 1-5 stars and optional review"""
+    data = request.json
+    user = g.current_user
+    
+    place_id = data.get('place_id')
+    rating = data.get('rating')
+    review = data.get('review', '')
+    
+    if not place_id or not rating:
+        return jsonify({"error": "Place ID and rating are required"}), 400
+    
+    if not isinstance(rating, int) or rating < 1 or rating > 5:
+        return jsonify({"error": "Rating must be an integer between 1 and 5"}), 400
+    
+    # Check if user already rated this place
+    existing_rating = PlaceRating.query.filter_by(
+        user_id=user.id, 
+        place_id=place_id
+    ).first()
+    
+    if existing_rating:
+        # Update existing rating
+        existing_rating.rating = rating
+        existing_rating.review = review
+        existing_rating.updated_at = datetime.utcnow()
+    else:
+        # Create new rating
+        place_rating = PlaceRating(
+            user_id=user.id,
+            place_id=place_id,
+            rating=rating,
+            review=review
+        )
+        db.session.add(place_rating)
+    
+    db.session.commit()
+    return jsonify({"message": "Place rated successfully!"}), 201
+
+@app.route('/places/<place_id>/ratings', methods=['GET'])
+def get_place_ratings(place_id):
+    """Get all ratings for a specific place"""
+    ratings = PlaceRating.query.filter_by(place_id=place_id).all()
+    
+    rating_data = []
+    for rating in ratings:
+        user = User.query.get(rating.user_id)
+        rating_data.append({
+            'id': rating.id,
+            'rating': rating.rating,
+            'review': rating.review,
+            'created_at': rating.created_at.isoformat(),
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'display_name': user.display_name
+            }
+        })
+    
+    # Calculate average rating
+    if ratings:
+        avg_rating = sum(r.rating for r in ratings) / len(ratings)
+        total_ratings = len(ratings)
+    else:
+        avg_rating = 0
+        total_ratings = 0
+    
+    return jsonify({
+        'place_id': place_id,
+        'average_rating': round(avg_rating, 2),
+        'total_ratings': total_ratings,
+        'ratings': rating_data
+    })
 
 @app.route('/geocode', methods=['GET'])
 def geocode():    
@@ -160,14 +326,24 @@ def fetch_places():
         return jsonify({"error": f"Error fetching places: {str(e)}"}), 500
 
 @app.route('/recommendations', methods=['GET'])
+@optional_auth
 def get_recommendations():
-    user_id = request.args.get('user_id')
+    # Try to get authenticated user first
+    user = None
+    if hasattr(g, 'current_user'):
+        user = g.current_user
+    else:
+        # Fallback to old user_id parameter
+        user_id = request.args.get('user_id')
+        if user_id:
+            user = User.query.filter_by(uuid=user_id).first()
+    
     address = request.args.get('address')
     latitude = request.args.get('latitude')
     longitude = request.args.get('longitude')
 
-    if not user_id:
-        return jsonify({"error": "User ID is required"}), 400
+    if not user:
+        return jsonify({"error": "User authentication required"}), 401
 
     # Resolve coordinates
     if latitude and longitude:
