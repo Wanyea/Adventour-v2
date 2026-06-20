@@ -7,19 +7,25 @@ type Location = {
 };
 
 class GoogleAutocompleteService {
-  static baseUrl = 'https://maps.googleapis.com/maps/api';
+  static async fetchAutocompleteSuggestions(input: string, location?: Location | null) {
+    if (input.trim().length < 3) {
+      return [];
+    }
 
-  static async fetchAutocompleteSuggestions(input: string, location: Location) {
     try {
-      const response = await axios.get(`${this.baseUrl}/place/autocomplete/json`, {
-        params: {
-          input,
-          location: `${location.latitude},${location.longitude}`,
-          radius: 3200, // Search radius in meters (approximately 2 miles)
-          key: Config.GOOGLE_API_KEY,
-        },
+      const params: Record<string, string | number> = {
+        input,
+        radius_meters: 3200,
+      };
+      if (location) {
+        params.latitude = location.latitude;
+        params.longitude = location.longitude;
+      }
+
+      const response = await axios.get(`${Config.BACKEND_BASE_URL}/api/places/autocomplete`, {
+        params,
       });
-      return response.data.predictions;
+      return response.data.predictions || [];
     } catch (error) {
       console.error('Error fetching autocomplete suggestions:', error);
       return [];

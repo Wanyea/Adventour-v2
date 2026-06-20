@@ -16,6 +16,7 @@ export interface User {
 class AuthService {
   private currentUser: User | null = null;
   private authStateListener: (() => void) | null = null;
+  private isDevAuth = Config.API_AUTH_MODE === 'dev';
 
   constructor() {
     // Set up axios interceptor to include auth token
@@ -35,6 +36,12 @@ class AuthService {
 
   async signInWithEmail(email: string, password: string): Promise<User> {
     try {
+      if (this.isDevAuth) {
+        const user = await this.getDevUser();
+        this.currentUser = user;
+        return user;
+      }
+
       const userCredential = await auth().signInWithEmailAndPassword(email, password);
       const user = await this.getOrCreateUser(userCredential.user);
       this.currentUser = user;
@@ -47,6 +54,12 @@ class AuthService {
 
   async signUpWithEmail(email: string, password: string, displayName: string): Promise<User> {
     try {
+      if (this.isDevAuth) {
+        const user = await this.getDevUser(displayName);
+        this.currentUser = user;
+        return user;
+      }
+
       const userCredential = await auth().createUserWithEmailAndPassword(email, password);
       
       // Update display name
@@ -65,7 +78,9 @@ class AuthService {
 
   async signOut(): Promise<void> {
     try {
-      await auth().signOut();
+      if (!this.isDevAuth) {
+        await auth().signOut();
+      }
       this.currentUser = null;
       await AsyncStorage.removeItem('user_id');
       await AsyncStorage.removeItem('auth_token');
@@ -76,6 +91,10 @@ class AuthService {
   }
 
   async getIdToken(): Promise<string | null> {
+    if (this.isDevAuth) {
+      return Config.getDevAuthHeader()?.replace('Bearer ', '') || null;
+    }
+
     try {
       const currentFirebaseUser = auth().currentUser;
       if (currentFirebaseUser) {
@@ -91,6 +110,17 @@ class AuthService {
   async getCurrentUser(): Promise<User | null> {
     if (this.currentUser) {
       return this.currentUser;
+    }
+
+    if (this.isDevAuth) {
+      try {
+        const user = await this.getDevUser();
+        this.currentUser = user;
+        return user;
+      } catch (error) {
+        console.error('Get dev user error:', error);
+        return null;
+      }
     }
 
     const currentFirebaseUser = auth().currentUser;
@@ -141,6 +171,30 @@ class AuthService {
   }
 
   onAuthStateChanged(callback: (user: User | null) => void): () => void {
+    if (this.isDevAuth) {
+      let active = true;
+      this.getDevUser()
+        .then((user) => {
+          if (!active) {
+            return;
+          }
+          this.currentUser = user;
+          callback(user);
+        })
+        .catch((error) => {
+          console.error('Dev auth state change error:', error);
+          if (active) {
+            callback(null);
+          }
+        });
+
+      const unsubscribe = () => {
+        active = false;
+      };
+      this.authStateListener = unsubscribe;
+      return unsubscribe;
+    }
+
     const unsubscribe = auth().onAuthStateChanged(async (firebaseUser) => {
       if (firebaseUser) {
         try {
@@ -162,6 +216,10 @@ class AuthService {
   }
 
   async resetPassword(email: string): Promise<void> {
+    if (this.isDevAuth) {
+      return;
+    }
+
     try {
       await auth().sendPasswordResetEmail(email);
     } catch (error) {
@@ -183,12 +241,22 @@ class AuthService {
         }
       });
 
-      this.currentUser = response.data.user;
-      return this.currentUser;
+      const updatedUser = response.data.user;
+      this.currentUser = updatedUser;
+      return updatedUser;
     } catch (error) {
       console.error('Update profile error:', error);
       throw error;
     }
+  }
+
+  private async getDevUser(displayName?: string): Promise<User> {
+    const response = await axios.post(`${Config.BACKEND_BASE_URL}/user/dev`, {
+      email: Config.DEV_AUTH_EMAIL,
+      display_name: displayName || Config.DEV_AUTH_EMAIL.split('@')[0],
+    });
+
+    return response.data.user;
   }
 }
 

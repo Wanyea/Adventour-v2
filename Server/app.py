@@ -1,29 +1,40 @@
 from flask import Flask, request, jsonify, g
 from flask_cors import CORS
-from google_services_api import GoogleServicesAPI  # Custom module
-from models import db, User, UserTagFeedback, PlaceRating
-from utils import is_chain, is_hidden_gem, review_sentiment_score
-from auth import require_auth, optional_auth
-from social_routes import social_bp
+from adventour_backend.services.google_services_api import GoogleServicesAPI
+from adventour_backend.models import db, User, UserTagFeedback, PlaceRating, Place, PlaceProviderRef
+from adventour_backend.auth import require_auth, optional_auth
+from adventour_backend.social_routes import social_bp
+from adventour_backend.services.recommender_service import RecommendationService
 
 from dotenv import load_dotenv
 from urllib.parse import quote_plus
 from datetime import datetime
 import os
+import logging
 
-load_dotenv()
+env_file = os.getenv("ENV_FILE")
+if env_file:
+    load_dotenv(env_file, override=True)
+else:
+    load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = quote_plus(os.getenv("DB_PASSWORD"))
+DB_PASSWORD = quote_plus(os.getenv("DB_PASSWORD") or "")
 DB_NAME = os.getenv("DB_NAME")
 CONNECTION_NAME = os.getenv("DB_CONNECTION_NAME")
 
-if os.getenv("GAE_ENV", "").startswith("standard"):
+if os.getenv("DATABASE_URL"):
+    DATABASE_URI = os.getenv("DATABASE_URL")
+elif DB_USER and DB_NAME and os.getenv("GAE_ENV", "").startswith("standard"):
     DB_HOST = "localhost"
     DATABASE_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
-else:
+elif DB_USER and DB_NAME:
     DB_HOST = "127.0.0.1"
     DATABASE_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:3306/{DB_NAME}"
+else:
+    DATABASE_URI = "sqlite:///adventour_dev.db"
 
 # Debug
 print(f"Connecting to database: {DATABASE_URI}")
@@ -45,6 +56,7 @@ db.init_app(app)
 
 # Register blueprints
 app.register_blueprint(social_bp, url_prefix='/api')
+recommendation_service = RecommendationService()
 
 # Initialize the database
 with app.app_context():
@@ -58,6 +70,29 @@ def home():
     return jsonify({
         "message": "This is the Adventour API. Refer to the documentation for available endpoints."
     })
+
+@app.route('/api/dev/config', methods=['GET'])
+def dev_config():
+    if os.getenv("ADVENTOUR_DEV_AUTH") != "true":
+        return jsonify({"error": "Dev tools are disabled"}), 403
+
+    google_key = os.getenv("GOOGLE_API_KEY") or ""
+    return jsonify({
+        "database_url": app.config["SQLALCHEMY_DATABASE_URI"],
+        "google_api_key_configured": bool(google_key),
+        "google_api_key_preview": f"{google_key[:4]}...{google_key[-4:]}" if google_key else None,
+    })
+
+def get_request_user(allow_legacy_id=False):
+    if hasattr(g, 'current_user'):
+        return g.current_user
+
+    if allow_legacy_id:
+        user_id = (request.json or {}).get('user_id') if request.is_json else request.args.get('user_id')
+        if user_id:
+            return User.query.filter_by(uuid=user_id).first()
+
+    return None
     
 @app.route('/onboarding', methods=['POST'])
 @optional_auth
@@ -137,6 +172,45 @@ def create_user():
         }
     }), 201
 
+@app.route('/user/dev', methods=['POST'])
+def create_dev_user():
+    """Create or return a local development user without Firebase."""
+    if os.getenv("ADVENTOUR_DEV_AUTH") != "true":
+        return jsonify({"error": "Dev auth is disabled"}), 403
+
+    data = request.json or {}
+    email = data.get("email") or "dev@adventour.local"
+    display_name = data.get("display_name") or email.split("@")[0]
+    firebase_uid = f"dev-{email.split('@')[0]}"
+
+    user = User.query.filter_by(firebase_uid=firebase_uid).first()
+    if not user:
+        username = email.split("@")[0]
+        user = User(
+            firebase_uid=firebase_uid,
+            email=email,
+            username=username,
+            display_name=display_name,
+        )
+        db.session.add(user)
+    else:
+        user.email = email
+        user.display_name = display_name
+
+    db.session.commit()
+
+    return jsonify({
+        "user": {
+            "id": user.id,
+            "firebase_uid": user.firebase_uid,
+            "email": user.email,
+            "username": user.username,
+            "display_name": user.display_name,
+            "profile_picture": user.profile_picture,
+            "preferences": user.preferences.split(',') if user.preferences else [],
+        }
+    }), 200
+
 @app.route('/user/profile', methods=['PUT'])
 @require_auth
 def update_user_profile():
@@ -191,6 +265,29 @@ def save_feedback():
         place_tags=",".join(data['tags']),
     )
     db.session.add(feedback)
+
+    place = None
+    provider_ref = None
+    provider_place_id = data.get('provider_place_id') or data.get('place_id')
+    provider = data.get('provider', 'google')
+    if provider_place_id:
+        provider_ref = PlaceProviderRef.query.filter_by(
+            provider=provider,
+            provider_place_id=str(provider_place_id)
+        ).first()
+        place = provider_ref.place if provider_ref else None
+    if place:
+        recommendation_service.record_event(
+            user=user,
+            place=place,
+            provider_ref=provider_ref,
+            event_type=data['feedback'],
+            context=data.get('context', 'solo'),
+            metadata={"legacy_feedback": True, "tags": data.get('tags', [])},
+            commit=False,
+        )
+        recommendation_service.rebuild_preference_vector(user, commit=False)
+
     db.session.commit()
     return jsonify({"message": "Feedback saved successfully!"}), 201
 
@@ -231,9 +328,142 @@ def rate_place():
             review=review
         )
         db.session.add(place_rating)
+
+    provider = data.get('provider', 'google')
+    provider_ref = PlaceProviderRef.query.filter_by(
+        provider=provider,
+        provider_place_id=str(place_id)
+    ).first()
+    if provider_ref:
+        recommendation_service.record_event(
+            user=user,
+            place=provider_ref.place,
+            provider_ref=provider_ref,
+            event_type="rate",
+            event_value=rating,
+            context=data.get('context', 'solo'),
+            metadata={"review_present": bool(review)},
+            commit=False,
+        )
+        recommendation_service.rebuild_preference_vector(user, commit=False)
     
     db.session.commit()
     return jsonify({"message": "Place rated successfully!"}), 201
+
+@app.route('/api/events', methods=['POST'])
+@require_auth
+def record_place_event():
+    data = request.json or {}
+    user = g.current_user
+    event_type = data.get("event_type")
+    adventour_place_id = data.get("place_id")
+    provider = data.get("provider")
+    provider_place_id = data.get("provider_place_id")
+
+    if not event_type:
+        return jsonify({"error": "event_type is required"}), 400
+
+    place = None
+    provider_ref = None
+
+    if adventour_place_id:
+        place = Place.query.get(adventour_place_id)
+    elif provider and provider_place_id:
+        provider_ref = PlaceProviderRef.query.filter_by(
+            provider=provider,
+            provider_place_id=str(provider_place_id)
+        ).first()
+        place = provider_ref.place if provider_ref else None
+
+    if not place:
+        return jsonify({"error": "Unknown place. Request recommendations before recording events."}), 404
+
+    try:
+        recommendation_service.record_event(
+            user=user,
+            place=place,
+            provider_ref=provider_ref,
+            event_type=event_type,
+            event_value=data.get("event_value"),
+            context=data.get("context", "solo"),
+            metadata=data.get("metadata", {}),
+        )
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+
+    return jsonify({"message": "Event recorded"}), 201
+
+@app.route('/api/recommendations', methods=['POST'])
+@require_auth
+def create_recommendations():
+    data = request.json or {}
+    user = g.current_user
+    location = data.get("location") or {}
+    latitude = location.get("latitude")
+    longitude = location.get("longitude")
+
+    if latitude is None or longitude is None:
+        return jsonify({"error": "location.latitude and location.longitude are required"}), 400
+
+    try:
+        logger.info(
+            "Recommendation request user=%s latitude=%s longitude=%s constraints=%s",
+            user.id,
+            latitude,
+            longitude,
+            data.get("constraints", {}),
+        )
+        result = recommendation_service.recommend(
+            user=user,
+            location={"latitude": float(latitude), "longitude": float(longitude)},
+            radius_meters=int(data.get("radius_meters", 3200)),
+            member_ids=data.get("member_ids", []),
+            constraints=data.get("constraints", {}),
+            mode=data.get("mode", "spontaneous"),
+        )
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    except Exception as exc:
+        logger.exception("Recommendation request failed")
+        return jsonify({"error": "Recommendation request failed", "detail": str(exc)}), 500
+
+    return jsonify(result), 200
+
+@app.route('/api/dev/seed-place', methods=['POST'])
+def seed_dev_place():
+    """Create a local development place near a coordinate for recommender smoke tests."""
+    if os.getenv("ADVENTOUR_DEV_AUTH") != "true":
+        return jsonify({"error": "Dev tools are disabled"}), 403
+
+    data = request.json or {}
+    name = data.get("name") or "Adventour Local Test Cafe"
+    latitude = float(data.get("latitude", 37.421998333333335))
+    longitude = float(data.get("longitude", -122.084))
+
+    place = Place.query.filter_by(normalized_name=name.lower()).first()
+    if not place:
+        place = Place(
+            canonical_name=name,
+            normalized_name=name.lower(),
+            latitude=latitude,
+            longitude=longitude,
+            source_confidence=1.0,
+        )
+        db.session.add(place)
+    else:
+        place.latitude = latitude
+        place.longitude = longitude
+
+    db.session.commit()
+
+    return jsonify({
+        "place": {
+            "id": place.id,
+            "name": place.canonical_name,
+            "latitude": place.latitude,
+            "longitude": place.longitude,
+        }
+    }), 201
 
 @app.route('/places/<place_id>/ratings', methods=['GET'])
 def get_place_ratings(place_id):
@@ -276,7 +506,7 @@ def geocode():
     latitude = request.args.get('latitude')
     longitude = request.args.get('longitude')
 
-    logger.info("Received geocode request: %s, %s", latitude, longitude)
+    logger.info("Received geocode request address=%s latitude=%s longitude=%s", address, latitude, longitude)
 
     if address:
         try:
@@ -290,13 +520,31 @@ def geocode():
         try:
             location = GoogleServicesAPI.reverse_geocode(latitude, longitude)
             if not location:
-                return jsonify({"error": "Unable to resolve coordinates to a city and state"}), 404
+                location = GoogleServicesAPI.coordinate_fallback(latitude, longitude)
             return jsonify(location)
         except Exception as e:
                 logger.exception("Error resolving coordinates")
                 return jsonify({"error": f"Error resolving coordinates: {str(e)}"}), 500
     else:
         return jsonify({"error": "Either address or coordinates must be provided"}), 400
+
+@app.route('/api/places/autocomplete', methods=['GET'])
+def places_autocomplete():
+    input_text = request.args.get('input', '').strip()
+    latitude = request.args.get('latitude')
+    longitude = request.args.get('longitude')
+    radius_meters = int(request.args.get('radius_meters', 3200))
+
+    if len(input_text) < 3:
+        return jsonify({"predictions": []})
+
+    predictions = GoogleServicesAPI.fetch_autocomplete(
+        input_text,
+        latitude,
+        longitude,
+        radius_meters,
+    )
+    return jsonify({"predictions": predictions})
 
 @app.route('/fetch-places', methods=['POST'])
 def fetch_places():
@@ -361,11 +609,6 @@ def get_recommendations():
             return jsonify({"error": f"Error resolving address: {str(e)}"}), 500
     else:
         return jsonify({"error": "Either coordinates or address must be provided"}), 400
-
-    # Get user
-    user = User.query.filter_by(uuid=user_id).first()
-    if not user:
-        return jsonify({"error": "User not found"}), 404
 
     feedback_entries = UserTagFeedback.query.filter_by(user_id=user.id).all()
 
@@ -459,4 +702,4 @@ def get_recommendations():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080)
+    app.run(host="0.0.0.0", port=int(os.getenv("PORT", "8080")))

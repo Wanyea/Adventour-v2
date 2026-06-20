@@ -1,0 +1,17 @@
+runtime: python311
+entrypoint: gunicorn -b :$PORT app:app
+
+# Copy this file to app.yaml for App Engine deploys, then fill in real values
+# locally or in your deployment environment. Do not commit app.yaml with
+# secrets. The Flask app reads these through os.getenv(...).
+env_variables:
+  DB_USER: your_cloud_sql_user
+  DB_PASSWORD: your_cloud_sql_password
+  DB_NAME: adventour
+  DB_CONNECTION_NAME: your-gcp-project:your-region:your-cloud-sql-instance
+  GOOGLE_API_KEY: your_server_restricted_google_maps_key
+
+instance_class: F1
+automatic_scaling:
+  target_cpu_utilization: 0.65
+  max_instances: 5

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -21,6 +21,24 @@ import { useEffect } from 'react';
 import { PermissionsAndroid, Platform } from 'react-native';
 import { Place } from './src/types/Place';
 
+type Coordinates = { latitude: number; longitude: number };
+type LocationMode = 'none' | 'gps' | 'manual';
+type RequestStep = 'geocode' | 'recommendations';
+
+const describeAxiosError = (error: unknown) => {
+  if (axios.isAxiosError(error)) {
+    return {
+      message: error.message,
+      code: error.code,
+      status: error.response?.status,
+      data: error.response?.data,
+      url: error.config?.url,
+      method: error.config?.method,
+    };
+  }
+  return error;
+};
+
 const HomeScreen: React.FC = () => {
   const backendBaseURL = Config.BACKEND_BASE_URL;
   const [places, setPlaces] = useState<Place[]>([]);
@@ -28,8 +46,11 @@ const HomeScreen: React.FC = () => {
   const [userFeedback, setUserFeedback] = useState<{ place_id: string; feedback: string; tags: string[] }[]>([]);
   const [userId, setUserId] = useState<string>('');
   const [city, setCity] = useState<string>(''); 
-  const [currentCoords, setCurrentCoords] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [currentCoords, setCurrentCoords] = useState<Coordinates | null>(null);
+  const [locationMode, setLocationMode] = useState<LocationMode>('none');
   const [suggestions, setSuggestions] = useState<any[]>([]); 
+  const [emptyMessage, setEmptyMessage] = useState<string>('No places found...');
+  const autocompleteTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const getOrCreateUserId = async () => {
@@ -65,46 +86,122 @@ const HomeScreen: React.FC = () => {
     }
   };
 
-  const fetchSuggestions = async (input: string) => {
-    if (input.length > 2) {
-      const location = currentCoords || { latitude: 0, longitude: 0 };
-      const autocompleteSuggestions = await GoogleAutocompleteService.fetchAutocompleteSuggestions(input, location);
-      setSuggestions(autocompleteSuggestions);
+  const fetchSuggestions = async (input: string, biasLocation: Coordinates | null = currentCoords) => {
+    if (autocompleteTimer.current) {
+      clearTimeout(autocompleteTimer.current);
     }
+
+    if (input.length <= 2) {
+      setSuggestions([]);
+      return;
+    }
+
+    autocompleteTimer.current = setTimeout(async () => {
+      const autocompleteSuggestions = await GoogleAutocompleteService.fetchAutocompleteSuggestions(input, biasLocation);
+      setSuggestions(autocompleteSuggestions);
+    }, 350);
+  };
+
+  const handleCityChange = (text: string) => {
+    setCity(text);
+    setLocationMode(text.trim() ? 'manual' : 'none');
+    setCurrentCoords(null);
+    fetchSuggestions(text, null);
+  };
+
+  const handleSuggestionSelect = (description: string) => {
+    setCity(description);
+    setLocationMode('manual');
+    setCurrentCoords(null);
+    setSuggestions([]);
   };
 
   const handleFindPlaces = async () => {
     setLoading(true);
     setPlaces([]);
+    setEmptyMessage('Loading recommendations...');
+
+    let step: RequestStep = 'recommendations';
 
     try {
-      const params: any = { user_id: userId };
-      if (currentCoords) {
-        params.latitude = currentCoords.latitude;
-        params.longitude = currentCoords.longitude;
-      } else if (city) {
-        params.address = city;
+      let recommendationResponse;
+      if (locationMode === 'gps' && currentCoords) {
+        step = 'recommendations';
+        console.log('Finding places using GPS coordinates:', currentCoords);
+        recommendationResponse = await axios.post(`${Config.BACKEND_BASE_URL}/api/recommendations`, {
+          mode: 'spontaneous',
+          location: currentCoords,
+          constraints: {
+            limit: 20,
+            avoid_chains: true,
+          },
+        });
+      } else if (city.trim()) {
+        step = 'geocode';
+        console.log('Resolving manual destination:', city.trim());
+        const geocodeResponse = await axios.get(`${Config.BACKEND_BASE_URL}/geocode`, {
+          params: { address: city.trim() },
+        });
+        const resolvedLocation = {
+          latitude: Number(geocodeResponse.data.latitude),
+          longitude: Number(geocodeResponse.data.longitude),
+        };
+        if (!Number.isFinite(resolvedLocation.latitude) || !Number.isFinite(resolvedLocation.longitude)) {
+          throw new Error(`Unable to resolve coordinates for ${city}`);
+        }
+        setCurrentCoords(resolvedLocation);
+        setLocationMode('manual');
+        step = 'recommendations';
+        console.log('Finding places using resolved destination:', resolvedLocation);
+        recommendationResponse = await axios.post(`${Config.BACKEND_BASE_URL}/api/recommendations`, {
+          mode: 'spontaneous',
+          location: resolvedLocation,
+          constraints: {
+            limit: 20,
+            avoid_chains: true,
+          },
+        });
       } else {
         Alert.alert('Error', 'Please enter a location or enable GPS.');
-        setLoading(false);
         return;
       }
 
-      const response = await axios.get(`${Config.BACKEND_BASE_URL}/recommendations`, { params });
-
-      const results = response.data.map((item: any) => ({
-        ...item.place,
-        relevance: item.relevance
+      const recommendations = recommendationResponse.data.recommendations || [];
+      const results = recommendations.map((item: any) => ({
+        place_id: String(item.place_id || item.provider_place_id),
+        name: item.name || item.display?.name || 'Unknown place',
+        vicinity: item.display?.vicinity || `${item.distance_meters ?? 'Unknown'} meters away`,
+        types: item.display?.types || [],
+        rating: item.display?.rating,
+        user_ratings_total: item.display?.user_ratings_total,
+        price_level: item.display?.price_level,
+        relevance: item.score,
+        likelihood: item.score,
       }));
 
       setPlaces(results);
-      Alert.alert('Places loaded!', 'We found some matches for you.');
-    } catch (error) {
-      console.error('Error fetching recommendations:', error);
-      Alert.alert('Error', 'Unable to load recommendations.');
+      if (results.length > 0) {
+        Alert.alert('Places loaded!', `We found ${results.length} match${results.length === 1 ? '' : 'es'} for you.`);
+      } else {
+        const providerErrors = recommendationResponse.data.provider_errors || [];
+        const hasProviderErrors = providerErrors.length > 0;
+        const message = hasProviderErrors
+          ? 'No places found. Local seed data is empty and the provider lookup failed.'
+          : 'No places found yet. Try a different location or seed local places for development.';
+        setEmptyMessage(message);
+        Alert.alert('No places found', message);
+      }
+    } catch (error: unknown) {
+      const details = describeAxiosError(error);
+      console.error(`Error during ${step}:`, details);
+      const message = step === 'geocode'
+        ? 'Unable to resolve that destination. Try a more specific city, state, or address.'
+        : 'Unable to load recommendations for that destination.';
+      setEmptyMessage(message);
+      Alert.alert('Error', message);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const requestLocationPermission = async () => {
@@ -132,6 +229,8 @@ const HomeScreen: React.FC = () => {
     Geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
+        setCurrentCoords({ latitude, longitude });
+        setLocationMode('gps');
 
         try {
           const response = await axios.get(`${Config.BACKEND_BASE_URL}/geocode`, {
@@ -146,7 +245,11 @@ const HomeScreen: React.FC = () => {
           }
         } catch (error) {
           console.error('Error fetching geocoded location:', error);
-          Alert.alert('Error', 'Unable to resolve location.');
+          setCity(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+          Alert.alert(
+            'Location selected',
+            'Using your GPS coordinates. City lookup is unavailable in local dev without geocoding.'
+          );
         }
       },
       (error) => {
@@ -168,12 +271,9 @@ const HomeScreen: React.FC = () => {
       <View style={styles.locationContainer}>
         <TextInput
           style={styles.cityInput}
-          placeholder="Enter City"
-          value={city}
-          onChangeText={(text) => {
-            setCity(text);
-            fetchSuggestions(text);
-          }}
+        placeholder="Enter City"
+        value={city}
+          onChangeText={handleCityChange}
         />
         <TouchableOpacity onPress={useCurrentLocation}>
           <Image
@@ -189,10 +289,7 @@ const HomeScreen: React.FC = () => {
           renderItem={({ item }) => (
             <Text
               style={styles.suggestionItem}
-              onPress={() => {
-                setCity(item.description);
-                setSuggestions([]);
-              }}
+              onPress={() => handleSuggestionSelect(item.description)}
             >
               {item.description}
             </Text>
@@ -207,7 +304,7 @@ const HomeScreen: React.FC = () => {
       ) : places.length > 0 ? (
         <PlaceList places={places} onFeedback={handleFeedback} />
       ) : (
-        <Text>No places found...</Text>
+        <Text>{emptyMessage}</Text>
       )}
     </View>
   );

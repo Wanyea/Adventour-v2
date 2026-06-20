@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, g
-from models import db, User, Friendship, Trip, TripMember, TripPlace, PlaceRating
-from auth import require_auth, optional_auth
+from adventour_backend.models import db, User, Friendship, Trip, TripMember, TripPlace, PlaceRating
+from adventour_backend.auth import require_auth, optional_auth
 from datetime import datetime, date
 from sqlalchemy import and_, or_
 

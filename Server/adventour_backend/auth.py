@@ -1,29 +1,51 @@
-import firebase_admin
-from firebase_admin import credentials, auth
 from functools import wraps
 from flask import request, jsonify, g
-from models import db, User
+from adventour_backend.models import db, User
 import os
+
+try:
+    import firebase_admin
+    from firebase_admin import credentials, auth
+except ImportError:
+    firebase_admin = None
+    credentials = None
+    auth = None
 
 # Initialize Firebase Admin SDK
 # In production, you'll need to set up Firebase service account
 # For now, we'll use a placeholder - you'll need to configure this
-try:
-    # Check if already initialized
-    firebase_admin.get_app()
-except ValueError:
-    # Initialize with service account key (you'll need to set this up)
-    # For development, you can use a service account JSON file
-    if os.getenv('FIREBASE_SERVICE_ACCOUNT_PATH'):
-        cred = credentials.Certificate(os.getenv('FIREBASE_SERVICE_ACCOUNT_PATH'))
-        firebase_admin.initialize_app(cred)
-    else:
-        # For now, we'll use a placeholder - you'll need to configure Firebase
-        print("Warning: Firebase not configured. Please set up Firebase service account.")
-        firebase_admin.initialize_app()
+if firebase_admin:
+    try:
+        # Check if already initialized
+        firebase_admin.get_app()
+    except ValueError:
+        # Initialize with service account key (you'll need to set this up)
+        # For development, you can use a service account JSON file
+        if os.getenv('FIREBASE_SERVICE_ACCOUNT_PATH'):
+            cred = credentials.Certificate(os.getenv('FIREBASE_SERVICE_ACCOUNT_PATH'))
+            firebase_admin.initialize_app(cred)
+        else:
+            # For now, we'll use a placeholder - you'll need to configure Firebase
+            print("Warning: Firebase not configured. Please set up Firebase service account.")
+            firebase_admin.initialize_app()
+else:
+    print("Warning: firebase-admin is not installed. Only ADVENTOUR_DEV_AUTH=true tokens will work.")
 
 def verify_firebase_token(token):
     """Verify Firebase ID token and return user info"""
+    if os.getenv('ADVENTOUR_DEV_AUTH') == 'true' and token.startswith('dev:'):
+        email = token.replace('dev:', '', 1) or 'dev@adventour.local'
+        username = email.split('@')[0]
+        return {
+            'uid': f'dev-{username}',
+            'email': email,
+            'name': username,
+        }
+
+    if not auth:
+        print("Token verification failed: firebase-admin is not installed.")
+        return None
+
     try:
         decoded_token = auth.verify_id_token(token)
         return decoded_token

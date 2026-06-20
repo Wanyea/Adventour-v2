@@ -1,4 +1,4 @@
-from chain_list import CHAIN_NAMES
+from adventour_backend.data.chain_list import CHAIN_NAMES
 
 def is_chain(place_name):
     name = place_name.lower()
@@ -9,8 +9,8 @@ def is_chain(place_name):
 
 def is_hidden_gem(place):
     # Hidden gem: high rating, low review count, not a chain
-    rating = place.get('rating', 0)
-    reviews = place.get('user_ratings_total', 0)
+    rating = place.get('rating') or 0
+    reviews = place.get('user_ratings_total') or 0
     name = place.get('name', '')
     return (
         rating >= 4.5 and

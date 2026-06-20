@@ -1,6 +1,19 @@
+import NativeConfig from 'react-native-config';
+
 class Config {
-  static BACKEND_BASE_URL = "https://adventour-73dfb.ue.r.appspot.com";
-  static GOOGLE_API_KEY = "AIzaSyD-RpERPi4HTQl3oiTWtbgZTXVu-kyN4as";
+  static BACKEND_BASE_URL =
+    NativeConfig.BACKEND_BASE_URL || 'http://10.0.2.2:8080';
+  static GOOGLE_API_KEY = NativeConfig.GOOGLE_API_KEY || '';
+  static API_AUTH_MODE = NativeConfig.API_AUTH_MODE || 'firebase';
+  static DEV_AUTH_EMAIL = NativeConfig.DEV_AUTH_EMAIL || 'dev@adventour.local';
+
+  static getDevAuthHeader() {
+    if (Config.API_AUTH_MODE !== 'dev') {
+      return undefined;
+    }
+
+    return `Bearer dev:${Config.DEV_AUTH_EMAIL}`;
+  }
 }
 
 export default Config;

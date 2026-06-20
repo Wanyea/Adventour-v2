@@ -104,7 +104,15 @@ pip install firebase-admin==6.4.0 PyJWT==2.8.0
 ```
 
 ### 4. Deploy Updated Backend
+
+App Engine uses `Server/app.yaml` as its deployment manifest. Keep the real
+`app.yaml` local because it contains deployment environment variables. Start
+from the committed template:
+
 ```bash
+cd Server
+cp app.yaml.example app.yaml
+# Edit app.yaml with your Cloud SQL settings and server-side Google Maps key.
 gcloud app deploy
 ```
 
