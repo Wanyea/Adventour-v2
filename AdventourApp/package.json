@@ -6,6 +6,7 @@
     "android": "react-native run-android",
     "android:local": "powershell -ExecutionPolicy Bypass -File ..\\scripts\\dev-android.ps1 -EnvFile .env.android.local -SkipInstall",
     "android:local:pixel7": "powershell -ExecutionPolicy Bypass -File ..\\scripts\\dev-android.ps1 -EnvFile .env.android.local -AvdName Pixel_7_API_30 -SkipInstall",
+    "android:local:pixel7:reset": "powershell -ExecutionPolicy Bypass -File ..\\scripts\\dev-android.ps1 -EnvFile .env.android.local -AvdName Pixel_7_API_30 -SkipInstall -ResetApp",
     "android:phone": "powershell -ExecutionPolicy Bypass -File ..\\scripts\\dev-android.ps1 -EnvFile .env.phone.local -SkipInstall",
     "ios": "react-native run-ios",
     "lint": "eslint .",

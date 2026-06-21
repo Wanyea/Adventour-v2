@@ -70,7 +70,7 @@ const HomeScreen: React.FC = () => {
   const [currentCoords, setCurrentCoords] = useState<Coordinates | null>(null);
   const [locationMode, setLocationMode] = useState<LocationMode>('none');
   const [suggestions, setSuggestions] = useState<any[]>([]); 
-  const [emptyMessage, setEmptyMessage] = useState<string>('No places found...');
+  const [emptyMessage, setEmptyMessage] = useState<string>('');
   const [hasLoadedRecommendations, setHasLoadedRecommendations] = useState(false);
   const [radiusOption, setRadiusOption] = useState<RadiusOption>(RADIUS_OPTIONS[1]);
   const [filtersOpen, setFiltersOpen] = useState(false);

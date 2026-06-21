@@ -170,7 +170,7 @@ const AdventourLaunchHero: React.FC<Props> = ({
 
   const floatY = floatAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, -7],
+    outputRange: [0, -25],
   });
 
   const launchY = launchAnim.interpolate({
@@ -190,7 +190,7 @@ const AdventourLaunchHero: React.FC<Props> = ({
 
       <View style={styles.launchRow}>
         <View style={styles.copy}>
-          <Text style={styles.stepLabel}>1. Set your launch point</Text>
+          <Text style={styles.stepLabel}>Set your launch point</Text>
           <Text style={styles.title}>Where should the balloon land?</Text>
           <Text style={styles.subtitle} numberOfLines={2}>
             {activeStopName
@@ -261,8 +261,8 @@ const styles = StyleSheet.create({
   },
   logo: {
     position: 'absolute',
-    top: 10,
-    left: 14,
+    top: 0,
+    left: -45,
     width: 268,
     height: 74,
     marginLeft: -12,

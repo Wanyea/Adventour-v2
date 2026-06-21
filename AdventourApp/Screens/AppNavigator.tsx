@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Image } from 'react-native';
 import LoginScreen from './LoginScreen';
 import FirebaseAuthScreen from './FirebaseAuthScreen';
 import OnboardingScreen from './OnboardingScreen';
@@ -15,6 +16,12 @@ import Config from '../src/Config';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+
+const tabIcons = {
+  Home: require('../src/assets/tabs/tab-pin.png'),
+  Social: require('../src/assets/tabs/tab-beacon.png'),
+  Profile: require('../src/assets/tabs/tab-user.png'),
+};
 
 const AppNavigator = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -86,7 +93,7 @@ const AppNavigator = () => {
 
   const MainTabs = () => (
     <Tab.Navigator
-      screenOptions={{
+      screenOptions={({ route }) => ({
         headerStyle: {
           backgroundColor: '#bfeaf4',
           shadowColor: 'transparent',
@@ -102,7 +109,18 @@ const AppNavigator = () => {
         },
         tabBarActiveTintColor: '#ff9f1c',
         tabBarInactiveTintColor: '#dff6f2',
-      }}
+        tabBarIcon: ({ color, focused }) => (
+          <Image
+            source={tabIcons[route.name as keyof typeof tabIcons]}
+            resizeMode="contain"
+            style={{
+              width: route.name === 'Social' ? 25 : 28,
+              height: route.name === 'Social' ? 25 : 28,
+              tintColor: focused ? '#ff4b47' : color,
+            }}
+          />
+        ),
+      })}
     >
       <Tab.Screen 
         name="Home" 

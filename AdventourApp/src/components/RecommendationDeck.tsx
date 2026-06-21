@@ -11,6 +11,7 @@ import {
 import { Place } from '../types/Place';
 import { StarRating } from './PlaceDetailsModal';
 import { tagGroupLabel, tagGroupMeta } from '../placeTagGroups';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 type Props = {
   places: Place[];
@@ -66,9 +67,9 @@ const TravelTimes = ({ place, muted = false }: { place: Place; muted?: boolean }
   }
 
   const items = [
-    { label: 'Walk', icon: 'W', minutes: times.walk_minutes },
-    { label: 'Car', icon: 'C', minutes: times.drive_minutes },
-    { label: 'Train', icon: 'T', minutes: times.transit_minutes },
+    { label: 'Walk', icon: 'walk', minutes: times.walk_minutes },
+    { label: 'Car', icon: 'car', minutes: times.drive_minutes },
+    { label: 'Train', icon: 'train', minutes: times.transit_minutes },
   ].filter((item): item is { label: string; icon: string; minutes: number } => typeof item.minutes === 'number');
 
   if (!items.length) {
@@ -79,9 +80,12 @@ const TravelTimes = ({ place, muted = false }: { place: Place; muted?: boolean }
     <View style={styles.travelRow}>
       {items.map(({ label, icon, minutes }) => (
         <View key={label} style={[styles.travelPill, muted && styles.mutedTravelPill]}>
-          <Text style={styles.travelIcon} accessibilityLabel={label}>
-            {icon}
-          </Text>
+          <Icon
+            name={icon}
+            size={14}
+            color={muted ? '#6b7280' : '#123c69'}
+            accessibilityLabel={label}
+          />
           <Text style={[styles.travelText, muted && styles.mutedTravelText]}>
             {minutes} min
           </Text>
@@ -480,9 +484,6 @@ const styles = StyleSheet.create({
     color: '#374151',
     fontSize: 11,
     fontWeight: '800',
-  },
-  travelIcon: {
-    fontSize: 12,
   },
   mutedTravelText: {
     color: '#6b7280',

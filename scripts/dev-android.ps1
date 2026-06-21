@@ -1,7 +1,8 @@
 param(
     [string]$EnvFile = ".env.android.local",
     [string]$AvdName = "",
-    [switch]$SkipInstall
+    [switch]$SkipInstall,
+    [switch]$ResetApp
 )
 
 $ErrorActionPreference = "Stop"
@@ -67,6 +68,11 @@ try {
     Write-Host "Reversing Metro port for Android debug builds..."
     & $adb reverse tcp:8081 tcp:8081 | Out-Null
 
+    if ($ResetApp) {
+        Write-Host "Resetting installed Adventour app data before install..."
+        & $adb uninstall com.adventourapp | Out-Null
+    }
+
     $metroRunning = $false
     try {
         $metroStatus = Invoke-WebRequest -UseBasicParsing -Uri "http://localhost:8081/status" -TimeoutSec 2
@@ -91,6 +97,28 @@ try {
     Write-Host "Installing Android app with ENVFILE=$EnvFile..."
     $env:ENVFILE = $EnvFile
     npx react-native run-android --no-packager
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host ""
+        Write-Host "Android install failed." -ForegroundColor Red
+
+        try {
+            $dataUsage = & $adb shell df -h /data 2>$null
+            if ($dataUsage) {
+                Write-Host "Emulator /data storage:"
+                $dataUsage | ForEach-Object { Write-Host "  $_" }
+            }
+        }
+        catch {
+            Write-Host "Could not read emulator storage diagnostics."
+        }
+
+        Write-Host ""
+        Write-Host "If the error is INSTALL_FAILED_INSUFFICIENT_STORAGE, free emulator space with one of these:" -ForegroundColor Yellow
+        Write-Host "  npm run android:local:pixel7:reset"
+        Write-Host "  Android Studio > Device Manager > Pixel_7_API_30 > Wipe Data"
+        Write-Host ""
+        throw "React Native Android install failed."
+    }
 }
 finally {
     Pop-Location

@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import { Place } from '../types/Place';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 type Props = {
   place: Place | null;
@@ -43,9 +44,9 @@ const TravelTimes = ({ place }: { place: Place }) => {
   }
 
   const items = [
-    { label: 'Walk', icon: 'W', minutes: times.walk_minutes },
-    { label: 'Car', icon: 'C', minutes: times.drive_minutes },
-    { label: 'Train', icon: 'T', minutes: times.transit_minutes },
+    { label: 'Walk', icon: 'walk', minutes: times.walk_minutes },
+    { label: 'Car', icon: 'car', minutes: times.drive_minutes },
+    { label: 'Train', icon: 'train', minutes: times.transit_minutes },
   ].filter((item): item is { label: string; icon: string; minutes: number } => typeof item.minutes === 'number');
 
   if (!items.length) {
@@ -56,9 +57,7 @@ const TravelTimes = ({ place }: { place: Place }) => {
     <View style={styles.travelRow}>
       {items.map(({ label, icon, minutes }) => (
         <View key={label} style={styles.travelPill}>
-          <Text style={styles.travelIcon} accessibilityLabel={label}>
-            {icon}
-          </Text>
+          <Icon name={icon} size={15} color="#123c69" accessibilityLabel={label} />
           <Text style={styles.travelText}>{minutes} min</Text>
         </View>
       ))}
