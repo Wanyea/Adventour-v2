@@ -176,3 +176,44 @@ class UserPreferenceVector(db.Model):
     __table_args__ = (
         db.UniqueConstraint('user_id', 'vector_type', name='unique_user_vector_type'),
     )
+
+class AdventourSession(db.Model):
+    """A spontaneous trip-by-trip Adventour that can be resumed, completed, and shared."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
+    title = db.Column(db.String(255), nullable=False)
+    status = db.Column(db.String(30), default='active', index=True)  # active, completed, abandoned
+    started_at = db.Column(db.DateTime, default=datetime.utcnow)
+    ended_at = db.Column(db.DateTime)
+    companion_user_ids_json = db.Column(db.Text)
+    summary_json = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    user = db.relationship('User', backref=db.backref('adventour_sessions', lazy='dynamic'))
+    stops = db.relationship(
+        'AdventourStop',
+        backref='session',
+        lazy='dynamic',
+        order_by='AdventourStop.order_index',
+        cascade='all, delete-orphan',
+    )
+
+class AdventourStop(db.Model):
+    """One place visited or skipped during an Adventour session."""
+    id = db.Column(db.Integer, primary_key=True)
+    session_id = db.Column(db.Integer, db.ForeignKey('adventour_session.id'), nullable=False, index=True)
+    place_id = db.Column(db.Integer, db.ForeignKey('place.id'), nullable=False)
+    provider_ref_id = db.Column(db.Integer, db.ForeignKey('place_provider_ref.id'))
+    order_index = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.String(30), default='planned')  # planned, navigating, arrived, completed, skipped
+    selected_at = db.Column(db.DateTime, default=datetime.utcnow)
+    navigation_started_at = db.Column(db.DateTime)
+    arrived_at = db.Column(db.DateTime)
+    departed_at = db.Column(db.DateTime)
+    rating = db.Column(db.Integer)
+    notes = db.Column(db.Text)
+    metadata_json = db.Column(db.Text)
+
+    place = db.relationship('Place')
+    provider_ref = db.relationship('PlaceProviderRef')

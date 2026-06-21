@@ -8,6 +8,7 @@ import FirebaseAuthScreen from './FirebaseAuthScreen';
 import OnboardingScreen from './OnboardingScreen';
 import HomeScreen from '../HomeScreen';
 import SocialScreen from './SocialScreen';
+import ProfileScreen from './ProfileScreen';
 import AuthService, { User } from '../src/services/AuthService';
 import axios from 'axios';
 import Config from '../src/Config';
@@ -84,7 +85,25 @@ const AppNavigator = () => {
   };
 
   const MainTabs = () => (
-    <Tab.Navigator>
+    <Tab.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#bfeaf4',
+          shadowColor: 'transparent',
+          elevation: 0,
+        },
+        headerTintColor: '#123c69',
+        headerTitleStyle: {
+          fontWeight: '900',
+        },
+        tabBarStyle: {
+          backgroundColor: '#123c69',
+          borderTopColor: '#0b2a49',
+        },
+        tabBarActiveTintColor: '#ff9f1c',
+        tabBarInactiveTintColor: '#dff6f2',
+      }}
+    >
       <Tab.Screen 
         name="Home" 
         component={HomeScreen}
@@ -94,6 +113,11 @@ const AppNavigator = () => {
         name="Social" 
         component={SocialScreen}
         options={{ title: 'Friends & Trips' }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{ title: 'Profile' }}
       />
     </Tab.Navigator>
   );

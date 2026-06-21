@@ -67,16 +67,30 @@ try {
     Write-Host "Reversing Metro port for Android debug builds..."
     & $adb reverse tcp:8081 tcp:8081 | Out-Null
 
-    Write-Host "Starting Metro in a separate terminal..."
-    Start-Process powershell -ArgumentList @(
-        "-NoExit",
-        "-Command",
-        "cd '$appDir'; `$env:ENVFILE='$EnvFile'; npx react-native start --reset-cache"
-    )
+    $metroRunning = $false
+    try {
+        $metroStatus = Invoke-WebRequest -UseBasicParsing -Uri "http://localhost:8081/status" -TimeoutSec 2
+        $metroRunning = $metroStatus.Content -match "packager-status:running"
+    }
+    catch {
+        $metroRunning = $false
+    }
+
+    if ($metroRunning) {
+        Write-Host "Metro is already running on http://localhost:8081."
+    }
+    else {
+        Write-Host "Starting Metro in a separate terminal..."
+        Start-Process powershell -ArgumentList @(
+            "-NoExit",
+            "-Command",
+            "cd '$appDir'; `$env:ENVFILE='$EnvFile'; npx react-native start --reset-cache"
+        )
+    }
 
     Write-Host "Installing Android app with ENVFILE=$EnvFile..."
     $env:ENVFILE = $EnvFile
-    npm run android
+    npx react-native run-android --no-packager
 }
 finally {
     Pop-Location

@@ -12,6 +12,8 @@ from adventour_backend.models import (
     UserPreferenceVector,
 )
 from adventour_backend.providers.place_providers import ProviderRegistry
+from adventour_backend.services.google_services_api import first_photo_url
+from adventour_backend.services.place_classification import classify_recommendation_lane, is_discoverable_candidate
 from adventour_backend.utils import is_chain, is_hidden_gem, review_sentiment_score
 
 
@@ -65,6 +67,17 @@ def _clamp(value, minimum=0.0, maximum=1.0):
     return max(minimum, min(maximum, value))
 
 
+def _travel_time_estimates(distance_meters):
+    if distance_meters is None:
+        return None
+
+    return {
+        "walk_minutes": max(1, round(distance_meters / 80)),
+        "drive_minutes": max(1, round(distance_meters / 500)),
+        "transit_minutes": max(2, round(distance_meters / 300) + 5),
+    }
+
+
 class RecommendationService:
     """Build preference vectors, score places, and log recommendation events."""
 
@@ -88,13 +101,99 @@ class RecommendationService:
             constraints=constraints,
         )
 
+        decided_place_ids = self._decided_place_ids(user) if constraints.get("exclude_decided", True) else set()
+        scored, skipped_decided = self._score_candidates(
+            raw_candidates=raw_candidates,
+            user=user,
+            members=members,
+            member_vectors=member_vectors,
+            constraints=constraints,
+            location=location,
+            radius_meters=radius_meters,
+            mode=mode,
+            decided_place_ids=decided_place_ids,
+            allow_decided=False,
+        )
+
+        repeated_decided = False
+        if not scored and skipped_decided and constraints.get("repeat_decided_on_exhaustion", True):
+            scored, _ = self._score_candidates(
+                raw_candidates=skipped_decided,
+                user=user,
+                members=members,
+                member_vectors=member_vectors,
+                constraints=constraints,
+                location=location,
+                radius_meters=radius_meters,
+                mode=mode,
+                decided_place_ids=set(),
+                allow_decided=True,
+            )
+            repeated_decided = bool(scored)
+
+        db.session.commit()
+        scored.sort(key=lambda item: item["score"], reverse=True)
+        return {
+            "mode": mode,
+            "member_count": len(members),
+            "query_tags": query_tags,
+            "provider_errors": provider_errors,
+            "repeated_decided": repeated_decided,
+            "recommendations": scored[: constraints.get("limit", 20)],
+        }
+
+    def record_event(self, user, place, event_type, provider_ref=None, event_value=None, context="solo", metadata=None, commit=True):
+        if event_type not in EVENT_WEIGHTS:
+            raise ValueError(f"Unsupported event_type: {event_type}")
+
+        event = UserPlaceEvent(
+            user_id=user.id,
+            place_id=place.id,
+            provider_ref_id=provider_ref.id if provider_ref else None,
+            event_type=event_type,
+            event_value=event_value,
+            context=context,
+            metadata_json=_json_dumps(metadata),
+        )
+        db.session.add(event)
+
+        if commit:
+            self.rebuild_preference_vector(user, commit=False)
+            db.session.commit()
+
+        return event
+
+    def _score_candidates(
+        self,
+        raw_candidates,
+        user,
+        members,
+        member_vectors,
+        constraints,
+        location,
+        radius_meters,
+        mode,
+        decided_place_ids,
+        allow_decided=False,
+    ):
         scored = []
+        skipped_decided = []
         seen_place_ids = set()
+
         for candidate in raw_candidates:
+            if not is_discoverable_candidate(
+                candidate.get("name"),
+                candidate.get("types") or candidate.get("categories") or [],
+            ):
+                continue
+
             place, provider_ref, feature = self.upsert_candidate(candidate)
             if not place or place.id in seen_place_ids:
                 continue
             seen_place_ids.add(place.id)
+            if place.id in decided_place_ids and not allow_decided:
+                skipped_decided.append(candidate)
+                continue
 
             distance_meters = _haversine_meters(
                 location.get("latitude"),
@@ -123,7 +222,11 @@ class RecommendationService:
                 provider_ref=provider_ref,
                 event_type="impression",
                 context="group" if len(members) > 1 else "solo",
-                metadata={"mode": mode, "score": score["score"]},
+                metadata={
+                    "mode": mode,
+                    "score": score["score"],
+                    "repeat_after_exhaustion": allow_decided,
+                },
                 commit=False,
             )
 
@@ -132,45 +235,19 @@ class RecommendationService:
                 "provider": candidate.get("provider"),
                 "provider_place_id": candidate.get("place_id") or candidate.get("fsq_id"),
                 "name": place.canonical_name,
+                "category": self._recommendation_category(candidate),
                 "latitude": place.latitude,
                 "longitude": place.longitude,
                 "distance_meters": round(distance_meters) if distance_meters is not None else None,
+                "travel_times": _travel_time_estimates(distance_meters),
                 "score": round(score["score"], 3),
                 "components": score["components"],
                 "explanation": score["explanation"],
                 "display": self._display_payload(candidate),
+                "repeat_after_exhaustion": allow_decided,
             })
 
-        db.session.commit()
-        scored.sort(key=lambda item: item["score"], reverse=True)
-        return {
-            "mode": mode,
-            "member_count": len(members),
-            "query_tags": query_tags,
-            "provider_errors": provider_errors,
-            "recommendations": scored[: constraints.get("limit", 20)],
-        }
-
-    def record_event(self, user, place, event_type, provider_ref=None, event_value=None, context="solo", metadata=None, commit=True):
-        if event_type not in EVENT_WEIGHTS:
-            raise ValueError(f"Unsupported event_type: {event_type}")
-
-        event = UserPlaceEvent(
-            user_id=user.id,
-            place_id=place.id,
-            provider_ref_id=provider_ref.id if provider_ref else None,
-            event_type=event_type,
-            event_value=event_value,
-            context=context,
-            metadata_json=_json_dumps(metadata),
-        )
-        db.session.add(event)
-
-        if commit:
-            self.rebuild_preference_vector(user, commit=False)
-            db.session.commit()
-
-        return event
+        return scored, skipped_decided
 
     def build_preference_vector(self, user):
         existing = UserPreferenceVector.query.filter_by(user_id=user.id, vector_type="phase1").first()
@@ -294,6 +371,17 @@ class RecommendationService:
         ids.update(int(member_id) for member_id in member_ids if member_id)
         return User.query.filter(User.id.in_(ids)).all()
 
+    def _decided_place_ids(self, user):
+        events = (
+            UserPlaceEvent.query
+            .filter(
+                UserPlaceEvent.user_id == user.id,
+                UserPlaceEvent.event_type.in_(["accept", "reject"]),
+            )
+            .all()
+        )
+        return {event.place_id for event in events}
+
     def _query_tags(self, vectors, fallback_user):
         scores = {}
         for vector in vectors:
@@ -403,6 +491,7 @@ class RecommendationService:
         )
 
     def _display_payload(self, candidate):
+        photos = candidate.get("photos") or []
         return {
             "name": candidate.get("name"),
             "vicinity": candidate.get("vicinity") or (candidate.get("location") or {}).get("formatted_address"),
@@ -411,7 +500,15 @@ class RecommendationService:
             "price_level": candidate.get("price_level") or candidate.get("price"),
             "business_status": candidate.get("business_status"),
             "types": candidate.get("types") or candidate.get("categories") or [],
+            "photo_url": first_photo_url(photos),
+            "photo_attributions": photos[0].get("author_attributions", []) if photos else [],
         }
+
+    def _recommendation_category(self, candidate):
+        return classify_recommendation_lane(
+            candidate.get("name"),
+            candidate.get("types") or candidate.get("categories") or [],
+        )
 
     def _quality_score(self, feature, candidate):
         provider_rating = candidate.get("rating")

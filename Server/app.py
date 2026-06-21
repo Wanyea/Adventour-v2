@@ -1,16 +1,29 @@
-from flask import Flask, request, jsonify, g
+from flask import Flask, request, jsonify, g, redirect
 from flask_cors import CORS
 from adventour_backend.services.google_services_api import GoogleServicesAPI
-from adventour_backend.models import db, User, UserTagFeedback, PlaceRating, Place, PlaceProviderRef
+from adventour_backend.models import (
+    db,
+    User,
+    UserTagFeedback,
+    PlaceRating,
+    Place,
+    PlaceProviderRef,
+    UserPlaceEvent,
+    PlaceFeature,
+    AdventourSession,
+    AdventourStop,
+)
 from adventour_backend.auth import require_auth, optional_auth
 from adventour_backend.social_routes import social_bp
 from adventour_backend.services.recommender_service import RecommendationService
+from adventour_backend.services.google_services_api import first_photo_url
 
 from dotenv import load_dotenv
 from urllib.parse import quote_plus
 from datetime import datetime
 import os
 import logging
+import json
 
 env_file = os.getenv("ENV_FILE")
 if env_file:
@@ -19,6 +32,21 @@ else:
     load_dotenv()
 
 logger = logging.getLogger(__name__)
+
+
+def place_display_payload(candidate):
+    photos = candidate.get("photos") or []
+    return {
+        "name": candidate.get("name"),
+        "vicinity": candidate.get("vicinity") or candidate.get("formatted_address") or (candidate.get("location") or {}).get("formatted_address"),
+        "rating": candidate.get("rating"),
+        "user_ratings_total": candidate.get("user_ratings_total"),
+        "price_level": candidate.get("price_level") or candidate.get("price"),
+        "business_status": candidate.get("business_status"),
+        "types": candidate.get("types") or candidate.get("categories") or [],
+        "photo_url": first_photo_url(photos),
+        "photo_attributions": photos[0].get("author_attributions", []) if photos else [],
+    }
 
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = quote_plus(os.getenv("DB_PASSWORD") or "")
@@ -93,6 +121,91 @@ def get_request_user(allow_legacy_id=False):
             return User.query.filter_by(uuid=user_id).first()
 
     return None
+
+def parse_json_object(value, fallback=None):
+    if not value:
+        return fallback if fallback is not None else {}
+    try:
+        parsed = json.loads(value)
+        return parsed if isinstance(parsed, dict) else (fallback if fallback is not None else {})
+    except (TypeError, ValueError):
+        return fallback if fallback is not None else {}
+
+def isoformat_or_none(value):
+    return value.isoformat() if value else None
+
+def resolve_place_reference(data):
+    adventour_place_id = data.get("place_id")
+    provider = data.get("provider")
+    provider_place_id = data.get("provider_place_id")
+
+    place = db.session.get(Place, adventour_place_id) if adventour_place_id else None
+    provider_ref = None
+    if provider and provider_place_id:
+        provider_ref = PlaceProviderRef.query.filter_by(
+            provider=provider,
+            provider_place_id=str(provider_place_id),
+        ).first()
+        if not place and provider_ref:
+            place = provider_ref.place
+
+    if not provider_ref and place:
+        provider_ref = PlaceProviderRef.query.filter_by(place_id=place.id).first()
+
+    return place, provider_ref
+
+def serialize_adventour_stop(stop):
+    metadata = parse_json_object(stop.metadata_json)
+    display = metadata.get("display") or {}
+    place = stop.place
+    provider_ref = stop.provider_ref
+    duration_seconds = None
+    if stop.arrived_at:
+        end_time = stop.departed_at or datetime.utcnow()
+        duration_seconds = max(0, int((end_time - stop.arrived_at).total_seconds()))
+
+    return {
+        "id": stop.id,
+        "session_id": stop.session_id,
+        "place_id": stop.place_id,
+        "provider": provider_ref.provider if provider_ref else metadata.get("provider"),
+        "provider_place_id": provider_ref.provider_place_id if provider_ref else metadata.get("provider_place_id"),
+        "order_index": stop.order_index,
+        "status": stop.status,
+        "selected_at": isoformat_or_none(stop.selected_at),
+        "navigation_started_at": isoformat_or_none(stop.navigation_started_at),
+        "arrived_at": isoformat_or_none(stop.arrived_at),
+        "departed_at": isoformat_or_none(stop.departed_at),
+        "duration_seconds": duration_seconds,
+        "rating": stop.rating,
+        "notes": stop.notes,
+        "display": {
+            "name": display.get("name") or (place.canonical_name if place else None),
+            "vicinity": display.get("vicinity"),
+            "types": display.get("types") or [],
+            "photo_url": display.get("photo_url"),
+            "photo_attributions": display.get("photo_attributions") or [],
+            "rating": display.get("rating"),
+            "user_ratings_total": display.get("user_ratings_total"),
+            "price_level": display.get("price_level"),
+            "latitude": display.get("latitude") or (place.latitude if place else None),
+            "longitude": display.get("longitude") or (place.longitude if place else None),
+        },
+    }
+
+def serialize_adventour_session(session, include_stops=True):
+    stops = session.stops.all() if include_stops else []
+    return {
+        "id": session.id,
+        "title": session.title,
+        "status": session.status,
+        "started_at": isoformat_or_none(session.started_at),
+        "ended_at": isoformat_or_none(session.ended_at),
+        "companion_user_ids": parse_json_object(session.companion_user_ids_json, {"ids": []}).get("ids", []),
+        "summary": parse_json_object(session.summary_json),
+        "stops": [serialize_adventour_stop(stop) for stop in stops],
+        "active_stop": serialize_adventour_stop(stops[-1]) if stops and stops[-1].status in ("planned", "navigating", "arrived") else None,
+    }
     
 @app.route('/onboarding', methods=['POST'])
 @optional_auth
@@ -368,12 +481,13 @@ def record_place_event():
 
     if adventour_place_id:
         place = Place.query.get(adventour_place_id)
-    elif provider and provider_place_id:
+    if provider and provider_place_id:
         provider_ref = PlaceProviderRef.query.filter_by(
             provider=provider,
             provider_place_id=str(provider_place_id)
         ).first()
-        place = provider_ref.place if provider_ref else None
+        if not place and provider_ref:
+            place = provider_ref.place
 
     if not place:
         return jsonify({"error": "Unknown place. Request recommendations before recording events."}), 404
@@ -392,6 +506,329 @@ def record_place_event():
         return jsonify({"error": str(exc)}), 400
 
     return jsonify({"message": "Event recorded"}), 201
+
+@app.route('/api/adventours/active', methods=['GET'])
+@require_auth
+def get_active_adventour():
+    session = (
+        AdventourSession.query
+        .filter_by(user_id=g.current_user.id, status="active")
+        .order_by(AdventourSession.started_at.desc())
+        .first()
+    )
+    return jsonify({"adventour": serialize_adventour_session(session) if session else None}), 200
+
+@app.route('/api/adventours', methods=['POST'])
+@require_auth
+def start_adventour():
+    data = request.json or {}
+    user = g.current_user
+
+    existing = AdventourSession.query.filter_by(user_id=user.id, status="active").first()
+    if existing:
+        return jsonify({"adventour": serialize_adventour_session(existing), "message": "Active Adventour resumed"}), 200
+
+    title = data.get("title") or f"{user.display_name or user.username or 'My'} Adventour"
+    companion_ids = data.get("companion_user_ids") or []
+    session = AdventourSession(
+        user_id=user.id,
+        title=title,
+        companion_user_ids_json=json.dumps({"ids": companion_ids}),
+    )
+    db.session.add(session)
+    db.session.commit()
+
+    return jsonify({"adventour": serialize_adventour_session(session), "message": "Adventour started"}), 201
+
+@app.route('/api/adventours/<int:session_id>/stops', methods=['POST'])
+@require_auth
+def add_adventour_stop(session_id):
+    data = request.json or {}
+    user = g.current_user
+    session = AdventourSession.query.filter_by(id=session_id, user_id=user.id, status="active").first()
+    if not session:
+        return jsonify({"error": "Active Adventour not found"}), 404
+
+    place, provider_ref = resolve_place_reference(data)
+    if not place:
+        return jsonify({"error": "Unknown place. Request recommendations before adding a stop."}), 404
+
+    active_stop = (
+        AdventourStop.query
+        .filter(
+            AdventourStop.session_id == session.id,
+            AdventourStop.status.in_(("planned", "navigating", "arrived")),
+        )
+        .order_by(AdventourStop.order_index.desc())
+        .first()
+    )
+    if active_stop:
+        return jsonify({
+            "error": "Finish or skip the current stop before choosing another place.",
+            "active_stop": serialize_adventour_stop(active_stop),
+        }), 409
+
+    order_index = session.stops.count()
+    display = data.get("display") or {}
+    metadata = {
+        "source": data.get("source", "recommendation_deck"),
+        "provider": data.get("provider"),
+        "provider_place_id": data.get("provider_place_id"),
+        "display": display,
+    }
+    stop = AdventourStop(
+        session_id=session.id,
+        place_id=place.id,
+        provider_ref_id=provider_ref.id if provider_ref else None,
+        order_index=order_index,
+        status="navigating",
+        navigation_started_at=datetime.utcnow(),
+        metadata_json=json.dumps(metadata),
+    )
+    db.session.add(stop)
+    recommendation_service.record_event(
+        user=user,
+        place=place,
+        provider_ref=provider_ref,
+        event_type="navigate",
+        context="adventour",
+        metadata={"adventour_session_id": session.id, "display": display},
+        commit=False,
+    )
+    db.session.commit()
+
+    return jsonify({
+        "adventour": serialize_adventour_session(session),
+        "stop": serialize_adventour_stop(stop),
+        "message": "Stop added",
+    }), 201
+
+@app.route('/api/adventours/<int:session_id>/stops/<int:stop_id>/arrive', methods=['POST'])
+@require_auth
+def arrive_adventour_stop(session_id, stop_id):
+    user = g.current_user
+    session = AdventourSession.query.filter_by(id=session_id, user_id=user.id, status="active").first()
+    stop = AdventourStop.query.filter_by(id=stop_id, session_id=session_id).first() if session else None
+    if not session or not stop:
+        return jsonify({"error": "Active Adventour stop not found"}), 404
+
+    stop.status = "arrived"
+    stop.arrived_at = stop.arrived_at or datetime.utcnow()
+    recommendation_service.record_event(
+        user=user,
+        place=stop.place,
+        provider_ref=stop.provider_ref,
+        event_type="arrival",
+        context="adventour",
+        metadata={"adventour_session_id": session.id, "adventour_stop_id": stop.id},
+        commit=False,
+    )
+    db.session.commit()
+
+    return jsonify({"adventour": serialize_adventour_session(session), "stop": serialize_adventour_stop(stop)}), 200
+
+@app.route('/api/adventours/<int:session_id>/stops/<int:stop_id>/complete', methods=['POST'])
+@require_auth
+def complete_adventour_stop(session_id, stop_id):
+    data = request.json or {}
+    user = g.current_user
+    session = AdventourSession.query.filter_by(id=session_id, user_id=user.id, status="active").first()
+    stop = AdventourStop.query.filter_by(id=stop_id, session_id=session_id).first() if session else None
+    if not session or not stop:
+        return jsonify({"error": "Active Adventour stop not found"}), 404
+
+    rating = data.get("rating")
+    if rating is not None:
+        try:
+            rating = int(rating)
+        except (TypeError, ValueError):
+            return jsonify({"error": "rating must be an integer between 1 and 5"}), 400
+        if rating < 1 or rating > 5:
+            return jsonify({"error": "rating must be an integer between 1 and 5"}), 400
+
+    stop.status = "completed"
+    stop.arrived_at = stop.arrived_at or datetime.utcnow()
+    stop.departed_at = datetime.utcnow()
+    stop.rating = rating
+    stop.notes = data.get("notes")
+
+    if rating:
+        recommendation_service.record_event(
+            user=user,
+            place=stop.place,
+            provider_ref=stop.provider_ref,
+            event_type="rate",
+            event_value=rating,
+            context="adventour",
+            metadata={"adventour_session_id": session.id, "adventour_stop_id": stop.id},
+            commit=False,
+        )
+        recommendation_service.rebuild_preference_vector(user, commit=False)
+    db.session.commit()
+
+    return jsonify({"adventour": serialize_adventour_session(session), "stop": serialize_adventour_stop(stop)}), 200
+
+@app.route('/api/adventours/<int:session_id>/complete', methods=['POST'])
+@require_auth
+def complete_adventour(session_id):
+    user = g.current_user
+    session = AdventourSession.query.filter_by(id=session_id, user_id=user.id, status="active").first()
+    if not session:
+        return jsonify({"error": "Active Adventour not found"}), 404
+
+    now = datetime.utcnow()
+    for stop in session.stops.all():
+        if stop.status in ("planned", "navigating", "arrived"):
+            stop.status = "skipped" if not stop.arrived_at else "completed"
+            stop.departed_at = stop.departed_at or now
+
+    completed_stops = [stop for stop in session.stops.all() if stop.status == "completed"]
+    duration_seconds = int((now - session.started_at).total_seconds()) if session.started_at else 0
+    session.status = "completed"
+    session.ended_at = now
+    session.summary_json = json.dumps({
+        "stop_count": len(completed_stops),
+        "duration_seconds": max(0, duration_seconds),
+        "rated_stop_count": len([stop for stop in completed_stops if stop.rating]),
+    })
+    db.session.commit()
+
+    return jsonify({"adventour": serialize_adventour_session(session), "message": "Adventour completed"}), 200
+
+@app.route('/api/adventours/history', methods=['GET'])
+@require_auth
+def adventour_history():
+    limit = min(int(request.args.get("limit", 20)), 100)
+    sessions = (
+        AdventourSession.query
+        .filter_by(user_id=g.current_user.id)
+        .order_by(AdventourSession.started_at.desc())
+        .limit(limit)
+        .all()
+    )
+    return jsonify({"adventours": [serialize_adventour_session(session) for session in sessions]}), 200
+
+@app.route('/api/profile/history', methods=['GET'])
+@require_auth
+def profile_history():
+    user = g.current_user
+    event_type = request.args.get("event_type", "accept")
+    limit = min(int(request.args.get("limit", 30)), 100)
+
+    if event_type not in ("accept", "reject"):
+        return jsonify({"error": "event_type must be accept or reject"}), 400
+
+    events = (
+        UserPlaceEvent.query
+        .filter_by(user_id=user.id, event_type=event_type)
+        .order_by(UserPlaceEvent.occurred_at.desc())
+        .limit(limit)
+        .all()
+    )
+
+    places = []
+    for event in events:
+        place = db.session.get(Place, event.place_id)
+        if not place:
+            continue
+
+        provider_ref = None
+        if event.provider_ref_id:
+            provider_ref = db.session.get(PlaceProviderRef, event.provider_ref_id)
+        if not provider_ref:
+            provider_ref = PlaceProviderRef.query.filter_by(place_id=place.id).first()
+
+        feature = PlaceFeature.query.filter_by(place_id=place.id).first()
+        metadata = json.loads(event.metadata_json or "{}")
+        display = metadata.get("display") or {}
+        types = display.get("types") or list((feature and json.loads(feature.category_vector or "{}") or {}).keys())
+        places.append({
+            "place_id": place.id,
+            "provider": provider_ref.provider if provider_ref else None,
+            "provider_place_id": provider_ref.provider_place_id if provider_ref else None,
+            "name": display.get("name") or place.canonical_name,
+            "vicinity": display.get("vicinity"),
+            "latitude": place.latitude,
+            "longitude": place.longitude,
+            "event_type": event.event_type,
+            "occurred_at": event.occurred_at.isoformat() if event.occurred_at else None,
+            "category": display.get("category") or (event.context if event.context in ("food", "activity") else None),
+            "types": types,
+            "rating": display.get("rating"),
+            "user_ratings_total": display.get("user_ratings_total"),
+            "price_level": display.get("price_level"),
+            "photo_url": display.get("photo_url"),
+            "photo_attributions": display.get("photo_attributions") or [],
+        })
+
+    return jsonify({
+        "user": {
+            "id": user.id,
+            "username": user.username,
+            "display_name": user.display_name,
+            "preferences": user.preferences.split(",") if user.preferences else [],
+        },
+        "places": places,
+    }), 200
+
+@app.route('/api/places/details', methods=['GET'])
+@require_auth
+def place_details():
+    provider = request.args.get("provider")
+    provider_place_id = request.args.get("provider_place_id")
+    adventour_place_id = request.args.get("place_id")
+
+    place = db.session.get(Place, adventour_place_id) if adventour_place_id else None
+    provider_ref = None
+    if provider and provider_place_id:
+        provider_ref = PlaceProviderRef.query.filter_by(
+            provider=provider,
+            provider_place_id=str(provider_place_id)
+        ).first()
+        if not place and provider_ref:
+            place = provider_ref.place
+
+    candidate = None
+    if provider == "google" and provider_place_id:
+        candidate = GoogleServicesAPI.fetch_place_details(provider_place_id)
+
+    feature = PlaceFeature.query.filter_by(place_id=place.id).first() if place else None
+    display = place_display_payload(candidate) if candidate else {}
+    types = display.get("types") or list((feature and json.loads(feature.category_vector or "{}") or {}).keys())
+
+    if not place and not display:
+        return jsonify({"error": "Unknown place"}), 404
+
+    return jsonify({
+        "place_id": place.id if place else None,
+        "provider": provider_ref.provider if provider_ref else provider,
+        "provider_place_id": provider_ref.provider_place_id if provider_ref else provider_place_id,
+        "name": display.get("name") or (place.canonical_name if place else None),
+        "vicinity": display.get("vicinity"),
+        "latitude": place.latitude if place else None,
+        "longitude": place.longitude if place else None,
+        "types": types,
+        "rating": display.get("rating"),
+        "user_ratings_total": display.get("user_ratings_total"),
+        "price_level": display.get("price_level"),
+        "photo_url": display.get("photo_url"),
+        "photo_attributions": display.get("photo_attributions") or [],
+    }), 200
+
+@app.route('/api/places/photo', methods=['GET'])
+def place_photo():
+    photo_name = request.args.get("name")
+    max_width_px = int(request.args.get("max_width_px", 640))
+    max_height_px = int(request.args.get("max_height_px", 420))
+
+    photo_uri = GoogleServicesAPI.fetch_photo_uri(
+        photo_name,
+        max_width_px=max_width_px,
+        max_height_px=max_height_px,
+    )
+    if not photo_uri:
+        return jsonify({"error": "Unable to load place photo"}), 404
+    return redirect(photo_uri, code=302)
 
 @app.route('/api/recommendations', methods=['POST'])
 @require_auth

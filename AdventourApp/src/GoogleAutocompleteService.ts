@@ -7,7 +7,7 @@ type Location = {
 };
 
 class GoogleAutocompleteService {
-  static async fetchAutocompleteSuggestions(input: string, location?: Location | null) {
+  static async fetchAutocompleteSuggestions(input: string, location?: Location | null, radiusMeters = 3200) {
     if (input.trim().length < 3) {
       return [];
     }
@@ -15,7 +15,7 @@ class GoogleAutocompleteService {
     try {
       const params: Record<string, string | number> = {
         input,
-        radius_meters: 3200,
+        radius_meters: radiusMeters,
       };
       if (location) {
         params.latitude = location.latitude;

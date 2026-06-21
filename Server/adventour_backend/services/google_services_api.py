@@ -8,6 +8,7 @@ import requests
 import os
 import re
 from functools import lru_cache
+from urllib.parse import quote
 
 
 GOOGLE_PLACES_BASE_URL = "https://places.googleapis.com/v1"
@@ -23,6 +24,21 @@ GOOGLE_PLACE_FIELD_MASK = ",".join([
     "places.rating",
     "places.userRatingCount",
     "places.priceLevel",
+    "places.photos",
+])
+
+GOOGLE_PLACE_DETAILS_FIELD_MASK = ",".join([
+    "id",
+    "displayName",
+    "formattedAddress",
+    "location",
+    "types",
+    "primaryType",
+    "businessStatus",
+    "rating",
+    "userRatingCount",
+    "priceLevel",
+    "photos",
 ])
 
 GOOGLE_AUTOCOMPLETE_FIELD_MASK = ",".join([
@@ -133,6 +149,16 @@ def _normalize_new_place(place):
         "user_ratings_total": place.get("userRatingCount"),
         "price_level": GOOGLE_PRICE_LEVELS.get(place.get("priceLevel")),
         "business_status": place.get("businessStatus"),
+        "photos": [
+            {
+                "name": photo.get("name"),
+                "width_px": photo.get("widthPx"),
+                "height_px": photo.get("heightPx"),
+                "author_attributions": photo.get("authorAttributions", []),
+            }
+            for photo in place.get("photos", [])[:3]
+            if photo.get("name")
+        ],
         "geometry": {
             "location": {
                 "lat": location.get("latitude"),
@@ -140,6 +166,20 @@ def _normalize_new_place(place):
             }
         },
     }
+
+
+def first_photo_url(photos, max_width_px=640, max_height_px=420):
+    if not photos:
+        return None
+    photo_name = photos[0].get("name")
+    if not photo_name:
+        return None
+    return (
+        "/api/places/photo?"
+        f"name={quote(photo_name, safe='')}"
+        f"&max_width_px={int(max_width_px)}"
+        f"&max_height_px={int(max_height_px)}"
+    )
 
 
 def _normalize_new_autocomplete(payload):
@@ -279,6 +319,27 @@ class GoogleServicesAPI:
             raise
 
     @staticmethod
+    @lru_cache(maxsize=512)
+    def fetch_place_details(place_id):
+        api_key = GoogleServicesAPI.api_key()
+        if not api_key or not place_id:
+            return None
+
+        try:
+            response = requests.get(
+                f"{GoogleServicesAPI.BASE_URL}/places/{place_id}",
+                headers=_headers(api_key, GOOGLE_PLACE_DETAILS_FIELD_MASK),
+                timeout=8,
+            )
+            response.raise_for_status()
+            return _normalize_new_place(response.json())
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching place details: {e}")
+            if getattr(e, "response", None) is not None:
+                print(f"[Place Details] Google response: {e.response.text}")
+            return None
+
+    @staticmethod
     def fetch_city_coordinates(city):
         """
         Get latitude and longitude for a city/address using Places API (New).
@@ -319,6 +380,31 @@ class GoogleServicesAPI:
             if getattr(e, "response", None) is not None:
                 print(f"[Geocode] Google response: {e.response.text}")
             raise
+
+    @staticmethod
+    def fetch_photo_uri(photo_name, max_width_px=640, max_height_px=420):
+        api_key = GoogleServicesAPI.api_key()
+        if not api_key or not photo_name:
+            return None
+
+        try:
+            response = requests.get(
+                f"{GoogleServicesAPI.BASE_URL}/{photo_name}/media",
+                params={
+                    "key": api_key,
+                    "maxWidthPx": max_width_px,
+                    "maxHeightPx": max_height_px,
+                    "skipHttpRedirect": "true",
+                },
+                timeout=8,
+            )
+            response.raise_for_status()
+            return response.json().get("photoUri")
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching place photo: {e}")
+            if getattr(e, "response", None) is not None:
+                print(f"[Photo] Google response: {e.response.text}")
+            return None
 
     @staticmethod
     def reverse_geocode(latitude, longitude):

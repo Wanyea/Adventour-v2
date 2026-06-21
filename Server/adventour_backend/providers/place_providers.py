@@ -76,8 +76,8 @@ class ProviderRegistry:
 
     def __init__(self, providers=None):
         self.providers = providers or [
-            LocalPlaceProvider(),
             GooglePlacesProvider(),
+            LocalPlaceProvider(),
         ]
 
     def search(self, tags, location, radius_meters=3200, constraints=None):
@@ -85,6 +85,9 @@ class ProviderRegistry:
         errors = []
 
         for provider in self.providers:
+            if provider.name == "local" and candidates:
+                continue
+
             try:
                 candidates.extend(provider.search(tags, location, radius_meters, constraints))
             except Exception as exc:

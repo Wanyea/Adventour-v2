@@ -3,5 +3,6 @@ CHAIN_NAMES = [
     "Dunkin'", "Domino's", "Chipotle", "Taco Bell", "Wendy's", "Panera Bread",
     "Chick-fil-A", "Panda Express", "Five Guys", "Shake Shack", "IHOP",
     "Olive Garden", "Buffalo Wild Wings", "Applebee's", "Outback Steakhouse",
+    "Culver", "Wawa", "RaceTrac", "Speedway", "7-Eleven",
     # ...add more as needed
 ] 

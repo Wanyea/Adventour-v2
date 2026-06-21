@@ -8,8 +8,11 @@ import {
   Alert,
   ScrollView,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import AuthService, { User } from '../src/services/AuthService';
+
+const logo = require('../src/assets/brand/adventour-logo.png');
 
 interface Props {
   onAuthSuccess: (user: User) => void;
@@ -76,7 +79,10 @@ const FirebaseAuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>Adventour</Text>
+        <View style={styles.logoCard}>
+          <Image source={logo} style={styles.logo} resizeMode="contain" />
+        </View>
+        <Text style={styles.title}>Adventure without the planning spiral.</Text>
         <Text style={styles.subtitle}>
           {isSignUp ? 'Create your account' : 'Welcome back!'}
         </Text>
@@ -153,37 +159,51 @@ const FirebaseAuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#dff6f2',
   },
   content: {
     flex: 1,
     justifyContent: 'center',
     padding: 20,
   },
+  logoCard: {
+    alignSelf: 'center',
+    width: 230,
+    height: 150,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  logo: {
+    width: 220,
+    height: 140,
+  },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
+    fontSize: 24,
+    lineHeight: 29,
+    fontWeight: '900',
     textAlign: 'center',
     marginBottom: 10,
-    color: '#333',
+    color: '#123c69',
   },
   subtitle: {
     fontSize: 18,
     textAlign: 'center',
     marginBottom: 30,
-    color: '#666',
+    color: '#31506b',
+    fontWeight: '700',
   },
   input: {
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#b6e2da',
     borderRadius: 8,
     padding: 15,
     marginBottom: 15,
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#123c69',
     borderRadius: 8,
     padding: 15,
     alignItems: 'center',
@@ -202,15 +222,17 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   linkText: {
-    color: '#007AFF',
+    color: '#0f766e',
     fontSize: 16,
+    fontWeight: '800',
   },
   switchButton: {
     alignItems: 'center',
   },
   switchText: {
-    color: '#666',
+    color: '#31506b',
     fontSize: 16,
+    fontWeight: '700',
   },
 });
 

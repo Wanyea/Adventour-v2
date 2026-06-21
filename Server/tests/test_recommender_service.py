@@ -135,6 +135,20 @@ def test_impressions_are_logged_for_returned_recommendations(app_context):
     assert len(events) == 1
 
 
+def test_recommendations_include_free_travel_time_estimates(app_context):
+    user = create_user("travel@example.com", ["museum"])
+    candidates = [
+        candidate("City Museum", "museum-1", ["museum"], 4.7, 80, lat=37.431, lng=-122.084),
+    ]
+
+    result = recommend_for(user, candidates)
+    travel_times = result["recommendations"][0]["travel_times"]
+
+    assert travel_times["walk_minutes"] >= 1
+    assert travel_times["drive_minutes"] >= 1
+    assert travel_times["transit_minutes"] >= 2
+
+
 def test_price_constraint_applies_penalty(app_context):
     user = create_user("budget@example.com", ["restaurant"])
     candidates = [
@@ -146,3 +160,88 @@ def test_price_constraint_applies_penalty(app_context):
     expensive = next(item for item in result["recommendations"] if item["name"] == "Expensive Tasting Room")
 
     assert expensive["components"]["price_penalty"] > 0
+
+
+def test_rejected_place_is_excluded_from_next_recommendation_batch(app_context):
+    user = create_user("reject@example.com", ["restaurant", "cafe"])
+    candidates = [
+        candidate("Wawa", "wawa-1", ["convenience_store", "restaurant"], 4.3, 400),
+        candidate("Local Sandwich Shop", "sandwich-1", ["restaurant"], 4.7, 55),
+    ]
+
+    service = RecommendationService(MockProviderRegistry(candidates))
+    first = service.recommend(
+        user=user,
+        location={"latitude": 37.421998333333335, "longitude": -122.084},
+        constraints={"limit": 10, "avoid_chains": True},
+    )
+    wawa = next(item for item in first["recommendations"] if item["name"] == "Wawa")
+    wawa_place = db.session.get(Place, wawa["place_id"])
+
+    service.record_event(user=user, place=wawa_place, event_type="reject")
+    second = service.recommend(
+        user=user,
+        location={"latitude": 37.421998333333335, "longitude": -122.084},
+        constraints={"limit": 10, "avoid_chains": True},
+    )
+
+    assert all(item["name"] != "Wawa" for item in second["recommendations"])
+
+
+def test_decided_places_repeat_when_batch_would_be_empty(app_context):
+    user = create_user("exhausted@example.com", ["museum"])
+    candidates = [
+        candidate("City Museum", "museum-1", ["museum"], 4.8, 300),
+    ]
+
+    service = RecommendationService(MockProviderRegistry(candidates))
+    first = service.recommend(
+        user=user,
+        location={"latitude": 37.421998333333335, "longitude": -122.084},
+        constraints={"limit": 10, "avoid_chains": True},
+    )
+    museum = first["recommendations"][0]
+    museum_place = db.session.get(Place, museum["place_id"])
+
+    service.record_event(user=user, place=museum_place, event_type="reject")
+    second = service.recommend(
+        user=user,
+        location={"latitude": 37.421998333333335, "longitude": -122.084},
+        constraints={"limit": 10, "avoid_chains": True},
+    )
+
+    assert second["repeated_decided"] is True
+    assert second["recommendations"][0]["name"] == "City Museum"
+    assert second["recommendations"][0]["repeat_after_exhaustion"] is True
+
+
+def test_food_lane_classifies_hybrid_food_chains(app_context):
+    user = create_user("lanes@example.com", ["restaurant"])
+    candidates = [
+        candidate("Wawa", "wawa-1", ["convenience_store", "restaurant"], 4.3, 400),
+        candidate("Culver's", "culvers-1", ["fast_food_restaurant"], 4.5, 300),
+        candidate("Local Seafood Shack", "seafood-1", ["seafood_restaurant"], 4.6, 90),
+        candidate("Orlando Science Center", "science-1", ["museum"], 4.7, 1200),
+    ]
+
+    result = recommend_for(user, candidates)
+    categories = {item["name"]: item["category"] for item in result["recommendations"]}
+
+    assert categories["Wawa"] == "food"
+    assert categories["Culver's"] == "food"
+    assert categories["Local Seafood Shack"] == "food"
+    assert categories["Orlando Science Center"] == "activity"
+
+
+def test_utility_only_places_are_filtered_from_discovery(app_context):
+    user = create_user("utility@example.com", ["restaurant", "museum"])
+    candidates = [
+        candidate("RaceTrac", "racetrac-1", ["gas_station", "convenience_store"], 4.2, 1000),
+        candidate("City Museum", "museum-1", ["museum"], 4.8, 300),
+    ]
+
+    result = recommend_for(user, candidates)
+    names = [item["name"] for item in result["recommendations"]]
+
+    assert "RaceTrac" not in names
+    assert "City Museum" in names

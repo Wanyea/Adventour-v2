@@ -42,6 +42,10 @@ If your emulator is already running, `npm run android:local` is enough. If you w
 npm run android:local -- -AvdName Pixel_XL_API_30
 ```
 
+The Android helper starts Metro only when port `8081` is not already serving a
+Metro status response. The app install step uses `--no-packager`, so this flow
+should open at most one separate Metro terminal.
+
 The Android emulator uses `AdventourApp/.env.android.local`:
 
 ```bash
