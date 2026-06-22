@@ -31,6 +31,10 @@ yarn-error.log*
 .expo-shared/
 
 /AdventourApp/android/local.properties
+/AdventourApp/android/app/google-services.json
+/AdventourApp/ios/**/GoogleService-Info.plist
+*service-account*.json
+firebase-service-account*.json
 
 # Environment files are local-only. Commit the matching .example files instead.
 .env

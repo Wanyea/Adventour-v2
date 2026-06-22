@@ -149,6 +149,9 @@ GOOGLE_API_KEY=
 
 Keep real keys out of git. Commit only `.example` files.
 
+For multi-account testing with trusted friends, see
+`docs/trusted-wild-testing-auth.md`.
+
 ## Testing Pyramid
 
 Use a small, repeatable testing ladder:

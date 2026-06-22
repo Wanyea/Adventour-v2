@@ -1,10 +1,59 @@
 from flask import Blueprint, request, jsonify, g
-from adventour_backend.models import db, User, Friendship, Trip, TripMember, TripPlace, PlaceRating
+from adventour_backend.models import db, User, Friendship, Trip, TripMember, TripPlace, PlaceRating, AdventourSession, AdventourStop
 from adventour_backend.auth import require_auth, optional_auth
 from datetime import datetime, date
-from sqlalchemy import and_, or_
+import json
+from sqlalchemy import and_, func, or_
 
 social_bp = Blueprint('social', __name__)
+
+
+def profile_payload(user):
+    return {
+        'id': user.id,
+        'username': user.username,
+        'display_name': user.display_name,
+        'profile_picture': user.profile_picture,
+    }
+
+
+def accepted_friend_ids(user_id):
+    friendships = Friendship.query.filter(
+        and_(
+            or_(Friendship.user_id == user_id, Friendship.friend_id == user_id),
+            Friendship.status == 'accepted'
+        )
+    ).all()
+    return [
+        friendship.friend_id if friendship.user_id == user_id else friendship.user_id
+        for friendship in friendships
+    ]
+
+
+def adventour_payload(session):
+    owner = User.query.get(session.user_id)
+    stops = session.stops.all()
+    completed_stops = [stop for stop in stops if stop.status == 'completed']
+    return {
+        'id': session.id,
+        'title': session.title,
+        'status': session.status,
+        'started_at': session.started_at.isoformat() if session.started_at else None,
+        'ended_at': session.ended_at.isoformat() if session.ended_at else None,
+        'summary': json.loads(session.summary_json or '{}'),
+        'stop_count': len(completed_stops),
+        'owner': profile_payload(owner) if owner else None,
+        'stops': [
+            {
+                'id': stop.id,
+                'place_id': stop.place_id,
+                'provider_ref_id': stop.provider_ref_id,
+                'order_index': stop.order_index,
+                'metadata': json.loads(stop.metadata_json or '{}'),
+            }
+            for stop in completed_stops
+        ],
+    }
 
 # Friend Management Routes
 @social_bp.route('/friends', methods=['GET'])
@@ -49,17 +98,17 @@ def search_users():
     
     user = g.current_user
     
-    # Search by username or display name
+    # Search by display name first. Username remains a fallback for older dev data.
     users = User.query.filter(
         and_(
             User.id != user.id,
             User.is_active == True,
             or_(
-                User.username.ilike(f'%{query}%'),
-                User.display_name.ilike(f'%{query}%')
+                User.display_name.ilike(f'%{query}%'),
+                User.username.ilike(f'%{query}%')
             )
         )
-    ).limit(10).all()
+    ).order_by(func.lower(User.display_name)).limit(10).all()
     
     results = []
     for found_user in users:
@@ -82,6 +131,69 @@ def search_users():
         })
     
     return jsonify({'users': results})
+
+@social_bp.route('/friends/adventours', methods=['GET'])
+@require_auth
+def get_friend_adventours():
+    """Get completed Adventours taken by accepted friends."""
+    user = g.current_user
+    friend_ids = accepted_friend_ids(user.id)
+    if not friend_ids:
+        return jsonify({'adventours': []})
+
+    limit = min(int(request.args.get('limit', 20)), 100)
+    sessions = (
+        AdventourSession.query
+        .filter(
+            AdventourSession.user_id.in_(friend_ids),
+            AdventourSession.status == 'completed',
+        )
+        .order_by(AdventourSession.ended_at.desc(), AdventourSession.started_at.desc())
+        .limit(limit)
+        .all()
+    )
+
+    return jsonify({'adventours': [adventour_payload(session) for session in sessions]})
+
+@social_bp.route('/friends/adventours/<int:session_id>/take', methods=['POST'])
+@require_auth
+def take_friend_adventour(session_id):
+    """Create an active Adventour draft from a friend's completed Adventour."""
+    user = g.current_user
+    friend_ids = accepted_friend_ids(user.id)
+    source = AdventourSession.query.filter(
+        AdventourSession.id == session_id,
+        AdventourSession.user_id.in_(friend_ids),
+        AdventourSession.status == 'completed',
+    ).first()
+    if not source:
+        return jsonify({'error': 'Friend Adventour not found'}), 404
+
+    active = AdventourSession.query.filter_by(user_id=user.id, status='active').first()
+    if active:
+        return jsonify({'error': 'End your active Adventour before taking a friend Adventour'}), 409
+
+    owner = User.query.get(source.user_id)
+    new_session = AdventourSession(
+        user_id=user.id,
+        title=f"{source.title} by {owner.display_name if owner else 'a friend'}",
+        companion_user_ids_json=json.dumps({'ids': [source.user_id]}),
+    )
+    db.session.add(new_session)
+    db.session.flush()
+
+    for index, source_stop in enumerate([stop for stop in source.stops.all() if stop.status == 'completed']):
+        db.session.add(AdventourStop(
+            session_id=new_session.id,
+            place_id=source_stop.place_id,
+            provider_ref_id=source_stop.provider_ref_id,
+            order_index=index,
+            status='planned',
+            metadata_json=source_stop.metadata_json,
+        ))
+
+    db.session.commit()
+    return jsonify({'message': 'Friend Adventour added to your active trip', 'adventour': adventour_payload(new_session)}), 201
 
 @social_bp.route('/friends/request', methods=['POST'])
 @require_auth

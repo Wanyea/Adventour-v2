@@ -1,113 +1,180 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
+  ActivityIndicator,
   Alert,
-  TextInput,
+  Image,
   Modal,
   ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import axios from 'axios';
 import Config from '../src/Config';
+import AnimatedClouds from '../src/components/AnimatedClouds';
 
-interface Friend {
+const wordmark = require('../src/assets/brand/adventour-wordmark.png');
+const balloon = require('../src/assets/brand/adventour-balloon.png');
+
+const SKY_BACKGROUND = '#bfeaf4';
+const SKY_STROKE = '#87cfe1';
+const NAVY = '#123c69';
+const ORANGE = '#ff9f1c';
+const RED = '#ff4b47';
+
+const profileImages = {
+  wanyea: require('../src/assets/profile/wanyea.jpg'),
+  nicnac: require('../src/assets/profile/nicnac.jpg'),
+  charley: require('../src/assets/profile/charley.jpg'),
+  dom: require('../src/assets/profile/dom.jpg'),
+  eric: require('../src/assets/profile/eric.jpg'),
+  ryan: require('../src/assets/profile/ryan.jpg'),
+  profpic_cheetah: require('../src/assets/profile/profpic_cheetah.png'),
+  profpic_monkey: require('../src/assets/profile/profpic_monkey.png'),
+  profpic_elephant: require('../src/assets/profile/profpic_elephant.png'),
+  profpic_ladybug: require('../src/assets/profile/profpic_ladybug.png'),
+  profpic_penguin: require('../src/assets/profile/profpic_penguin.png'),
+  profpic_fox: require('../src/assets/profile/profpic_fox.png'),
+};
+
+type ProfileImageId = keyof typeof profileImages;
+
+interface Person {
   id: number;
   username: string;
   display_name: string;
   profile_picture?: string;
+  friendship_status?: string | null;
+}
+
+interface Friend extends Person {
   friendship_id: number;
   friendship_date: string;
 }
 
-interface Trip {
-  id: number;
-  name: string;
-  description?: string;
-  destination?: string;
-  start_date?: string;
-  end_date?: string;
-  role: string;
-  member_count: number;
-  created_at: string;
-}
-
-interface FriendRequest {
+interface FriendRequest extends Person {
   friendship_id: number;
   user_id: number;
-  username: string;
-  display_name: string;
-  profile_picture?: string;
   request_date: string;
 }
 
+interface FriendAdventour {
+  id: number;
+  title: string;
+  ended_at?: string;
+  stop_count: number;
+  owner?: Person;
+  summary?: {
+    duration_seconds?: number;
+    stop_count?: number;
+  };
+}
+
+const profileSource = (id?: string) => {
+  const imageId = id as ProfileImageId | undefined;
+  return imageId && profileImages[imageId] ? profileImages[imageId] : profileImages.wanyea;
+};
+
+const formatDate = (value?: string) => {
+  if (!value) {
+    return 'recently';
+  }
+  return new Date(value).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+};
+
+const formatDuration = (seconds?: number) => {
+  if (!seconds) {
+    return 'freshly stamped';
+  }
+  const minutes = Math.max(1, Math.round(seconds / 60));
+  if (minutes < 60) {
+    return `${minutes} min`;
+  }
+  const hours = Math.floor(minutes / 60);
+  const remainder = minutes % 60;
+  return remainder ? `${hours}h ${remainder}m` : `${hours}h`;
+};
+
 const SocialScreen: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'friends' | 'trips'>('friends');
+  const [activeTab, setActiveTab] = useState<'friends' | 'adventours'>('friends');
   const [friends, setFriends] = useState<Friend[]>([]);
-  const [trips, setTrips] = useState<Trip[]>([]);
   const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
+  const [friendAdventours, setFriendAdventours] = useState<FriendAdventour[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [showSearchModal, setShowSearchModal] = useState(false);
-  const [showCreateTripModal, setShowCreateTripModal] = useState(false);
-  const [newTripData, setNewTripData] = useState({
-    name: '',
-    description: '',
-    destination: '',
-    start_date: '',
-    end_date: '',
-  });
+  const [searchResults, setSearchResults] = useState<Person[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [searched, setSearched] = useState(false);
+
+  const summaryText = useMemo(() => {
+    if (activeTab === 'friends') {
+      return `${friends.length} friend${friends.length === 1 ? '' : 's'} - ${friendRequests.length} request${friendRequests.length === 1 ? '' : 's'}`;
+    }
+    return `${friendAdventours.length} friend${friendAdventours.length === 1 ? '' : 's'}`;
+  }, [activeTab, friendAdventours.length, friendRequests.length, friends.length]);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const [friendsResponse, requestsResponse, adventoursResponse] = await Promise.all([
+        axios.get(`${Config.BACKEND_BASE_URL}/api/friends`),
+        axios.get(`${Config.BACKEND_BASE_URL}/api/friends/requests`),
+        axios.get(`${Config.BACKEND_BASE_URL}/api/friends/adventours`, { params: { limit: 20 } }),
+      ]);
+      setFriends(friendsResponse.data.friends || []);
+      setFriendRequests(requestsResponse.data.requests || []);
+      setFriendAdventours(adventoursResponse.data.adventours || []);
+    } catch (error) {
+      console.error('Error loading social data:', error);
+      Alert.alert('Social unavailable', 'Adventour could not load friends and trips yet.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     loadData();
   }, []);
 
-  const loadData = async () => {
-    try {
-      if (activeTab === 'friends') {
-        const [friendsResponse, requestsResponse] = await Promise.all([
-          axios.get(`${Config.BACKEND_BASE_URL}/api/friends`),
-          axios.get(`${Config.BACKEND_BASE_URL}/api/friends/requests`),
-        ]);
-        setFriends(friendsResponse.data.friends);
-        setFriendRequests(requestsResponse.data.requests);
-      } else {
-        const tripsResponse = await axios.get(`${Config.BACKEND_BASE_URL}/api/trips`);
-        setTrips(tripsResponse.data.trips);
-      }
-    } catch (error) {
-      console.error('Error loading data:', error);
-      Alert.alert('Error', 'Failed to load data');
-    }
-  };
-
   const searchUsers = async () => {
-    if (searchQuery.length < 2) return;
+    const query = searchQuery.trim();
+    if (query.length < 2) {
+      setSearchResults([]);
+      setSearched(false);
+      return;
+    }
 
+    setSearching(true);
+    setSearched(true);
     try {
-      const response = await axios.get(
-        `${Config.BACKEND_BASE_URL}/api/friends/search?q=${encodeURIComponent(searchQuery)}`
-      );
-      setSearchResults(response.data.users);
-    } catch (error) {
+      const response = await axios.get(`${Config.BACKEND_BASE_URL}/api/friends/search`, {
+        params: { q: query },
+      });
+      setSearchResults(response.data.users || []);
+    } catch (error: any) {
+      if (error?.response?.status === 400) {
+        setSearchResults([]);
+        return;
+      }
       console.error('Error searching users:', error);
-      Alert.alert('Error', 'Failed to search users');
+      Alert.alert('Search failed', 'Adventour could not search for that display name.');
+    } finally {
+      setSearching(false);
     }
   };
 
   const sendFriendRequest = async (friendId: number) => {
     try {
-      await axios.post(`${Config.BACKEND_BASE_URL}/api/friends/request`, {
-        friend_id: friendId,
-      });
-      Alert.alert('Success', 'Friend request sent!');
-      setShowSearchModal(false);
-      setSearchQuery('');
-      setSearchResults([]);
+      await axios.post(`${Config.BACKEND_BASE_URL}/api/friends/request`, { friend_id: friendId });
+      setSearchResults((current) => current.map((person) => (
+        person.id === friendId ? { ...person, friendship_status: 'pending' } : person
+      )));
+      Alert.alert('Request sent', 'They will see your request in Friends & Trips.');
     } catch (error: any) {
-      Alert.alert('Error', error.response?.data?.error || 'Failed to send friend request');
+      Alert.alert('Request failed', error.response?.data?.error || 'Could not send friend request.');
     }
   };
 
@@ -117,248 +184,194 @@ const SocialScreen: React.FC = () => {
         friendship_id: friendshipId,
         action,
       });
-      Alert.alert('Success', `Friend request ${action}ed!`);
-      loadData();
+      await loadData();
     } catch (error: any) {
-      Alert.alert('Error', error.response?.data?.error || 'Failed to respond to request');
+      Alert.alert('Request failed', error.response?.data?.error || 'Could not respond to request.');
     }
   };
 
-  const createTrip = async () => {
-    if (!newTripData.name) {
-      Alert.alert('Error', 'Trip name is required');
-      return;
-    }
-
+  const takeFriendAdventour = async (adventour: FriendAdventour) => {
     try {
-      await axios.post(`${Config.BACKEND_BASE_URL}/api/trips`, newTripData);
-      Alert.alert('Success', 'Trip created successfully!');
-      setShowCreateTripModal(false);
-      setNewTripData({ name: '', description: '', destination: '', start_date: '', end_date: '' });
-      loadData();
+      await axios.post(`${Config.BACKEND_BASE_URL}/api/friends/adventours/${adventour.id}/take`);
+      Alert.alert('Adventour saved', 'A draft is now active on Discover. End any active Adventour before taking another.');
     } catch (error: any) {
-      Alert.alert('Error', error.response?.data?.error || 'Failed to create trip');
+      Alert.alert('Could not take Adventour', error.response?.data?.error || 'Try again in a moment.');
     }
   };
 
-  const renderFriend = ({ item }: { item: Friend }) => (
-    <View style={styles.friendItem}>
-      <View style={styles.friendInfo}>
-        <Text style={styles.friendName}>{item.display_name}</Text>
-        <Text style={styles.friendUsername}>@{item.username}</Text>
+  const renderPersonRow = (person: Person, action?: React.ReactNode) => (
+    <View key={person.id} style={styles.personRow}>
+      <Image source={profileSource(person.profile_picture)} style={styles.avatar} />
+      <View style={styles.personText}>
+        <Text style={styles.personName}>{person.display_name || person.username}</Text>
+        <Text style={styles.personMeta}>@{person.username}</Text>
       </View>
-      <Text style={styles.friendDate}>
-        Friends since {new Date(item.friendship_date).toLocaleDateString()}
-      </Text>
-    </View>
-  );
-
-  const renderTrip = ({ item }: { item: Trip }) => (
-    <View style={styles.tripItem}>
-      <View style={styles.tripHeader}>
-        <Text style={styles.tripName}>{item.name}</Text>
-        <Text style={styles.tripRole}>{item.role}</Text>
-      </View>
-      {item.description && <Text style={styles.tripDescription}>{item.description}</Text>}
-      {item.destination && <Text style={styles.tripDestination}>📍 {item.destination}</Text>}
-      <View style={styles.tripFooter}>
-        <Text style={styles.tripMembers}>{item.member_count} members</Text>
-        <Text style={styles.tripDate}>
-          {new Date(item.created_at).toLocaleDateString()}
-        </Text>
-      </View>
-    </View>
-  );
-
-  const renderFriendRequest = ({ item }: { item: FriendRequest }) => (
-    <View style={styles.requestItem}>
-      <View style={styles.requestInfo}>
-        <Text style={styles.requestName}>{item.display_name}</Text>
-        <Text style={styles.requestUsername}>@{item.username}</Text>
-      </View>
-      <View style={styles.requestActions}>
-        <TouchableOpacity
-          style={[styles.requestButton, styles.acceptButton]}
-          onPress={() => respondToFriendRequest(item.friendship_id, 'accept')}
-        >
-          <Text style={styles.requestButtonText}>Accept</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.requestButton, styles.rejectButton]}
-          onPress={() => respondToFriendRequest(item.friendship_id, 'reject')}
-        >
-          <Text style={styles.requestButtonText}>Reject</Text>
-        </TouchableOpacity>
-      </View>
+      {action}
     </View>
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Social</Text>
-        <View style={styles.tabContainer}>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'friends' && styles.activeTab]}
-            onPress={() => setActiveTab('friends')}
-          >
-            <Text style={[styles.tabText, activeTab === 'friends' && styles.activeTabText]}>
-              Friends
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'trips' && styles.activeTab]}
-            onPress={() => setActiveTab('trips')}
-          >
-            <Text style={[styles.tabText, activeTab === 'trips' && styles.activeTabText]}>
-              Trips
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+    <View style={styles.screen}>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <AnimatedClouds height={1100} speed="slow" />
+        <View style={styles.foreground}>
+          <View style={styles.heroCard}>
+            <Image source={wordmark} style={styles.wordmark} resizeMode="contain" />
+            <Text style={styles.kicker}>Friends & Trips</Text>
+            <Text style={styles.title}>Find your travel people.</Text>
+            <Text style={styles.subtitle}>{summaryText}</Text>
+            <Image source={balloon} style={styles.balloon} resizeMode="contain" />
+          </View>
 
-      {activeTab === 'friends' && (
-        <View style={styles.content}>
-          <View style={styles.actions}>
+          <View style={styles.tabs}>
             <TouchableOpacity
-              style={styles.actionButton}
-              onPress={() => setShowSearchModal(true)}
+              style={[styles.tab, activeTab === 'friends' && styles.activeTab]}
+              onPress={() => setActiveTab('friends')}
             >
-              <Text style={styles.actionButtonText}>Add Friends</Text>
+              <Text style={[styles.tabText, activeTab === 'friends' && styles.activeTabText]}>Friends</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.tab, activeTab === 'adventours' && styles.activeTab]}
+              onPress={() => setActiveTab('adventours')}
+            >
+              <Text style={[styles.tabText, activeTab === 'adventours' && styles.activeTabText]}>Friend Adventours</Text>
             </TouchableOpacity>
           </View>
 
-          {friendRequests.length > 0 && (
+          <TouchableOpacity style={styles.primaryButton} onPress={() => setSearchOpen(true)} activeOpacity={0.86}>
+            <Text style={styles.primaryButtonText}>Find by display name</Text>
+          </TouchableOpacity>
+
+          {loading ? (
+            <View style={styles.loadingBox}>
+              <ActivityIndicator color={NAVY} />
+              <Text style={styles.emptyText}>Checking your travel circle...</Text>
+            </View>
+          ) : activeTab === 'friends' ? (
+            <>
+              {friendRequests.length ? (
+                <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>Passport requests</Text>
+                  {friendRequests.map((request) => (
+                    <View key={request.friendship_id} style={styles.requestCard}>
+                      {renderPersonRow(request)}
+                      <View style={styles.requestActions}>
+                        <TouchableOpacity
+                          style={[styles.smallButton, styles.acceptButton]}
+                          onPress={() => respondToFriendRequest(request.friendship_id, 'accept')}
+                        >
+                          <Text style={styles.smallButtonText}>Accept</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={[styles.smallButton, styles.rejectButton]}
+                          onPress={() => respondToFriendRequest(request.friendship_id, 'reject')}
+                        >
+                          <Text style={styles.smallButtonText}>Reject</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              ) : null}
+
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Your friends</Text>
+                {friends.length ? friends.map((friend) => (
+                  <View key={friend.id} style={styles.card}>
+                    {renderPersonRow(friend)}
+                    <Text style={styles.cardFootnote}>Friends since {formatDate(friend.friendship_date)}</Text>
+                  </View>
+                )) : (
+                  <View style={styles.emptyCard}>
+                    <Text style={styles.emptyTitle}>No passport pals yet.</Text>
+                    <Text style={styles.emptyText}>Search a unique display name to send your first request.</Text>
+                  </View>
+                )}
+              </View>
+            </>
+          ) : (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Friend Requests ({friendRequests.length})</Text>
-              <FlatList
-                data={friendRequests}
-                renderItem={renderFriendRequest}
-                keyExtractor={(item) => item.friendship_id.toString()}
-                style={styles.list}
-              />
+              <Text style={styles.sectionTitle}>Adventours friends have taken</Text>
+              {friendAdventours.length ? friendAdventours.map((adventour) => (
+                <View key={adventour.id} style={styles.adventourCard}>
+                  <View style={styles.adventourHeader}>
+                    <Image source={profileSource(adventour.owner?.profile_picture)} style={styles.avatar} />
+                    <View style={styles.personText}>
+                      <Text style={styles.personName}>{adventour.title}</Text>
+                      <Text style={styles.personMeta}>
+                        by {adventour.owner?.display_name || 'a friend'} - {formatDate(adventour.ended_at)}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.statsRow}>
+                    <Text style={styles.statPill}>{adventour.stop_count} stops</Text>
+                    <Text style={styles.statPill}>{formatDuration(adventour.summary?.duration_seconds)}</Text>
+                  </View>
+                  <TouchableOpacity style={styles.takeButton} onPress={() => takeFriendAdventour(adventour)}>
+                    <Text style={styles.takeButtonText}>Take Adventour</Text>
+                  </TouchableOpacity>
+                </View>
+              )) : (
+                <View style={styles.emptyCard}>
+                  <Text style={styles.emptyTitle}>No friend Adventours yet.</Text>
+                  <Text style={styles.emptyText}>When friends finish trips, their shared routes will show up here.</Text>
+                </View>
+              )}
             </View>
           )}
-
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Your Friends ({friends.length})</Text>
-            <FlatList
-              data={friends}
-              renderItem={renderFriend}
-              keyExtractor={(item) => item.id.toString()}
-              style={styles.list}
-            />
-          </View>
         </View>
-      )}
+      </ScrollView>
 
-      {activeTab === 'trips' && (
-        <View style={styles.content}>
-          <View style={styles.actions}>
-            <TouchableOpacity
-              style={styles.actionButton}
-              onPress={() => setShowCreateTripModal(true)}
-            >
-              <Text style={styles.actionButtonText}>Create Trip</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Your Trips ({trips.length})</Text>
-            <FlatList
-              data={trips}
-              renderItem={renderTrip}
-              keyExtractor={(item) => item.id.toString()}
-              style={styles.list}
-            />
-          </View>
-        </View>
-      )}
-
-      {/* Search Modal */}
-      <Modal visible={showSearchModal} animationType="slide">
-        <View style={styles.modalContainer}>
+      <Modal visible={searchOpen} animationType="slide" onRequestClose={() => setSearchOpen(false)}>
+        <View style={styles.modalScreen}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Add Friends</Text>
-            <TouchableOpacity onPress={() => setShowSearchModal(false)}>
-              <Text style={styles.closeButton}>✕</Text>
+            <Text style={styles.modalTitle}>Find a friend</Text>
+            <TouchableOpacity onPress={() => setSearchOpen(false)}>
+              <Text style={styles.closeText}>Close</Text>
             </TouchableOpacity>
           </View>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search by username or name..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            onSubmitEditing={searchUsers}
-          />
-          <FlatList
-            data={searchResults}
-            renderItem={({ item }) => (
-              <View style={styles.searchResult}>
-                <View style={styles.searchResultInfo}>
-                  <Text style={styles.searchResultName}>{item.display_name}</Text>
-                  <Text style={styles.searchResultUsername}>@{item.username}</Text>
-                </View>
-                <TouchableOpacity
-                  style={styles.addButton}
-                  onPress={() => sendFriendRequest(item.id)}
-                  disabled={item.friendship_status === 'pending'}
-                >
-                  <Text style={styles.addButtonText}>
-                    {item.friendship_status === 'pending' ? 'Pending' : 'Add'}
-                  </Text>
-                </TouchableOpacity>
+          <Text style={styles.modalHelp}>Search their unique Adventour display name.</Text>
+          <View style={styles.searchRow}>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Display name"
+              value={searchQuery}
+              onChangeText={(text) => {
+                setSearchQuery(text);
+                setSearched(false);
+              }}
+              autoCapitalize="words"
+              autoCorrect={false}
+              onSubmitEditing={searchUsers}
+            />
+            <TouchableOpacity style={styles.searchButton} onPress={searchUsers}>
+              {searching ? <ActivityIndicator color="#fffaf3" /> : <Text style={styles.searchButtonText}>Search</Text>}
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView contentContainerStyle={styles.searchResults}>
+            {searchResults.map((person) => renderPersonRow(
+              person,
+              <TouchableOpacity
+                style={[styles.addButton, person.friendship_status === 'pending' && styles.addButtonDisabled]}
+                onPress={() => sendFriendRequest(person.id)}
+                disabled={person.friendship_status === 'pending' || person.friendship_status === 'accepted'}
+              >
+                <Text style={styles.addButtonText}>
+                  {person.friendship_status === 'accepted'
+                    ? 'Friends'
+                    : person.friendship_status === 'pending'
+                      ? 'Pending'
+                      : 'Add'}
+                </Text>
+              </TouchableOpacity>,
+            ))}
+            {searched && !searching && searchResults.length === 0 ? (
+              <View style={styles.emptyCard}>
+                <Text style={styles.emptyTitle}>No display name found.</Text>
+                <Text style={styles.emptyText}>Check the spelling and try their exact Adventour name.</Text>
               </View>
-            )}
-            keyExtractor={(item) => item.id.toString()}
-          />
-        </View>
-      </Modal>
-
-      {/* Create Trip Modal */}
-      <Modal visible={showCreateTripModal} animationType="slide">
-        <View style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Create New Trip</Text>
-            <TouchableOpacity onPress={() => setShowCreateTripModal(false)}>
-              <Text style={styles.closeButton}>✕</Text>
-            </TouchableOpacity>
-          </View>
-          <ScrollView style={styles.modalContent}>
-            <TextInput
-              style={styles.modalInput}
-              placeholder="Trip Name *"
-              value={newTripData.name}
-              onChangeText={(text) => setNewTripData({ ...newTripData, name: text })}
-            />
-            <TextInput
-              style={styles.modalInput}
-              placeholder="Description"
-              value={newTripData.description}
-              onChangeText={(text) => setNewTripData({ ...newTripData, description: text })}
-              multiline
-            />
-            <TextInput
-              style={styles.modalInput}
-              placeholder="Destination"
-              value={newTripData.destination}
-              onChangeText={(text) => setNewTripData({ ...newTripData, destination: text })}
-            />
-            <TextInput
-              style={styles.modalInput}
-              placeholder="Start Date (YYYY-MM-DD)"
-              value={newTripData.start_date}
-              onChangeText={(text) => setNewTripData({ ...newTripData, start_date: text })}
-            />
-            <TextInput
-              style={styles.modalInput}
-              placeholder="End Date (YYYY-MM-DD)"
-              value={newTripData.end_date}
-              onChangeText={(text) => setNewTripData({ ...newTripData, end_date: text })}
-            />
-            <TouchableOpacity style={styles.createButton} onPress={createTrip}>
-              <Text style={styles.createButtonText}>Create Trip</Text>
-            </TouchableOpacity>
+            ) : null}
           </ScrollView>
         </View>
       </Modal>
@@ -367,261 +380,335 @@ const SocialScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: SKY_BACKGROUND,
   },
-  header: {
-    backgroundColor: '#fff',
-    padding: 20,
-    paddingTop: 60,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+  scroll: {
+    flex: 1,
+  },
+  content: {
+    padding: 14,
+    paddingBottom: 30,
+    position: 'relative',
+  },
+  foreground: {
+    zIndex: 1,
+  },
+  heroCard: {
+    backgroundColor: '#d9f8fb',
+    borderColor: SKY_STROKE,
+    borderRadius: 8,
+    borderWidth: 1,
+    minHeight: 210,
+    overflow: 'hidden',
+    padding: 16,
+    shadowColor: NAVY,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  wordmark: {
+    height: 62,
+    marginBottom: -15,
+    marginLeft: -5,
+    marginTop: -16,
+    width: 130,
+  },
+  kicker: {
+    color: RED,
+    fontSize: 12,
+    fontWeight: '900',
+    letterSpacing: 0.6,
+    marginTop: 9,
+    textTransform: 'uppercase',
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+    color: NAVY,
+    fontSize: 27,
+    fontWeight: '900',
+    lineHeight: 31,
+    marginTop: 6,
+    paddingRight: 110,
   },
-  tabContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#f0f0f0',
+  subtitle: {
+    color: '#31506b',
+    fontSize: 13,
+    fontWeight: '800',
+    marginTop: 8,
+  },
+  balloon: {
+    bottom: 10,
+    height: 137,
+    position: 'absolute',
+    right: 18,
+    width: 98,
+  },
+  tabs: {
+    backgroundColor: '#dff6f2',
+    borderColor: SKY_STROKE,
     borderRadius: 8,
+    borderWidth: 1,
+    flexDirection: 'row',
+    marginTop: 12,
     padding: 4,
   },
   tab: {
-    flex: 1,
-    paddingVertical: 12,
     alignItems: 'center',
-    borderRadius: 6,
+    borderRadius: 7,
+    flex: 1,
+    paddingVertical: 11,
   },
   activeTab: {
-    backgroundColor: '#007AFF',
+    backgroundColor: NAVY,
   },
   tabText: {
-    fontSize: 16,
-    color: '#666',
+    color: NAVY,
+    fontSize: 13,
+    fontWeight: '900',
   },
   activeTabText: {
-    color: '#fff',
-    fontWeight: '600',
+    color: '#fffaf3',
   },
-  content: {
-    flex: 1,
+  primaryButton: {
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    backgroundColor: NAVY,
+    borderColor: ORANGE,
+    borderRadius: 999,
+    borderWidth: 2,
+    marginTop: 12,
+    paddingVertical: 13,
+  },
+  primaryButtonText: {
+    color: '#fffaf3',
+    fontSize: 14,
+    fontWeight: '900',
+  },
+  loadingBox: {
+    alignItems: 'center',
     padding: 20,
   },
-  actions: {
-    marginBottom: 20,
-  },
-  actionButton: {
-    backgroundColor: '#007AFF',
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  actionButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
   section: {
-    marginBottom: 20,
+    marginTop: 16,
   },
   sectionTitle: {
+    color: NAVY,
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '900',
     marginBottom: 10,
   },
-  list: {
+  card: {
+    backgroundColor: '#fffaf3',
+    borderColor: SKY_STROKE,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginBottom: 10,
+    padding: 12,
+  },
+  requestCard: {
+    backgroundColor: '#fffaf3',
+    borderColor: ORANGE,
+    borderRadius: 8,
+    borderWidth: 2,
+    marginBottom: 10,
+    padding: 12,
+  },
+  personRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  avatar: {
+    backgroundColor: '#dff6f2',
+    borderColor: NAVY,
+    borderRadius: 24,
+    borderWidth: 2,
+    height: 48,
+    marginRight: 11,
+    width: 48,
+  },
+  personText: {
     flex: 1,
   },
-  friendItem: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
+  personName: {
+    color: NAVY,
+    fontSize: 15,
+    fontWeight: '900',
   },
-  friendInfo: {
-    marginBottom: 5,
-  },
-  friendName: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  friendUsername: {
-    fontSize: 14,
-    color: '#666',
-  },
-  friendDate: {
+  personMeta: {
+    color: '#31506b',
     fontSize: 12,
-    color: '#999',
+    fontWeight: '800',
+    marginTop: 2,
   },
-  tripItem: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-  tripHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 5,
-  },
-  tripName: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  tripRole: {
+  cardFootnote: {
+    color: '#6b7280',
     fontSize: 12,
-    color: '#007AFF',
-    backgroundColor: '#e3f2fd',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  tripDescription: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 5,
-  },
-  tripDestination: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 5,
-  },
-  tripFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  tripMembers: {
-    fontSize: 12,
-    color: '#999',
-  },
-  tripDate: {
-    fontSize: 12,
-    color: '#999',
-  },
-  requestItem: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-  requestInfo: {
-    marginBottom: 10,
-  },
-  requestName: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  requestUsername: {
-    fontSize: 14,
-    color: '#666',
+    fontWeight: '700',
+    marginTop: 9,
   },
   requestActions: {
     flexDirection: 'row',
-    gap: 10,
+    gap: 8,
+    marginTop: 12,
   },
-  requestButton: {
-    flex: 1,
-    padding: 10,
-    borderRadius: 6,
+  smallButton: {
     alignItems: 'center',
+    borderRadius: 999,
+    flex: 1,
+    paddingVertical: 9,
   },
   acceptButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: NAVY,
   },
   rejectButton: {
-    backgroundColor: '#f44336',
+    backgroundColor: RED,
   },
-  requestButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
+  smallButtonText: {
+    color: '#fffaf3',
+    fontSize: 13,
+    fontWeight: '900',
   },
-  modalContainer: {
+  adventourCard: {
+    backgroundColor: '#fffaf3',
+    borderColor: SKY_STROKE,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginBottom: 12,
+    padding: 13,
+  },
+  adventourHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  statsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 7,
+    marginTop: 12,
+  },
+  statPill: {
+    backgroundColor: '#dff6f2',
+    borderColor: SKY_STROKE,
+    borderRadius: 999,
+    borderWidth: 1,
+    color: NAVY,
+    fontSize: 12,
+    fontWeight: '900',
+    overflow: 'hidden',
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+  },
+  takeButton: {
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: ORANGE,
+    borderColor: NAVY,
+    borderRadius: 999,
+    borderWidth: 2,
+    marginTop: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+  },
+  takeButtonText: {
+    color: NAVY,
+    fontSize: 13,
+    fontWeight: '900',
+  },
+  emptyCard: {
+    backgroundColor: '#dff6f2',
+    borderColor: SKY_STROKE,
+    borderRadius: 8,
+    borderWidth: 1,
+    padding: 16,
+  },
+  emptyTitle: {
+    color: NAVY,
+    fontSize: 16,
+    fontWeight: '900',
+  },
+  emptyText: {
+    color: '#6b7280',
+    fontSize: 13,
+    fontWeight: '700',
+    lineHeight: 19,
+    marginTop: 5,
+  },
+  modalScreen: {
+    backgroundColor: SKY_BACKGROUND,
     flex: 1,
-    backgroundColor: '#fff',
-    paddingTop: 60,
+    paddingTop: 52,
   },
   modalHeader: {
+    alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    paddingHorizontal: 18,
   },
   modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  closeButton: {
+    color: NAVY,
     fontSize: 24,
-    color: '#666',
+    fontWeight: '900',
+  },
+  closeText: {
+    color: RED,
+    fontSize: 14,
+    fontWeight: '900',
+  },
+  modalHelp: {
+    color: '#31506b',
+    fontSize: 13,
+    fontWeight: '800',
+    marginHorizontal: 18,
+    marginTop: 8,
+  },
+  searchRow: {
+    flexDirection: 'row',
+    gap: 9,
+    margin: 18,
   },
   searchInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
+    backgroundColor: '#fff',
+    borderColor: SKY_STROKE,
     borderRadius: 8,
-    padding: 15,
-    margin: 20,
-    fontSize: 16,
-  },
-  searchResult: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  searchResultInfo: {
+    borderWidth: 1,
+    color: NAVY,
     flex: 1,
-  },
-  searchResultName: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
+    paddingHorizontal: 12,
   },
-  searchResultUsername: {
-    fontSize: 14,
-    color: '#666',
+  searchButton: {
+    alignItems: 'center',
+    backgroundColor: NAVY,
+    borderRadius: 8,
+    justifyContent: 'center',
+    minWidth: 88,
+    paddingHorizontal: 13,
+  },
+  searchButtonText: {
+    color: '#fffaf3',
+    fontSize: 13,
+    fontWeight: '900',
+  },
+  searchResults: {
+    padding: 18,
+    paddingTop: 0,
   },
   addButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 20,
+    backgroundColor: NAVY,
+    borderRadius: 999,
+    paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 6,
+  },
+  addButtonDisabled: {
+    backgroundColor: '#7aa6bd',
   },
   addButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  modalContent: {
-    padding: 20,
-  },
-  modalInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 15,
-    marginBottom: 15,
-    fontSize: 16,
-  },
-  createButton: {
-    backgroundColor: '#007AFF',
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  createButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    color: '#fffaf3',
+    fontSize: 12,
+    fontWeight: '900',
   },
 });
 

@@ -28,6 +28,66 @@ EVENT_WEIGHTS = {
     "share": 4.0,
 }
 
+TAG_GROUP_SEARCH_TYPES = {
+    "food_drink": [
+        "restaurant",
+        "breakfast_restaurant",
+        "brunch_restaurant",
+        "bakery",
+        "bar",
+    ],
+    "coffee_sweets": [
+        "cafe",
+        "coffee_shop",
+        "dessert_restaurant",
+        "ice_cream_shop",
+        "tea_house",
+    ],
+    "arts_culture": [
+        "museum",
+        "art_gallery",
+        "historical_landmark",
+        "performing_arts_theater",
+        "tourist_attraction",
+    ],
+    "outdoors": [
+        "park",
+        "hiking_area",
+        "garden",
+        "zoo",
+        "aquarium",
+    ],
+    "nightlife": [
+        "bar",
+        "night_club",
+        "comedy_club",
+        "concert_hall",
+    ],
+    "entertainment": [
+        "amusement_park",
+        "movie_theater",
+        "concert_hall",
+        "performing_arts_theater",
+        "comedy_club",
+    ],
+    "shopping": [
+        "market",
+        "book_store",
+        "clothing_store",
+        "shopping_mall",
+    ],
+    "wellness": [
+        "spa",
+    ],
+    "local_gems": [
+        "tourist_attraction",
+        "restaurant",
+        "park",
+        "art_gallery",
+        "market",
+    ],
+}
+
 
 def _json_loads(value, default=None):
     if not value:
@@ -65,6 +125,11 @@ def _haversine_meters(lat1, lon1, lat2, lon2):
 
 def _clamp(value, minimum=0.0, maximum=1.0):
     return max(minimum, min(maximum, value))
+
+
+def _expand_preference_tag(tag):
+    normalized = (tag or "").strip()
+    return TAG_GROUP_SEARCH_TYPES.get(normalized, [normalized] if normalized else [])
 
 
 def _travel_time_estimates(distance_meters):
@@ -267,7 +332,10 @@ class RecommendationService:
 
         if user.preferences:
             for tag in [tag.strip() for tag in user.preferences.split(",") if tag.strip()]:
-                vector["categories"][tag] = vector["categories"].get(tag, 0) + 1.0
+                expanded_tags = _expand_preference_tag(tag)
+                weight = 1.0 / max(len(expanded_tags), 1)
+                for expanded_tag in expanded_tags:
+                    vector["categories"][expanded_tag] = vector["categories"].get(expanded_tag, 0) + weight
 
         events = (
             UserPlaceEvent.query
@@ -389,7 +457,10 @@ class RecommendationService:
                 scores[tag] = scores.get(tag, 0) + value
 
         if not scores and fallback_user.preferences:
-            return [tag.strip() for tag in fallback_user.preferences.split(",") if tag.strip()][:5]
+            expanded = []
+            for tag in [tag.strip() for tag in fallback_user.preferences.split(",") if tag.strip()]:
+                expanded.extend(_expand_preference_tag(tag))
+            return list(dict.fromkeys(expanded))[:5]
 
         ranked = sorted(scores.items(), key=lambda item: item[1], reverse=True)
         return [tag for tag, _ in ranked[:5]] or ["restaurant", "tourist_attraction", "park"]

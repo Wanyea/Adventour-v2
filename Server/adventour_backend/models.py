@@ -13,6 +13,7 @@ class User(db.Model):
     email = db.Column(db.String(255), unique=True, nullable=True)
     username = db.Column(db.String(100), unique=True, nullable=True)
     display_name = db.Column(db.String(100))
+    date_of_birth = db.Column(db.Date)
     profile_picture = db.Column(db.String(500))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

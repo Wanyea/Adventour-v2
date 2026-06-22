@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   Animated,
   Image,
   PanResponder,
@@ -10,15 +11,18 @@ import {
 } from 'react-native';
 import { Place } from '../types/Place';
 import { StarRating } from './PlaceDetailsModal';
-import { tagGroupLabel, tagGroupMeta } from '../placeTagGroups';
+import { tagGroupDisplayLabel, tagGroupMeta } from '../placeTagGroups';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 type Props = {
   places: Place[];
   activeFilterLabel: string;
   totalPlaces: number;
+  loadingMore?: boolean;
+  canLoadMore?: boolean;
   onFeedback: (place: Place, verdict: 'accept' | 'reject') => void;
   onOpenPlace: (place: Place) => void;
+  onExhausted?: () => void;
 };
 
 const loadedPhotoUrls = new Set<string>();
@@ -104,7 +108,7 @@ const CompactPlaceContent = ({
   fallbackLabel: string;
   muted?: boolean;
 }) => {
-  const tagLabels = (place.tag_groups || []).slice(0, 3).map(tagGroupLabel);
+  const tagLabels = (place.tag_groups || []).slice(0, 3).map(tagGroupDisplayLabel);
   const primaryGroup = tagGroupMeta((place.tag_groups || [])[0] || '');
   const primaryLabel = tagLabels[0] || fallbackLabel;
 
@@ -114,7 +118,7 @@ const CompactPlaceContent = ({
       <View style={styles.tagRow}>
         {(place.tag_groups?.length ? place.tag_groups.slice(0, 3) : ['fallback']).map((groupId, index) => {
           const group = tagGroupMeta(groupId);
-          const label = group?.label || primaryLabel;
+          const label = group ? `${group.emoji} ${group.label}` : primaryLabel;
           return (
             <Text
               key={`${groupId}-${index}`}
@@ -160,14 +164,23 @@ const RecommendationDeck: React.FC<Props> = ({
   places,
   activeFilterLabel,
   totalPlaces,
+  loadingMore,
+  canLoadMore,
   onFeedback,
   onOpenPlace,
+  onExhausted,
 }) => {
   const position = useRef(new Animated.ValueXY()).current;
   const promote = useRef(new Animated.Value(1)).current;
   const currentPlace = places[0];
   const nextPlace = places[1];
   const allResultsExhausted = totalPlaces === 0;
+
+  useEffect(() => {
+    if (!currentPlace && canLoadMore && !loadingMore) {
+      onExhausted?.();
+    }
+  }, [canLoadMore, currentPlace, loadingMore, onExhausted]);
 
   useEffect(() => {
     position.setValue({ x: 0, y: 0 });
@@ -304,16 +317,26 @@ const RecommendationDeck: React.FC<Props> = ({
           </Animated.View>
         ) : (
           <View style={[styles.card, styles.emptyCard]}>
-            <Text style={styles.emptyTitle}>
-              {allResultsExhausted
-                ? 'All caught up.'
-                : `No ${activeFilterLabel.toLowerCase()} picks in this batch.`}
-            </Text>
-            <Text style={styles.emptyText}>
-              {allResultsExhausted
-                ? 'Search again to load fresh recommendations.'
-                : 'Try another tag group or search again to load fresh recommendations.'}
-            </Text>
+            {loadingMore ? (
+              <>
+                <ActivityIndicator color="#123c69" />
+                <Text style={styles.emptyTitle}>Scouting more picks...</Text>
+                <Text style={styles.emptyText}>The balloon is checking for another batch.</Text>
+              </>
+            ) : (
+              <>
+                <Text style={styles.emptyTitle}>
+                  {allResultsExhausted
+                    ? 'All caught up.'
+                    : `No ${activeFilterLabel.toLowerCase()} picks in this batch.`}
+                </Text>
+                <Text style={styles.emptyText}>
+                  {allResultsExhausted
+                    ? 'Search again to load fresh recommendations.'
+                    : 'Try another tag group or search again to load fresh recommendations.'}
+                </Text>
+              </>
+            )}
           </View>
         )}
       </View>

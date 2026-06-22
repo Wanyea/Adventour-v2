@@ -21,6 +21,10 @@ type Props = {
 
 const formatDuration = (seconds?: number) => {
   const totalSeconds = Math.max(0, seconds || 0);
+  if (totalSeconds < 60) {
+    return `${totalSeconds}s`;
+  }
+
   const minutes = Math.floor(totalSeconds / 60);
   const hours = Math.floor(minutes / 60);
   const remainingMinutes = minutes % 60;
@@ -28,7 +32,7 @@ const formatDuration = (seconds?: number) => {
   if (hours > 0) {
     return `${hours}h ${remainingMinutes}m`;
   }
-  return `${Math.max(1, minutes)}m`;
+  return `${minutes}m`;
 };
 
 const useElapsedSeconds = (start?: string) => {
@@ -47,7 +51,8 @@ const useElapsedSeconds = (start?: string) => {
     return 0;
   }
 
-  return Math.max(0, Math.floor((now - new Date(start).getTime()) / 1000));
+  const timestamp = /(?:Z|[+-]\d{2}:?\d{2})$/.test(start) ? start : `${start}Z`;
+  return Math.max(0, Math.floor((now - new Date(timestamp).getTime()) / 1000));
 };
 
 const photoUrlForStop = (stop: AdventourStop) => {
@@ -67,9 +72,13 @@ const AdventourJourneyPanel: React.FC<Props> = ({
   onRateStop,
   onEnd,
 }) => {
+  const [tripLogOpen, setTripLogOpen] = useState(false);
   const activeStop = adventour?.active_stop || null;
   const elapsedAtStop = useElapsedSeconds(activeStop?.arrived_at);
   const completedStops = adventour?.stops.filter((stop) => stop.status === 'completed') || [];
+  const visitedStops = adventour?.stops.filter((stop) => (
+    stop.status === 'completed' || stop.status === 'arrived'
+  )) || [];
   const currentPhotoUrl = activeStop ? photoUrlForStop(activeStop) : undefined;
   const statusLabel = useMemo(() => {
     if (!adventour) {
@@ -162,6 +171,76 @@ const AdventourJourneyPanel: React.FC<Props> = ({
         <Text style={styles.progressText}>{completedStops.length} stop{completedStops.length === 1 ? '' : 's'} finished</Text>
         <Text style={styles.progressText}>{adventour.stops.length} total picked</Text>
       </View>
+
+      {visitedStops.length > 0 && (
+        <View style={styles.tripLog}>
+          <TouchableOpacity
+            style={styles.tripLogHeader}
+            onPress={() => setTripLogOpen((current) => !current)}
+          >
+            <View>
+              <Text style={styles.tripLogKicker}>Trip log</Text>
+              <Text style={styles.tripLogTitle}>
+                {visitedStops.length} place{visitedStops.length === 1 ? '' : 's'} visited so far
+              </Text>
+            </View>
+            <Text style={styles.tripLogToggle}>{tripLogOpen ? 'Hide' : 'View'}</Text>
+          </TouchableOpacity>
+
+          {tripLogOpen && (
+            <View style={styles.tripLogList}>
+              {visitedStops.map((stop, index) => {
+                const isCurrentStop = activeStop?.id === stop.id;
+                const duration = isCurrentStop ? elapsedAtStop : stop.duration_seconds;
+
+                return (
+                  <View key={stop.id} style={styles.tripLogItem}>
+                    <View style={styles.tripLogIndex}>
+                      <Text style={styles.tripLogIndexText}>{index + 1}</Text>
+                    </View>
+                    <View style={styles.tripLogContent}>
+                      <View style={styles.tripLogNameRow}>
+                        <Text style={styles.tripLogName} numberOfLines={1}>
+                          {stop.display?.name || 'Adventour stop'}
+                        </Text>
+                        {isCurrentStop && (
+                          <Text style={styles.currentBadge}>Here now</Text>
+                        )}
+                      </View>
+                      <Text style={styles.tripLogMeta} numberOfLines={1}>
+                        {stop.display?.vicinity || 'Saved Adventour stop'} - {formatDuration(duration)}
+                      </Text>
+                      {stop.status === 'completed' && (
+                        <View style={styles.historyRatingRow}>
+                          {[1, 2, 3, 4, 5].map((rating) => (
+                            <TouchableOpacity
+                              key={rating}
+                              style={[
+                                styles.historyRatingButton,
+                                stop.rating === rating && styles.historyRatingButtonActive,
+                              ]}
+                              onPress={() => onRateStop(stop, rating)}
+                            >
+                              <Text
+                                style={[
+                                  styles.historyRatingText,
+                                  stop.rating === rating && styles.historyRatingTextActive,
+                                ]}
+                              >
+                                {rating}
+                              </Text>
+                            </TouchableOpacity>
+                          ))}
+                        </View>
+                      )}
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
+          )}
+        </View>
+      )}
     </View>
   );
 };
@@ -323,6 +402,114 @@ const styles = StyleSheet.create({
     color: '#dff6f2',
     fontSize: 11,
     fontWeight: '800',
+  },
+  tripLog: {
+    backgroundColor: '#fffaf3',
+    borderRadius: 8,
+    marginTop: 10,
+    overflow: 'hidden',
+  },
+  tripLogHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+  },
+  tripLogKicker: {
+    color: '#e6534b',
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+  },
+  tripLogTitle: {
+    color: '#123c69',
+    fontSize: 13,
+    fontWeight: '900',
+    marginTop: 2,
+  },
+  tripLogToggle: {
+    color: '#123c69',
+    fontSize: 12,
+    fontWeight: '900',
+  },
+  tripLogList: {
+    borderTopColor: '#f3d8b5',
+    borderTopWidth: 1,
+    padding: 10,
+    paddingTop: 4,
+  },
+  tripLogItem: {
+    flexDirection: 'row',
+    paddingTop: 9,
+  },
+  tripLogIndex: {
+    alignItems: 'center',
+    backgroundColor: '#ff9f1c',
+    borderRadius: 12,
+    height: 24,
+    justifyContent: 'center',
+    marginRight: 9,
+    width: 24,
+  },
+  tripLogIndexText: {
+    color: '#111827',
+    fontSize: 11,
+    fontWeight: '900',
+  },
+  tripLogContent: {
+    flex: 1,
+    paddingBottom: 8,
+  },
+  tripLogNameRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  tripLogName: {
+    color: '#111827',
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '900',
+  },
+  currentBadge: {
+    backgroundColor: '#dff6f2',
+    borderRadius: 999,
+    color: '#123c69',
+    fontSize: 10,
+    fontWeight: '900',
+    marginLeft: 8,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+  },
+  tripLogMeta: {
+    color: '#6b7280',
+    fontSize: 11,
+    marginTop: 2,
+  },
+  historyRatingRow: {
+    flexDirection: 'row',
+    marginTop: 7,
+  },
+  historyRatingButton: {
+    alignItems: 'center',
+    borderColor: '#ff9f1c',
+    borderRadius: 12,
+    borderWidth: 1,
+    height: 24,
+    justifyContent: 'center',
+    marginRight: 5,
+    width: 24,
+  },
+  historyRatingButtonActive: {
+    backgroundColor: '#ff9f1c',
+  },
+  historyRatingText: {
+    color: '#123c69',
+    fontSize: 11,
+    fontWeight: '900',
+  },
+  historyRatingTextActive: {
+    color: '#111827',
   },
 });
 

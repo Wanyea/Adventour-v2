@@ -1,5 +1,14 @@
 const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
-const exclusionList = require('metro-config/src/defaults/exclusionList');
+
+const blockList = [
+  /[/\\]android[/\\]build[/\\].*/,
+  /[/\\]android[/\\]app[/\\]build[/\\].*/,
+  /[/\\]ios[/\\]build[/\\].*/,
+  /[/\\]node_modules[/\\].*[/\\]android[/\\]build[/\\].*/,
+  /[/\\]node_modules[/\\].*[/\\]ios[/\\]build[/\\].*/,
+  /[/\\]node_modules[/\\]@react-native[/\\]gradle-plugin[/\\]react-native-gradle-plugin[/\\]build[/\\].*/,
+  /[/\\]node_modules[/\\]@react-native-async-storage[/\\]async-storage[/\\]android[/\\]build[/\\].*/,
+];
 
 /**
  * Metro configuration
@@ -11,14 +20,7 @@ const config = {
   projectRoot: __dirname,
   watchFolders: [],
   resolver: {
-    blockList: exclusionList([
-      /android[\/\\]build[\/\\].*/,
-      /android[\/\\]app[\/\\]build[\/\\].*/,
-      /ios[\/\\]build[\/\\].*/,
-      /node_modules[\/\\].*[\/\\]android[\/\\]build[\/\\].*/,
-      /node_modules[\/\\].*[\/\\]ios[\/\\]build[\/\\].*/,
-      /node_modules[\/\\]@react-native[\/\\]gradle-plugin[\/\\]react-native-gradle-plugin[\/\\]build[\/\\].*/,
-    ]),
+    blockList: new RegExp(blockList.map((pattern) => pattern.source).join('|')),
   },
 };
 

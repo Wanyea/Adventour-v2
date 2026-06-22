@@ -1,5 +1,6 @@
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import axios from 'axios';
 import Config from '../Config';
 
@@ -9,8 +10,10 @@ export interface User {
   email: string;
   username: string;
   display_name: string;
+  date_of_birth?: string;
   profile_picture?: string;
   preferences?: string[];
+  profile_complete?: boolean;
 }
 
 class AuthService {
@@ -19,6 +22,12 @@ class AuthService {
   private isDevAuth = Config.API_AUTH_MODE === 'dev';
 
   constructor() {
+    if (Config.GOOGLE_WEB_CLIENT_ID) {
+      GoogleSignin.configure({
+        webClientId: Config.GOOGLE_WEB_CLIENT_ID,
+      });
+    }
+
     // Set up axios interceptor to include auth token
     axios.interceptors.request.use(
       async (config) => {
@@ -37,7 +46,7 @@ class AuthService {
   async signInWithEmail(email: string, password: string): Promise<User> {
     try {
       if (this.isDevAuth) {
-        const user = await this.getDevUser();
+        const user = await this.getDevUser(undefined, email);
         this.currentUser = user;
         return user;
       }
@@ -52,10 +61,10 @@ class AuthService {
     }
   }
 
-  async signUpWithEmail(email: string, password: string, displayName: string): Promise<User> {
+  async signUpWithEmail(email: string, password: string, displayName?: string): Promise<User> {
     try {
       if (this.isDevAuth) {
-        const user = await this.getDevUser(displayName);
+        const user = await this.getDevUser(displayName, email);
         this.currentUser = user;
         return user;
       }
@@ -63,9 +72,12 @@ class AuthService {
       const userCredential = await auth().createUserWithEmailAndPassword(email, password);
       
       // Update display name
-      await userCredential.user.updateProfile({
-        displayName: displayName
-      });
+      const trimmedDisplayName = displayName?.trim();
+      if (trimmedDisplayName) {
+        await userCredential.user.updateProfile({
+          displayName: trimmedDisplayName,
+        });
+      }
 
       const user = await this.getOrCreateUser(userCredential.user);
       this.currentUser = user;
@@ -76,9 +88,52 @@ class AuthService {
     }
   }
 
+  async signInWithGoogle(displayName?: string): Promise<User> {
+    try {
+      if (this.isDevAuth) {
+        const user = await this.getDevUser(displayName || 'Google Dev User', 'google-dev@adventour.local');
+        this.currentUser = user;
+        return user;
+      }
+
+      if (!Config.GOOGLE_WEB_CLIENT_ID) {
+        throw new Error('Google sign-in is missing GOOGLE_WEB_CLIENT_ID in the app environment.');
+      }
+
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+      const googleUser = await GoogleSignin.signIn();
+      const idToken = googleUser.data?.idToken;
+
+      if (!idToken) {
+        throw new Error('Google sign-in did not return an ID token.');
+      }
+
+      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+      const userCredential = await auth().signInWithCredential(googleCredential);
+      let user = await this.getOrCreateUser(userCredential.user);
+      const trimmedDisplayName = displayName?.trim();
+      if (trimmedDisplayName && trimmedDisplayName !== user.display_name) {
+        this.currentUser = user;
+        user = await this.updateProfile({ display_name: trimmedDisplayName });
+      }
+      this.currentUser = user;
+      return user;
+    } catch (error: any) {
+      if (error?.code === statusCodes.SIGN_IN_CANCELLED) {
+        throw new Error('Google sign-in was cancelled.');
+      }
+
+      console.error('Google sign in error:', error);
+      throw error;
+    }
+  }
+
   async signOut(): Promise<void> {
     try {
       if (!this.isDevAuth) {
+        if (GoogleSignin.hasPreviousSignIn()) {
+          await GoogleSignin.signOut();
+        }
         await auth().signOut();
       }
       this.currentUser = null;
@@ -86,6 +141,39 @@ class AuthService {
       await AsyncStorage.removeItem('auth_token');
     } catch (error) {
       console.error('Sign out error:', error);
+      throw error;
+    }
+  }
+
+  async deleteAccount(): Promise<void> {
+    try {
+      const token = await this.getIdToken();
+      if (!token) {
+        throw new Error('No authentication token');
+      }
+
+      await axios.post(`${Config.BACKEND_BASE_URL}/user/me/reset`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!this.isDevAuth) {
+        const firebaseUser = auth().currentUser;
+        if (firebaseUser) {
+          await firebaseUser.delete();
+        }
+
+        if (GoogleSignin.hasPreviousSignIn()) {
+          await GoogleSignin.signOut();
+        }
+      }
+
+      this.currentUser = null;
+      await AsyncStorage.removeItem('user_id');
+      await AsyncStorage.removeItem('auth_token');
+    } catch (error) {
+      console.error('Delete account error:', error);
       throw error;
     }
   }
@@ -149,6 +237,16 @@ class AuthService {
       });
 
       if (response.data.user) {
+        if (firebaseUser.displayName && !response.data.user.display_name) {
+          const updateResponse = await axios.post(`${Config.BACKEND_BASE_URL}/user`, {
+            display_name: firebaseUser.displayName,
+          }, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          return updateResponse.data.user;
+        }
         return response.data.user;
       }
 
@@ -228,7 +326,7 @@ class AuthService {
     }
   }
 
-  async updateProfile(updates: { display_name?: string; profile_picture?: string }): Promise<User> {
+  async updateProfile(updates: { display_name?: string; date_of_birth?: string; profile_picture?: string }): Promise<User> {
     try {
       const token = await this.getIdToken();
       if (!token) {
@@ -250,10 +348,11 @@ class AuthService {
     }
   }
 
-  private async getDevUser(displayName?: string): Promise<User> {
+  private async getDevUser(displayName?: string, emailOverride?: string): Promise<User> {
+    const devEmail = emailOverride || Config.DEV_AUTH_EMAIL;
     const response = await axios.post(`${Config.BACKEND_BASE_URL}/user/dev`, {
-      email: Config.DEV_AUTH_EMAIL,
-      display_name: displayName || Config.DEV_AUTH_EMAIL.split('@')[0],
+      email: devEmail,
+      display_name: displayName || devEmail.split('@')[0],
     });
 
     return response.data.user;

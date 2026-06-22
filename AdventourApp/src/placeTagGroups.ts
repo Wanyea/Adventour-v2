@@ -14,6 +14,7 @@ export type TagGroupId =
 export type TagGroup = {
   id: TagGroupId;
   label: string;
+  emoji: string;
   description: string;
   color: string;
   backgroundColor: string;
@@ -25,6 +26,7 @@ export const TAG_GROUPS: TagGroup[] = [
   {
     id: 'food_drink',
     label: 'Food & Drink',
+    emoji: '🍽️',
     description: 'Restaurants, bars, bakeries, and other places built around eating or drinking.',
     color: '#7c2d12',
     backgroundColor: '#ffedd5',
@@ -48,6 +50,7 @@ export const TAG_GROUPS: TagGroup[] = [
   {
     id: 'coffee_sweets',
     label: 'Coffee & Sweets',
+    emoji: '☕',
     description: 'Cafes, coffee shops, dessert spots, ice cream, tea, and small treat stops.',
     color: '#854d0e',
     backgroundColor: '#fef3c7',
@@ -57,6 +60,7 @@ export const TAG_GROUPS: TagGroup[] = [
   {
     id: 'arts_culture',
     label: 'Arts & Culture',
+    emoji: '🎭',
     description: 'Museums, galleries, landmarks, libraries, theaters, and places with local history.',
     color: '#1e3a8a',
     backgroundColor: '#dbeafe',
@@ -65,6 +69,7 @@ export const TAG_GROUPS: TagGroup[] = [
   {
     id: 'outdoors',
     label: 'Outdoors',
+    emoji: '🌿',
     description: 'Parks, gardens, trails, campgrounds, zoos, aquariums, and open-air experiences.',
     color: '#14532d',
     backgroundColor: '#dcfce7',
@@ -74,6 +79,7 @@ export const TAG_GROUPS: TagGroup[] = [
   {
     id: 'nightlife',
     label: 'Nightlife',
+    emoji: '🌙',
     description: 'Bars, clubs, comedy, concerts, and late-day social spots.',
     color: '#581c87',
     backgroundColor: '#f3e8ff',
@@ -82,6 +88,7 @@ export const TAG_GROUPS: TagGroup[] = [
   {
     id: 'entertainment',
     label: 'Entertainment',
+    emoji: '🎟️',
     description: 'Movies, amusement parks, performances, live events, and playful things to do.',
     color: '#9f1239',
     backgroundColor: '#ffe4e6',
@@ -90,6 +97,7 @@ export const TAG_GROUPS: TagGroup[] = [
   {
     id: 'shopping',
     label: 'Shopping',
+    emoji: '🛍️',
     description: 'Markets, bookstores, malls, boutiques, and browse-worthy local retail.',
     color: '#134e4a',
     backgroundColor: '#ccfbf1',
@@ -99,6 +107,7 @@ export const TAG_GROUPS: TagGroup[] = [
   {
     id: 'wellness',
     label: 'Wellness',
+    emoji: '🌸',
     description: 'Spas and slower places for relaxing, resetting, or recovering between stops.',
     color: '#365314',
     backgroundColor: '#ecfccb',
@@ -107,6 +116,7 @@ export const TAG_GROUPS: TagGroup[] = [
   {
     id: 'local_gems',
     label: 'Local Gems',
+    emoji: '💎',
     description: 'Places Adventour thinks may feel less generic, more local, or more discovery-worthy.',
     color: '#92400e',
     backgroundColor: '#fef3c7',
@@ -148,6 +158,11 @@ export const tagGroupIdsForPlace = (place: Pick<Place, 'name' | 'types' | 'user_
 
 export const tagGroupLabel = (groupId: string) =>
   TAG_GROUPS.find((group) => group.id === groupId)?.label || groupId;
+
+export const tagGroupDisplayLabel = (groupId: string) => {
+  const group = TAG_GROUPS.find((item) => item.id === groupId);
+  return group ? `${group.emoji} ${group.label}` : groupId;
+};
 
 export const tagGroupMeta = (groupId: string) =>
   TAG_GROUPS.find((group) => group.id === groupId);

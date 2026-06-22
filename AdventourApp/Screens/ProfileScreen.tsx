@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
+  Alert,
   ActivityIndicator,
   Image,
   ImageBackground,
@@ -11,29 +12,46 @@ import {
   View,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Config from '../src/Config';
 import PlaceDetailsModal from '../src/components/PlaceDetailsModal';
 import { Place } from '../src/types/Place';
-import { AdventourSession } from '../src/types/Adventour';
+import { AdventourSession, AdventourStop } from '../src/types/Adventour';
+import { tagGroupIdsForPlace, tagGroupMeta } from '../src/placeTagGroups';
+import AuthService from '../src/services/AuthService';
+import { User } from '../src/services/AuthService';
 
 const passportCard = require('../src/assets/profile/passport-card.png');
+const ticketCard = require('../src/assets/cards/ticket-card.png');
+const stampCard = require('../src/assets/cards/stamp-card.png');
 
 const SKY_BACKGROUND = '#bfeaf4';
 const SKY_STROKE = '#87cfe1';
+const PASSPORT_STAMP_INK = '#172033';
 
-const PROFILE_IMAGE_STORAGE_KEY = 'adventour_profile_image';
 const PROFILE_IMAGES = [
+  { id: 'wanyea', label: 'Wanyea', source: require('../src/assets/profile/wanyea.jpg') },
+  { id: 'nicnac', label: 'Nicnac', source: require('../src/assets/profile/nicnac.jpg') },
   { id: 'charley', label: 'Charley', source: require('../src/assets/profile/charley.jpg') },
   { id: 'dom', label: 'Dom', source: require('../src/assets/profile/dom.jpg') },
   { id: 'eric', label: 'Eric', source: require('../src/assets/profile/eric.jpg') },
-  { id: 'nicnac', label: 'Nicnac', source: require('../src/assets/profile/nicnac.jpg') },
   { id: 'ryan', label: 'Ryan', source: require('../src/assets/profile/ryan.jpg') },
-  { id: 'wanyea', label: 'Wanyea', source: require('../src/assets/profile/wanyea.jpg') },
+  { id: 'profpic_cheetah', label: 'Cheetah', source: require('../src/assets/profile/profpic_cheetah.png') },
+  { id: 'profpic_monkey', label: 'Monkey', source: require('../src/assets/profile/profpic_monkey.png') },
+  { id: 'profpic_elephant', label: 'Elephant', source: require('../src/assets/profile/profpic_elephant.png') },
+  { id: 'profpic_ladybug', label: 'Ladybug', source: require('../src/assets/profile/profpic_ladybug.png') },
+  { id: 'profpic_penguin', label: 'Penguin', source: require('../src/assets/profile/profpic_penguin.png') },
+  { id: 'profpic_fox', label: 'Fox', source: require('../src/assets/profile/profpic_fox.png') },
 ];
 
+type ProfileScreenProps = {
+  onSignOut?: () => void | Promise<void>;
+  onAccountDeleted?: () => void | Promise<void>;
+  onUserUpdated?: (user: User) => void;
+};
+
 type HistoryPlace = {
+  event_id?: number;
   place_id: number;
   provider?: string;
   provider_place_id?: string;
@@ -57,6 +75,7 @@ type ProfilePayload = {
     id: number;
     username?: string;
     display_name?: string;
+    profile_picture?: string;
     preferences: string[];
   };
   places: HistoryPlace[];
@@ -97,7 +116,53 @@ const formatTagLabel = (tag: string) =>
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(' ');
 
-const ProfileScreen: React.FC = () => {
+const completedStopsForAdventour = (adventour: AdventourSession) =>
+  adventour.stops.filter((stop) => stop.status === 'completed');
+
+const routePinsForStops = (stops: AdventourStop[]) => {
+  const stopsWithCoordinates = stops.filter((stop) => (
+    typeof stop.display?.latitude === 'number' && typeof stop.display?.longitude === 'number'
+  ));
+
+  if (!stopsWithCoordinates.length) {
+    return [];
+  }
+
+  const latitudes = stopsWithCoordinates.map((stop) => stop.display.latitude as number);
+  const longitudes = stopsWithCoordinates.map((stop) => stop.display.longitude as number);
+  const minLatitude = Math.min(...latitudes);
+  const maxLatitude = Math.max(...latitudes);
+  const minLongitude = Math.min(...longitudes);
+  const maxLongitude = Math.max(...longitudes);
+  const latitudeRange = Math.max(maxLatitude - minLatitude, 0.001);
+  const longitudeRange = Math.max(maxLongitude - minLongitude, 0.001);
+
+  return stopsWithCoordinates.map((stop, index) => ({
+    id: stop.id,
+    label: String(index + 1),
+    name: stop.display?.name || `Stop ${index + 1}`,
+    x: 12 + (((stop.display.longitude as number) - minLongitude) / longitudeRange) * 76,
+    y: 88 - (((stop.display.latitude as number) - minLatitude) / latitudeRange) * 76,
+  }));
+};
+
+const cityCountryFromAddress = (address?: string) => {
+  if (!address) {
+    return null;
+  }
+
+  const parts = address.split(',').map((part) => part.trim()).filter(Boolean);
+  if (!parts.length) {
+    return null;
+  }
+
+  return {
+    city: parts.length >= 3 ? parts[parts.length - 3] : parts[0],
+    country: parts[parts.length - 1],
+  };
+};
+
+const ProfileScreen: React.FC<ProfileScreenProps> = ({ onSignOut, onAccountDeleted, onUserUpdated }) => {
   const [profile, setProfile] = useState<ProfilePayload | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -106,17 +171,14 @@ const ProfileScreen: React.FC = () => {
   const [adventours, setAdventours] = useState<AdventourSession[]>([]);
   const [selectedProfileImageId, setSelectedProfileImageId] = useState(PROFILE_IMAGES[0].id);
   const [profilePickerOpen, setProfilePickerOpen] = useState(false);
+  const [resettingAccount, setResettingAccount] = useState(false);
 
   useEffect(() => {
-    const loadProfileImage = async () => {
-      const stored = await AsyncStorage.getItem(PROFILE_IMAGE_STORAGE_KEY);
-      if (stored && PROFILE_IMAGES.some((image) => image.id === stored)) {
-        setSelectedProfileImageId(stored);
-      }
-    };
-
-    loadProfileImage();
-  }, []);
+    const profilePicture = profile?.user.profile_picture;
+    if (profilePicture && PROFILE_IMAGES.some((image) => image.id === profilePicture)) {
+      setSelectedProfileImageId(profilePicture);
+    }
+  }, [profile?.user.profile_picture]);
 
   const loadProfile = useCallback(async (isRefresh = false) => {
     if (isRefresh) {
@@ -166,6 +228,17 @@ const ProfileScreen: React.FC = () => {
 
   const likedPlaces = profile?.places || [];
   const completedAdventours = adventours.filter((adventour) => adventour.status === 'completed');
+  const visitedAddresses = [
+    ...likedPlaces.map((place) => place.vicinity),
+    ...completedAdventours.flatMap((adventour) => (
+      completedStopsForAdventour(adventour).map((stop) => stop.display?.vicinity)
+    )),
+  ];
+  const visitedLocations = visitedAddresses
+    .map(cityCountryFromAddress)
+    .filter((location): location is { city: string; country: string } => Boolean(location));
+  const visitedCities = new Set(visitedLocations.map((location) => location.city));
+  const visitedCountries = new Set(visitedLocations.map((location) => location.country));
   const displayName = profile?.user.display_name || profile?.user.username || 'Adventourer';
   const selectedProfileImage = PROFILE_IMAGES.find((image) => image.id === selectedProfileImageId) || PROFILE_IMAGES[0];
   const topAcceptedTags = Array.from(
@@ -184,9 +257,65 @@ const ProfileScreen: React.FC = () => {
     .map(([tag]) => tag);
 
   const chooseProfileImage = async (imageId: string) => {
+    const previousImageId = selectedProfileImageId;
     setSelectedProfileImageId(imageId);
     setProfilePickerOpen(false);
-    await AsyncStorage.setItem(PROFILE_IMAGE_STORAGE_KEY, imageId);
+
+    try {
+      const updatedUser = await AuthService.updateProfile({ profile_picture: imageId });
+      onUserUpdated?.(updatedUser);
+      setProfile((currentProfile) => currentProfile ? {
+        ...currentProfile,
+        user: {
+          ...currentProfile.user,
+          profile_picture: updatedUser.profile_picture,
+        },
+      } : currentProfile);
+    } catch (profileError) {
+      console.error('Error saving profile image:', profileError);
+      setSelectedProfileImageId(previousImageId);
+      Alert.alert('Unable to save photo', 'Your profile photo could not be saved. Please try again.');
+    }
+  };
+
+  const handleSignOut = async () => {
+    if (onSignOut) {
+      await onSignOut();
+      return;
+    }
+
+    await AuthService.signOut();
+  };
+
+  const handleResetAccount = () => {
+    Alert.alert(
+      'Reset Adventour profile?',
+      'This deletes your Adventour profile, history, ratings, and active trips from the local backend, then removes your Firebase login so you can sign up again with the same email.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Reset',
+          style: 'destructive',
+          onPress: async () => {
+            setResettingAccount(true);
+            try {
+              await AuthService.deleteAccount();
+              if (onAccountDeleted) {
+                await onAccountDeleted();
+              }
+            } catch (resetError: any) {
+              console.error('Error resetting account:', resetError);
+              const message = resetError?.code === 'auth/requires-recent-login'
+                ? 'Firebase needs a fresh login before deleting this account. Sign out, sign back in, and try reset again.'
+                : 'Your Adventour profile could not be reset. Please try again.';
+              Alert.alert('Reset failed', message);
+            } finally {
+              setResettingAccount(false);
+            }
+          },
+        },
+      ],
+    );
   };
 
   const toPlace = (item: HistoryPlace): Place => ({
@@ -250,7 +379,13 @@ const ProfileScreen: React.FC = () => {
       >
         <View style={styles.passportCover}>
           <ImageBackground source={passportCard} style={styles.passportArtwork} imageStyle={styles.passportArtworkImage} resizeMode="stretch">
-            <Text style={styles.passportStamp}>PASSPORT</Text>
+            <View style={styles.passportStamp}>
+              <View style={styles.passportStampBorder}>
+                <Text style={styles.passportStampTop}>ADVENTOUR</Text>
+                <View style={styles.passportStampBand} />
+                <Text style={styles.passportStampBottom}>PASSPORT</Text>
+              </View>
+            </View>
             <View style={styles.header}>
               <TouchableOpacity style={styles.avatar} activeOpacity={0.82} onPress={() => setProfilePickerOpen((open) => !open)}>
                 <Image source={selectedProfileImage.source} style={styles.avatarImage} />
@@ -259,9 +394,26 @@ const ProfileScreen: React.FC = () => {
                 <Text style={styles.name}>{displayName}</Text>
                 <Text style={styles.passportMeta}>{likedPlaces.length} liked place{likedPlaces.length === 1 ? '' : 's'} stamped</Text>
                 <Text style={styles.passportMeta}>{completedAdventours.length} completed Adventour{completedAdventours.length === 1 ? '' : 's'}</Text>
+                {visitedCities.size || visitedCountries.size ? (
+                  <Text style={styles.passportMeta}>
+                    {visitedCities.size} cit{visitedCities.size === 1 ? 'y' : 'ies'} - {visitedCountries.size} countr{visitedCountries.size === 1 ? 'y' : 'ies'}
+                  </Text>
+                ) : null}
                 <TouchableOpacity onPress={() => setProfilePickerOpen((open) => !open)}>
                   <Text style={styles.changePhotoText}>Change passport photo</Text>
                 </TouchableOpacity>
+                {onSignOut ? (
+                  <TouchableOpacity onPress={handleSignOut}>
+                    <Text style={styles.signOutText}>Sign out</Text>
+                  </TouchableOpacity>
+                ) : null}
+                {onSignOut ? (
+                  <TouchableOpacity onPress={handleResetAccount} disabled={resettingAccount}>
+                    <Text style={[styles.resetAccountText, resettingAccount && styles.disabledText]}>
+                      {resettingAccount ? 'Resetting...' : 'Reset profile'}
+                    </Text>
+                  </TouchableOpacity>
+                ) : null}
               </View>
             </View>
           </ImageBackground>
@@ -299,24 +451,60 @@ const ProfileScreen: React.FC = () => {
         </View>
 
         {completedAdventours.length ? (
-          completedAdventours.slice(0, 3).map((adventour) => (
-            <View key={adventour.id} style={styles.adventourCard}>
-              <View style={styles.cardTopRow}>
-                <Text style={styles.adventourTitle}>{adventour.title}</Text>
-                <Text style={styles.dateText}>{formatDate(adventour.ended_at)}</Text>
-              </View>
-              <Text style={styles.adventourMeta}>
-                {adventour.summary?.stop_count || 0} stops - {formatDuration(adventour.summary?.duration_seconds)}
-              </Text>
-              <Text style={styles.typeText} numberOfLines={2}>
-                {adventour.stops
-                  .filter((stop) => stop.status === 'completed')
-                  .slice(0, 4)
-                  .map((stop) => stop.display?.name || 'A stop')
-                  .join(' -> ')}
-              </Text>
-            </View>
-          ))
+          completedAdventours.slice(0, 3).map((adventour) => {
+            const completedStops = completedStopsForAdventour(adventour);
+            const routePins = routePinsForStops(completedStops);
+
+            return (
+              <ImageBackground
+                key={adventour.id}
+                source={ticketCard}
+                style={styles.ticketCard}
+                imageStyle={styles.ticketCardImage}
+                resizeMode="stretch"
+              >
+                <View style={styles.ticketContent}>
+                  <View style={styles.cardTopRow}>
+                    <Text style={styles.ticketKicker}>Boarding pass</Text>
+                    <Text style={styles.ticketDate}>{formatDate(adventour.ended_at)}</Text>
+                  </View>
+                  <Text style={styles.adventourTitle}>{adventour.title}</Text>
+                  <Text style={styles.adventourMeta}>
+                    {adventour.summary?.stop_count || 0} stops - {formatDuration(adventour.summary?.duration_seconds)}
+                  </Text>
+
+                  <View style={styles.routeMap}>
+                    <View style={[styles.mapGridLine, styles.mapGridLineOne]} />
+                    <View style={[styles.mapGridLine, styles.mapGridLineTwo]} />
+                    <View style={[styles.mapGridLineVertical, styles.mapGridLineThree]} />
+                    <View style={[styles.mapGridLineVertical, styles.mapGridLineFour]} />
+                    {routePins.length ? (
+                      routePins.map((pin) => (
+                        <View
+                          key={pin.id}
+                          style={[
+                            styles.routePin,
+                            { left: `${pin.x}%`, top: `${pin.y}%` },
+                          ]}
+                        >
+                          <Text style={styles.routePinText}>{pin.label}</Text>
+                        </View>
+                      ))
+                    ) : (
+                      <Text style={styles.routeMapEmpty}>Route pins will appear when stops have coordinates.</Text>
+                    )}
+                  </View>
+
+                  <Text style={styles.routeStopsText} numberOfLines={2}>
+                    {completedStops
+                      .slice(0, 4)
+                      .map((stop) => stop.display?.name || 'A stop')
+                      .join(' -> ')}
+                  </Text>
+                </View>
+              </ImageBackground>
+            );
+          })
         ) : (
           <View style={styles.emptyJourneyCard}>
             <Text style={styles.emptyTitle}>No completed Adventours yet.</Text>
@@ -334,17 +522,55 @@ const ProfileScreen: React.FC = () => {
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
         {likedPlaces.length ? (
-          likedPlaces.map((item) => (
-            <TouchableOpacity key={String(item.place_id)} style={styles.placeCard} activeOpacity={0.82} onPress={() => openHistoryPlace(item)}>
-              <View style={styles.cardTopRow}>
-                <Text style={styles.placeName}>{item.name}</Text>
-                <Text style={styles.dateText}>{formatDate(item.occurred_at)}</Text>
-              </View>
-              <Text style={styles.categoryText}>{item.category || 'saved place'}</Text>
-              {item.types?.length ? (
-                <Text style={styles.typeText} numberOfLines={1}>{item.types.slice(0, 4).join(', ')}</Text>
-              ) : null}
-              <Text style={styles.detailPrompt}>Tap for details</Text>
+          likedPlaces.map((item, itemIndex) => (
+            <TouchableOpacity
+              key={item.event_id ? `liked-event-${item.event_id}` : `liked-place-${item.place_id}-${item.occurred_at || itemIndex}`}
+              activeOpacity={0.82}
+              onPress={() => openHistoryPlace(item)}
+            >
+              {/*
+                Use Adventour tag groups instead of legacy food/activity lanes so
+                the Passport reflects the same taste language as Discover.
+              */}
+              <ImageBackground
+                source={stampCard}
+                style={styles.stampCard}
+                imageStyle={styles.stampCardImage}
+                resizeMode="stretch"
+              >
+                <View style={styles.placeStampMark}>
+                  <Text style={styles.placeStampText}>LIKED</Text>
+                  <Text style={styles.placeStampDate}>{formatDate(item.occurred_at)}</Text>
+                </View>
+                <View style={styles.stampContent}>
+                  <Text style={styles.placeName} numberOfLines={1}>{item.name}</Text>
+                  <View style={styles.placeTagRow}>
+                    {tagGroupIdsForPlace({
+                      name: item.name,
+                      types: item.types || [],
+                      user_ratings_total: item.user_ratings_total,
+                    }).slice(0, 3).map((groupId, groupIndex) => {
+                      const group = tagGroupMeta(groupId);
+                      return (
+                        <Text
+                          key={`${item.event_id || item.place_id}-${groupId}-${groupIndex}`}
+                          style={[
+                            styles.placeTag,
+                            {
+                              backgroundColor: group?.backgroundColor || '#dff6f2',
+                              color: group?.color || '#123c69',
+                              borderColor: group?.color || SKY_STROKE,
+                            },
+                          ]}
+                        >
+                          {group ? `${group.emoji} ${group.label}` : groupId}
+                        </Text>
+                      );
+                    })}
+                  </View>
+                  <Text style={styles.detailPrompt}>Tap for details</Text>
+                </View>
+              </ImageBackground>
             </TouchableOpacity>
           ))
         ) : (
@@ -409,17 +635,47 @@ const styles = StyleSheet.create({
   },
   passportStamp: {
     position: 'absolute',
-    left: 30,
-    top: 34,
-    color: '#1d66c0',
-    borderColor: '#1d66c0',
+    left: 20,
+    top: 42,
+    width: 84,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    transform: [{ rotate: '-11deg' }],
+    opacity: 0.92,
+  },
+  passportStampBorder: {
+    width: '100%',
+    height: '100%',
     borderWidth: 2,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    fontSize: 12,
+    borderColor: PASSPORT_STAMP_INK,
+    borderStyle: 'dashed',
+    backgroundColor: 'rgba(255, 255, 255, 0.18)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  passportStampTop: {
+    position: 'absolute',
+    top: 5,
+    color: PASSPORT_STAMP_INK,
+    fontSize: 8,
     fontWeight: '900',
-    transform: [{ rotate: '-5deg' }],
+    letterSpacing: 0.6,
+  },
+  passportStampBand: {
+    width: 61,
+    height: 11,
+    backgroundColor: PASSPORT_STAMP_INK,
+    transform: [{ rotate: '-8deg' }],
+  },
+  passportStampBottom: {
+    position: 'absolute',
+    bottom: 5,
+    color: PASSPORT_STAMP_INK,
+    fontSize: 8,
+    fontWeight: '900',
+    letterSpacing: 0.6,
   },
   avatar: {
     width: 74,
@@ -454,6 +710,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '900',
     marginTop: 6,
+  },
+  signOutText: {
+    color: '#123c69',
+    fontSize: 12,
+    fontWeight: '900',
+    marginTop: 4,
+  },
+  resetAccountText: {
+    color: '#ff4b47',
+    fontSize: 12,
+    fontWeight: '900',
+    marginTop: 4,
+  },
+  disabledText: {
+    opacity: 0.5,
   },
   profilePicker: {
     flexDirection: 'row',
@@ -531,32 +802,115 @@ const styles = StyleSheet.create({
     color: '#dc2626',
     marginBottom: 10,
   },
-  placeCard: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: SKY_STROKE,
-    padding: 14,
-    marginBottom: 10,
+  ticketCard: {
+    aspectRatio: 4 / 3,
+    marginBottom: 12,
+    paddingHorizontal: 23,
+    paddingVertical: 22,
   },
-  adventourCard: {
-    backgroundColor: '#123c69',
+  ticketCardImage: {
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: SKY_STROKE,
-    padding: 14,
-    marginBottom: 10,
+  },
+  ticketContent: {
+    flex: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  ticketKicker: {
+    color: '#e6534b',
+    fontSize: 11,
+    fontWeight: '900',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+  },
+  ticketDate: {
+    color: '#6b7280',
+    fontSize: 12,
+    fontWeight: '800',
   },
   adventourTitle: {
-    flex: 1,
-    color: '#fff7ed',
+    color: '#123c69',
     fontSize: 16,
     fontWeight: '900',
+    marginTop: 3,
   },
   adventourMeta: {
     marginTop: 6,
-    color: '#ff9f1c',
+    color: '#e6534b',
     fontWeight: '900',
+  },
+  routeMap: {
+    backgroundColor: '#dff6f2',
+    borderColor: SKY_STROKE,
+    borderRadius: 8,
+    borderWidth: 1,
+    height: 118,
+    marginTop: 10,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  mapGridLine: {
+    backgroundColor: 'rgba(18, 60, 105, 0.12)',
+    height: 1,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+  },
+  mapGridLineVertical: {
+    backgroundColor: 'rgba(18, 60, 105, 0.12)',
+    bottom: 0,
+    position: 'absolute',
+    top: 0,
+    width: 1,
+  },
+  mapGridLineOne: {
+    top: '34%',
+  },
+  mapGridLineTwo: {
+    top: '67%',
+  },
+  mapGridLineThree: {
+    left: '35%',
+  },
+  mapGridLineFour: {
+    left: '69%',
+  },
+  routePin: {
+    alignItems: 'center',
+    backgroundColor: '#ff4b47',
+    borderColor: '#fffaf3',
+    borderRadius: 11,
+    borderWidth: 2,
+    height: 22,
+    justifyContent: 'center',
+    marginLeft: -11,
+    marginTop: -11,
+    position: 'absolute',
+    shadowColor: '#0b2551',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    width: 22,
+  },
+  routePinText: {
+    color: '#fffaf3',
+    fontSize: 10,
+    fontWeight: '900',
+  },
+  routeMapEmpty: {
+    alignSelf: 'center',
+    color: '#6b7280',
+    fontSize: 12,
+    fontWeight: '700',
+    marginTop: 43,
+    paddingHorizontal: 18,
+    textAlign: 'center',
+  },
+  routeStopsText: {
+    color: '#6b7280',
+    fontSize: 12,
+    fontWeight: '700',
+    marginTop: 7,
   },
   emptyJourneyCard: {
     backgroundColor: '#dff6f2',
@@ -581,12 +935,6 @@ const styles = StyleSheet.create({
     color: '#6b7280',
     fontWeight: '700',
   },
-  categoryText: {
-    marginTop: 6,
-    textTransform: 'capitalize',
-    color: '#e6534b',
-    fontWeight: '800',
-  },
   typeText: {
     marginTop: 4,
     color: '#6b7280',
@@ -596,6 +944,61 @@ const styles = StyleSheet.create({
     color: '#123c69',
     fontWeight: '800',
     fontSize: 12,
+  },
+  stampCard: {
+    aspectRatio: 330 / 186,
+    marginBottom: 10,
+    paddingHorizontal: 26,
+    paddingVertical: 22,
+  },
+  stampCardImage: {
+    borderRadius: 8,
+  },
+  stampContent: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingRight: 58,
+  },
+  placeTagRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 5,
+    marginTop: 7,
+  },
+  placeTag: {
+    borderRadius: 999,
+    borderWidth: 1,
+    fontSize: 10,
+    fontWeight: '900',
+    overflow: 'hidden',
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+  },
+  placeStampMark: {
+    alignItems: 'center',
+    borderColor: '#e6534b',
+    borderRadius: 999,
+    borderStyle: 'dashed',
+    borderWidth: 2,
+    height: 54,
+    justifyContent: 'center',
+    opacity: 0.84,
+    position: 'absolute',
+    right: 28,
+    top: 23,
+    transform: [{ rotate: '-12deg' }],
+    width: 54,
+  },
+  placeStampText: {
+    color: '#e6534b',
+    fontSize: 10,
+    fontWeight: '900',
+  },
+  placeStampDate: {
+    color: '#e6534b',
+    fontSize: 9,
+    fontWeight: '800',
+    marginTop: 1,
   },
   emptyCard: {
     backgroundColor: '#fff',

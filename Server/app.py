@@ -17,10 +17,12 @@ from adventour_backend.auth import require_auth, optional_auth
 from adventour_backend.social_routes import social_bp
 from adventour_backend.services.recommender_service import RecommendationService
 from adventour_backend.services.google_services_api import first_photo_url
+from adventour_backend.services.account_service import delete_user_account_data
 
 from dotenv import load_dotenv
 from urllib.parse import quote_plus
-from datetime import datetime
+from datetime import date, datetime, timezone
+from sqlalchemy import func, inspect, text
 import os
 import logging
 import json
@@ -86,9 +88,23 @@ db.init_app(app)
 app.register_blueprint(social_bp, url_prefix='/api')
 recommendation_service = RecommendationService()
 
+
+def ensure_local_schema():
+    """Keep existing local dev databases usable until proper migrations land."""
+    inspector = inspect(db.engine)
+    user_columns = {column["name"] for column in inspector.get_columns(User.__tablename__)}
+    if "date_of_birth" in user_columns:
+        return
+
+    table_name = db.engine.dialect.identifier_preparer.quote(User.__tablename__)
+    with db.engine.begin() as connection:
+        connection.execute(text(f"ALTER TABLE {table_name} ADD COLUMN date_of_birth DATE"))
+
+
 # Initialize the database
 with app.app_context():
     db.create_all()
+    ensure_local_schema()
 
 @app.route('/')
 def home():
@@ -132,7 +148,50 @@ def parse_json_object(value, fallback=None):
         return fallback if fallback is not None else {}
 
 def isoformat_or_none(value):
-    return value.isoformat() if value else None
+    if not value:
+        return None
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=timezone.utc)
+    return value.isoformat().replace("+00:00", "Z")
+
+def date_or_none(value):
+    if not value:
+        return None
+    return value.isoformat()
+
+def parse_birthdate(value):
+    if not value:
+        return None
+    try:
+        return date.fromisoformat(value)
+    except ValueError:
+        return None
+
+def is_at_least_13(birthdate):
+    today = date.today()
+    age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+    return age >= 13
+
+def display_name_taken(display_name, user_id=None):
+    normalized = display_name.strip().lower()
+    query = User.query.filter(func.lower(User.display_name) == normalized)
+    if user_id:
+        query = query.filter(User.id != user_id)
+    return query.first() is not None
+
+def serialize_user(user):
+    preferences = user.preferences.split(',') if user.preferences else []
+    return {
+        "id": user.id,
+        "firebase_uid": user.firebase_uid,
+        "email": user.email,
+        "username": user.username,
+        "display_name": user.display_name,
+        "date_of_birth": date_or_none(user.date_of_birth),
+        "profile_picture": user.profile_picture,
+        "preferences": preferences,
+        "profile_complete": bool(user.display_name and user.date_of_birth),
+    }
 
 def resolve_place_reference(data):
     adventour_place_id = data.get("place_id")
@@ -233,6 +292,7 @@ def onboarding():
         return jsonify({"error": "User authentication required"}), 401
 
     user.preferences = ",".join(tags)
+    recommendation_service.rebuild_preference_vector(user, commit=False)
     db.session.commit()
     return jsonify({"message": "Onboarding preferences saved"}), 200
 
@@ -248,14 +308,16 @@ def get_user_info(user_id):
         user = User.query.filter_by(uuid=user_id).first()
     
     if not user:
-        return jsonify({"onboarded": False}), 200
+        return jsonify({"onboarded": False, "profile_complete": False}), 200
     
     return jsonify({
         "onboarded": bool(user.preferences),
         "preferences": user.preferences.split(',') if user.preferences else [],
+        "profile_complete": bool(user.display_name and user.date_of_birth),
         "user_id": user.id,
         "username": user.username,
-        "display_name": user.display_name
+        "display_name": user.display_name,
+        "user": serialize_user(user),
     }), 200
 
 @app.route('/user', methods=['POST'])
@@ -267,22 +329,27 @@ def create_user():
     
     # Update user with provided data
     if data.get('display_name'):
-        user.display_name = data['display_name']
+        display_name = data['display_name'].strip()
+        if not display_name:
+            return jsonify({"error": "display_name is required"}), 400
+        if display_name_taken(display_name, user.id):
+            return jsonify({"error": "That display name is already taken"}), 409
+        user.display_name = display_name
     if data.get('profile_picture'):
         user.profile_picture = data['profile_picture']
+    if data.get('date_of_birth'):
+        birthdate = parse_birthdate(data.get('date_of_birth'))
+        if not birthdate:
+            return jsonify({"error": "date_of_birth must be YYYY-MM-DD"}), 400
+        if not is_at_least_13(birthdate):
+            return jsonify({"error": "You must be at least 13 to use Adventour"}), 400
+        user.date_of_birth = birthdate
     
     db.session.commit()
     
     return jsonify({
         "message": "User created successfully",
-        "user": {
-            "id": user.id,
-            "firebase_uid": user.firebase_uid,
-            "email": user.email,
-            "username": user.username,
-            "display_name": user.display_name,
-            "profile_picture": user.profile_picture
-        }
+        "user": serialize_user(user),
     }), 201
 
 @app.route('/user/dev', methods=['POST'])
@@ -313,15 +380,7 @@ def create_dev_user():
     db.session.commit()
 
     return jsonify({
-        "user": {
-            "id": user.id,
-            "firebase_uid": user.firebase_uid,
-            "email": user.email,
-            "username": user.username,
-            "display_name": user.display_name,
-            "profile_picture": user.profile_picture,
-            "preferences": user.preferences.split(',') if user.preferences else [],
-        }
+        "user": serialize_user(user)
     }), 200
 
 @app.route('/user/profile', methods=['PUT'])
@@ -332,22 +391,41 @@ def update_user_profile():
     user = g.current_user
     
     if data.get('display_name'):
-        user.display_name = data['display_name']
+        display_name = data['display_name'].strip()
+        if not display_name:
+            return jsonify({"error": "display_name is required"}), 400
+        if display_name_taken(display_name, user.id):
+            return jsonify({"error": "That display name is already taken"}), 409
+        user.display_name = display_name
     if data.get('profile_picture'):
         user.profile_picture = data['profile_picture']
+    if data.get('date_of_birth'):
+        birthdate = parse_birthdate(data.get('date_of_birth'))
+        if not birthdate:
+            return jsonify({"error": "date_of_birth must be YYYY-MM-DD"}), 400
+        if not is_at_least_13(birthdate):
+            return jsonify({"error": "You must be at least 13 to use Adventour"}), 400
+        user.date_of_birth = birthdate
     
     db.session.commit()
     
     return jsonify({
         "message": "Profile updated successfully",
-        "user": {
-            "id": user.id,
-            "firebase_uid": user.firebase_uid,
-            "email": user.email,
-            "username": user.username,
-            "display_name": user.display_name,
-            "profile_picture": user.profile_picture
-        }
+        "user": serialize_user(user),
+    }), 200
+
+@app.route('/user/me', methods=['DELETE'])
+@app.route('/user/me/reset', methods=['POST'])
+@require_auth
+def delete_current_user():
+    """Delete the current user's Adventour account data from the backend."""
+    user = g.current_user
+    deleted = delete_user_account_data(user)
+    db.session.commit()
+
+    return jsonify({
+        "message": "User account deleted",
+        "deleted": deleted,
     }), 200
 
 @app.route('/feedback', methods=['POST'])
@@ -646,11 +724,13 @@ def complete_adventour_stop(session_id, stop_id):
         if rating < 1 or rating > 5:
             return jsonify({"error": "rating must be an integer between 1 and 5"}), 400
 
+    now = datetime.utcnow()
     stop.status = "completed"
-    stop.arrived_at = stop.arrived_at or datetime.utcnow()
-    stop.departed_at = datetime.utcnow()
+    stop.arrived_at = stop.arrived_at or now
+    stop.departed_at = stop.departed_at or now
     stop.rating = rating
-    stop.notes = data.get("notes")
+    if "notes" in data:
+        stop.notes = data.get("notes")
 
     if rating:
         recommendation_service.record_event(
@@ -743,6 +823,7 @@ def profile_history():
         display = metadata.get("display") or {}
         types = display.get("types") or list((feature and json.loads(feature.category_vector or "{}") or {}).keys())
         places.append({
+            "event_id": event.id,
             "place_id": place.id,
             "provider": provider_ref.provider if provider_ref else None,
             "provider_place_id": provider_ref.provider_place_id if provider_ref else None,
@@ -766,6 +847,8 @@ def profile_history():
             "id": user.id,
             "username": user.username,
             "display_name": user.display_name,
+            "date_of_birth": date_or_none(user.date_of_birth),
+            "profile_picture": user.profile_picture,
             "preferences": user.preferences.split(",") if user.preferences else [],
         },
         "places": places,

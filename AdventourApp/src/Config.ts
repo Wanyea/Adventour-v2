@@ -4,6 +4,7 @@ class Config {
   static BACKEND_BASE_URL =
     NativeConfig.BACKEND_BASE_URL || 'http://10.0.2.2:8080';
   static GOOGLE_API_KEY = NativeConfig.GOOGLE_API_KEY || '';
+  static GOOGLE_WEB_CLIENT_ID = NativeConfig.GOOGLE_WEB_CLIENT_ID || '';
   static API_AUTH_MODE = NativeConfig.API_AUTH_MODE || 'firebase';
   static DEV_AUTH_EMAIL = NativeConfig.DEV_AUTH_EMAIL || 'dev@adventour.local';
 

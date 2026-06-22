@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Animated,
   View,
@@ -22,12 +22,12 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
-import { useEffect } from 'react';
 import { PermissionsAndroid, Platform } from 'react-native';
 import { Place } from './src/types/Place';
 import { AdventourSession, AdventourStop } from './src/types/Adventour';
-import { TAG_GROUPS, tagGroupIdsForPlace } from './src/placeTagGroups';
+import { TAG_GROUPS, tagGroupDisplayLabel, tagGroupIdsForPlace } from './src/placeTagGroups';
 import AdventourService from './src/services/AdventourService';
+import { User } from './src/services/AuthService';
 
 type Coordinates = { latitude: number; longitude: number };
 type LocationMode = 'none' | 'gps' | 'manual';
@@ -60,10 +60,59 @@ const describeAxiosError = (error: unknown) => {
   return error;
 };
 
-const HomeScreen: React.FC = () => {
+const placeFromRecommendation = (item: any): Place => {
+  const name = item.name || item.display?.name || 'Unknown place';
+  const types = item.display?.types || [];
+  const place = {
+    place_id: String(item.place_id || item.provider_place_id),
+    provider: item.provider,
+    provider_place_id: item.provider_place_id,
+    name,
+    vicinity: item.display?.vicinity || `${item.distance_meters ?? 'Unknown'} meters away`,
+    types,
+    category: item.category,
+    explanation: item.explanation,
+    photo_url: item.display?.photo_url
+      ? `${Config.BACKEND_BASE_URL}${item.display.photo_url}`
+      : undefined,
+    photo_attributions: item.display?.photo_attributions || [],
+    rating: item.display?.rating,
+    user_ratings_total: item.display?.user_ratings_total,
+    price_level: item.display?.price_level,
+    relevance: item.score,
+    likelihood: item.score,
+    latitude: item.latitude,
+    longitude: item.longitude,
+    distance_meters: item.distance_meters,
+    travel_times: item.travel_times,
+  };
+
+  return {
+    ...place,
+    tag_groups: tagGroupIdsForPlace(place),
+  };
+};
+
+type HomeScreenProps = {
+  user?: User | null;
+};
+
+const greetingForNow = () => {
+  const hour = new Date().getHours();
+  if (hour < 12) {
+    return 'Good morning';
+  }
+  if (hour < 17) {
+    return 'Good afternoon';
+  }
+  return 'Good evening';
+};
+
+const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
   const backendBaseURL = Config.BACKEND_BASE_URL;
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [userFeedback, setUserFeedback] = useState<{ place_id: string; feedback: string; tags: string[] }[]>([]);
   const [userId, setUserId] = useState<string>('');
   const [city, setCity] = useState<string>(''); 
@@ -72,6 +121,7 @@ const HomeScreen: React.FC = () => {
   const [suggestions, setSuggestions] = useState<any[]>([]); 
   const [emptyMessage, setEmptyMessage] = useState<string>('');
   const [hasLoadedRecommendations, setHasLoadedRecommendations] = useState(false);
+  const [autoRefillAvailable, setAutoRefillAvailable] = useState(false);
   const [radiusOption, setRadiusOption] = useState<RadiusOption>(RADIUS_OPTIONS[1]);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [distanceOpen, setDistanceOpen] = useState(false);
@@ -81,7 +131,13 @@ const HomeScreen: React.FC = () => {
   const [activeAdventour, setActiveAdventour] = useState<AdventourSession | null>(null);
   const [journeyLoading, setJourneyLoading] = useState(false);
   const autocompleteTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scrollRef = useRef<ScrollView>(null);
   const filterPanelAnim = useRef(new Animated.Value(0)).current;
+  const recentlyDecidedPlaceIds = useRef(new Set<string>());
+  const autoRefillInFlight = useRef(false);
+  const pendingBasketScroll = useRef(false);
+  const [basketOffsetY, setBasketOffsetY] = useState(0);
+  const displayName = user?.display_name || user?.username || 'Adventourer';
 
   useEffect(() => {
     const getOrCreateUserId = async () => {
@@ -123,7 +179,7 @@ const HomeScreen: React.FC = () => {
 
   const selectedTagLabel = selectedTagGroup === 'all'
     ? 'All picks'
-    : TAG_GROUPS.find((group) => group.id === selectedTagGroup)?.label || 'All picks';
+    : tagGroupDisplayLabel(selectedTagGroup) || 'All picks';
 
   useEffect(() => {
     if (selectedTagGroup !== 'all' && places.length > 0 && filteredPlaces.length === 0) {
@@ -150,6 +206,22 @@ const HomeScreen: React.FC = () => {
       },
     ],
   };
+
+  useEffect(() => {
+    if (!pendingBasketScroll.current || loading || !hasLoadedRecommendations || places.length === 0) {
+      return;
+    }
+
+    pendingBasketScroll.current = false;
+    const timeout = setTimeout(() => {
+      scrollRef.current?.scrollTo({
+        y: Math.max(0, basketOffsetY - 12),
+        animated: true,
+      });
+    }, 180);
+
+    return () => clearTimeout(timeout);
+  }, [basketOffsetY, hasLoadedRecommendations, loading, places.length]);
 
   const showTagDescription = (groupId: string) => {
     if (groupId === 'all') {
@@ -273,6 +345,10 @@ const HomeScreen: React.FC = () => {
       ...prev,
       { place_id: place.place_id, feedback, tags: place.types },
     ]);
+    recentlyDecidedPlaceIds.current.add(place.place_id);
+    if (place.provider_place_id) {
+      recentlyDecidedPlaceIds.current.add(String(place.provider_place_id));
+    }
     setPlaces((prev) => prev.filter((item) => item.place_id !== place.place_id));
 
     try {
@@ -350,28 +426,44 @@ const HomeScreen: React.FC = () => {
     setSuggestions([]);
   };
 
-  const handleFindPlaces = async () => {
-    setLoading(true);
-    setPlaces([]);
-    setHasLoadedRecommendations(false);
-    setEmptyMessage('Loading recommendations...');
+  const loadRecommendations = useCallback(async ({ append = false, quiet = false } = {}) => {
+    if (append) {
+      if (autoRefillInFlight.current) {
+        return;
+      }
+      autoRefillInFlight.current = true;
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+      setPlaces([]);
+      setHasLoadedRecommendations(false);
+      setAutoRefillAvailable(false);
+      recentlyDecidedPlaceIds.current.clear();
+    }
+    setEmptyMessage(append ? 'Scouting more recommendations...' : 'Loading recommendations...');
 
     let step: RequestStep = 'recommendations';
 
     try {
       let recommendationResponse;
+      const requestRecommendations = async (location: Coordinates) => axios.post(`${Config.BACKEND_BASE_URL}/api/recommendations`, {
+        mode: 'spontaneous',
+        location,
+        radius_meters: radiusOption.meters,
+        constraints: {
+          limit: 20,
+          avoid_chains: true,
+        },
+      });
+
       if (locationMode === 'gps' && currentCoords) {
         step = 'recommendations';
         console.log('Finding places using GPS coordinates:', currentCoords);
-        recommendationResponse = await axios.post(`${Config.BACKEND_BASE_URL}/api/recommendations`, {
-          mode: 'spontaneous',
-          location: currentCoords,
-          radius_meters: radiusOption.meters,
-          constraints: {
-            limit: 20,
-            avoid_chains: true,
-          },
-        });
+        recommendationResponse = await requestRecommendations(currentCoords);
+      } else if (locationMode === 'manual' && currentCoords) {
+        step = 'recommendations';
+        console.log('Finding places using saved manual destination:', currentCoords);
+        recommendationResponse = await requestRecommendations(currentCoords);
       } else if (city.trim()) {
         step = 'geocode';
         console.log('Resolving manual destination:', city.trim());
@@ -389,58 +481,44 @@ const HomeScreen: React.FC = () => {
         setLocationMode('manual');
         step = 'recommendations';
         console.log('Finding places using resolved destination:', resolvedLocation);
-        recommendationResponse = await axios.post(`${Config.BACKEND_BASE_URL}/api/recommendations`, {
-          mode: 'spontaneous',
-          location: resolvedLocation,
-          radius_meters: radiusOption.meters,
-          constraints: {
-            limit: 20,
-            avoid_chains: true,
-          },
-        });
+        recommendationResponse = await requestRecommendations(resolvedLocation);
       } else {
-        Alert.alert('Error', 'Please enter a location or enable GPS.');
+        if (!quiet) {
+          Alert.alert('Error', 'Please enter a location or enable GPS.');
+        }
         return;
       }
 
       const recommendations = recommendationResponse.data.recommendations || [];
-      const results = recommendations.map((item: any) => {
-        const name = item.name || item.display?.name || 'Unknown place';
-        const types = item.display?.types || [];
-        const place = {
-          place_id: String(item.place_id || item.provider_place_id),
-          provider: item.provider,
-          provider_place_id: item.provider_place_id,
-          name,
-          vicinity: item.display?.vicinity || `${item.distance_meters ?? 'Unknown'} meters away`,
-          types,
-          category: item.category,
-          explanation: item.explanation,
-          photo_url: item.display?.photo_url
-            ? `${Config.BACKEND_BASE_URL}${item.display.photo_url}`
-            : undefined,
-          photo_attributions: item.display?.photo_attributions || [],
-          rating: item.display?.rating,
-          user_ratings_total: item.display?.user_ratings_total,
-          price_level: item.display?.price_level,
-          relevance: item.score,
-          likelihood: item.score,
-          latitude: item.latitude,
-          longitude: item.longitude,
-          distance_meters: item.distance_meters,
-          travel_times: item.travel_times,
-        };
-        return {
-          ...place,
-          tag_groups: tagGroupIdsForPlace(place),
-        };
-      });
+      const results = recommendations
+        .map(placeFromRecommendation)
+        .filter((place: Place) => (
+          !recentlyDecidedPlaceIds.current.has(place.place_id)
+          && (!place.provider_place_id || !recentlyDecidedPlaceIds.current.has(String(place.provider_place_id)))
+        ));
 
-      setPlaces(results);
-      setHasLoadedRecommendations(results.length > 0);
-      setSelectedTagGroup('all');
-      if (results.length > 0) {
-        setEmptyMessage('');
+      const existingIds = new Set(
+        places.flatMap((place) => [
+          place.place_id,
+          place.provider_place_id ? String(place.provider_place_id) : '',
+        ]).filter(Boolean),
+      );
+      const freshResults = append
+        ? results.filter((place: Place) => (
+          !existingIds.has(place.place_id)
+          && (!place.provider_place_id || !existingIds.has(String(place.provider_place_id)))
+        ))
+        : results;
+
+      setPlaces(append ? [...places, ...freshResults] : freshResults);
+      setHasLoadedRecommendations((current) => current || freshResults.length > 0 || append);
+      setAutoRefillAvailable(!append || freshResults.length > 0);
+      if (!append) {
+        setSelectedTagGroup('all');
+        pendingBasketScroll.current = freshResults.length > 0;
+      }
+      if (freshResults.length > 0 || append) {
+        setEmptyMessage(freshResults.length > 0 ? '' : 'No new places found yet. Try refreshing or widening the search distance.');
       } else {
         const providerErrors = recommendationResponse.data.provider_errors || [];
         const hasProviderErrors = providerErrors.length > 0;
@@ -457,12 +535,30 @@ const HomeScreen: React.FC = () => {
         ? 'Unable to resolve that destination. Try a more specific city, state, or address.'
         : 'Unable to load recommendations for that destination.';
       setEmptyMessage(message);
-      setHasLoadedRecommendations(false);
-      Alert.alert('Error', message);
+      if (!append) {
+        setHasLoadedRecommendations(false);
+      }
+      setAutoRefillAvailable(false);
+      if (!quiet) {
+        Alert.alert('Error', message);
+      }
     } finally {
-      setLoading(false);
+      if (append) {
+        setLoadingMore(false);
+        autoRefillInFlight.current = false;
+      } else {
+        setLoading(false);
+      }
     }
+  }, [city, currentCoords, locationMode, places, radiusOption.meters]);
+
+  const handleFindPlaces = () => {
+    loadRecommendations({ append: false });
   };
+
+  const handleRecommendationDeckExhausted = useCallback(() => {
+    loadRecommendations({ append: true, quiet: true });
+  }, [loadRecommendations]);
 
   const requestLocationPermission = async () => {
     if (Platform.OS === 'android') {
@@ -519,11 +615,15 @@ const HomeScreen: React.FC = () => {
   return (
     <View style={styles.screen}>
       <ScrollView
+        ref={scrollRef}
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
+        <View style={styles.greetingBlock}>
+          <Text style={styles.greetingText}>{greetingForNow()}, {displayName}</Text>
+        </View>
         <View style={styles.launchControls}>
           <Text style={styles.controlLabel}>Launch point</Text>
           <View style={styles.locationContainer}>
@@ -540,6 +640,18 @@ const HomeScreen: React.FC = () => {
                 style={styles.locationIcon}
               />
             </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.locationButton, styles.filterIconButton, filtersOpen && styles.filterIconButtonActive]}
+              onPress={() => setFiltersOpen((open) => !open)}
+              activeOpacity={0.82}
+              accessibilityLabel="Open filters"
+            >
+              <View style={styles.filterGlyph}>
+                <View style={[styles.filterGlyphLine, styles.filterGlyphLineTop]} />
+                <View style={[styles.filterGlyphLine, styles.filterGlyphLineMiddle]} />
+                <View style={[styles.filterGlyphLine, styles.filterGlyphLineBottom]} />
+              </View>
+            </TouchableOpacity>
           </View>
         </View>
         {suggestions.length > 0 && (
@@ -555,23 +667,20 @@ const HomeScreen: React.FC = () => {
             ))}
           </View>
         )}
-        <View style={styles.filterSection}>
-          <TouchableOpacity
-            style={styles.filterToggle}
-            activeOpacity={0.82}
-            onPress={() => setFiltersOpen((open) => !open)}
-          >
-            <View>
-              <Text style={styles.filterTitle}>Filters</Text>
-              <Text style={styles.filterSummary}>
-                {radiusOption.label}{hasLoadedRecommendations ? ` - ${selectedTagLabel}` : ''}
-              </Text>
-            </View>
-            <Text style={styles.dropdownValue}>{filtersOpen ? 'Hide' : 'Show'}</Text>
-          </TouchableOpacity>
-
-          {filtersOpen ? (
+        {filtersOpen ? (
+          <View style={styles.filterSection}>
             <Animated.View style={[styles.filterPanel, filterPanelStyle]}>
+              <View style={styles.filterPanelHeader}>
+                <View>
+                  <Text style={styles.filterTitle}>Filters</Text>
+                  <Text style={styles.filterSummary}>
+                    {radiusOption.label}{hasLoadedRecommendations ? ` - ${selectedTagLabel}` : ''}
+                  </Text>
+                </View>
+                <TouchableOpacity onPress={() => setFiltersOpen(false)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                  <Text style={styles.dropdownValue}>Close</Text>
+                </TouchableOpacity>
+              </View>
               <TouchableOpacity
                 style={styles.dropdownButton}
                 activeOpacity={0.8}
@@ -659,7 +768,7 @@ const HomeScreen: React.FC = () => {
                             selected && styles.dropdownItemTextSelected,
                           ]}
                         >
-                          {group.label} ({count})
+                          {group.emoji} {group.label} ({count})
                         </Text>
                         <TouchableOpacity onPress={() => showTagDescription(group.id)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
                           <Text style={[styles.tagInfo, selected && styles.dropdownItemTextSelected]}>?</Text>
@@ -670,8 +779,8 @@ const HomeScreen: React.FC = () => {
                 </View>
               ) : null}
             </Animated.View>
-          ) : null}
-        </View>
+          </View>
+        ) : null}
         <AdventourLaunchHero
           locationLabel={city || (currentCoords ? 'GPS location' : 'Pick your launch point')}
           distanceLabel={`${radiusOption.label} range`}
@@ -689,19 +798,26 @@ const HomeScreen: React.FC = () => {
           onRateStop={handleRateStop}
           onEnd={handleEndAdventour}
         />
-        {loading ? (
-          <Text style={styles.emptyText}>Loading...</Text>
-        ) : hasLoadedRecommendations ? (
-          <RecommendationDeck
-            places={filteredPlaces}
-            activeFilterLabel={selectedTagLabel}
-            totalPlaces={places.length}
-            onFeedback={handleFeedback}
-            onOpenPlace={setSelectedPlace}
-          />
-        ) : (
-          <Text style={styles.emptyText}>{emptyMessage}</Text>
-        )}
+        <View
+          onLayout={(event) => setBasketOffsetY(event.nativeEvent.layout.y)}
+        >
+          {loading ? (
+            <Text style={styles.emptyText}>Loading...</Text>
+          ) : hasLoadedRecommendations ? (
+            <RecommendationDeck
+              places={filteredPlaces}
+              activeFilterLabel={selectedTagLabel}
+              totalPlaces={places.length}
+              loadingMore={loadingMore}
+              canLoadMore={autoRefillAvailable}
+              onFeedback={handleFeedback}
+              onOpenPlace={setSelectedPlace}
+              onExhausted={handleRecommendationDeckExhausted}
+            />
+          ) : (
+            <Text style={styles.emptyText}>{emptyMessage}</Text>
+          )}
+        </View>
       </ScrollView>
       <PlaceDetailsModal
         place={selectedPlace}
@@ -724,6 +840,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingTop: 12,
     paddingBottom: 28,
+  },
+  greetingBlock: {
+    marginBottom: 10,
+  },
+  greetingText: {
+    color: '#31506b',
+    fontSize: 20,
+    fontWeight: '800',
+  },
+  greetingPrompt: {
+    color: '#123c69',
+    fontSize: 26,
+    fontWeight: '900',
+    lineHeight: 30,
+    marginTop: 2,
   },
   launchControls: {
     backgroundColor: '#dff6f2',
@@ -774,6 +905,34 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginLeft: 9,
   },
+  filterIconButton: {
+    backgroundColor: '#ff9f1c',
+    borderColor: '#123c69',
+    borderWidth: 2,
+  },
+  filterIconButtonActive: {
+    backgroundColor: '#ff4b47',
+  },
+  filterGlyph: {
+    height: 21,
+    justifyContent: 'space-between',
+    width: 22,
+  },
+  filterGlyphLine: {
+    backgroundColor: '#ffffff',
+    borderRadius: 999,
+    height: 3,
+  },
+  filterGlyphLineTop: {
+    width: 18,
+  },
+  filterGlyphLineMiddle: {
+    alignSelf: 'flex-end',
+    width: 22,
+  },
+  filterGlyphLineBottom: {
+    width: 14,
+  },
   locationIcon: {
     width: 24,
     height: 24,
@@ -804,7 +963,7 @@ const styles = StyleSheet.create({
     marginTop: 0,
     marginBottom: 8,
   },
-  filterToggle: {
+  filterPanelHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -814,6 +973,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#dff6f2',
     paddingHorizontal: 10,
     paddingVertical: 9,
+    marginBottom: 8,
     shadowColor: '#123c69',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
