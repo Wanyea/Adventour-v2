@@ -254,6 +254,11 @@ def serialize_adventour_stop(stop):
 
 def serialize_adventour_session(session, include_stops=True):
     stops = session.stops.all() if include_stops else []
+    active_stops = [
+        stop for stop in stops
+        if stop.status in ("planned", "navigating", "arrived")
+    ]
+    active_stop = active_stops[-1] if active_stops else None
     return {
         "id": session.id,
         "title": session.title,
@@ -263,7 +268,7 @@ def serialize_adventour_session(session, include_stops=True):
         "companion_user_ids": parse_json_object(session.companion_user_ids_json, {"ids": []}).get("ids", []),
         "summary": parse_json_object(session.summary_json),
         "stops": [serialize_adventour_stop(stop) for stop in stops],
-        "active_stop": serialize_adventour_stop(stops[-1]) if stops and stops[-1].status in ("planned", "navigating", "arrived") else None,
+        "active_stop": serialize_adventour_stop(active_stop) if active_stop else None,
     }
     
 @app.route('/onboarding', methods=['POST'])

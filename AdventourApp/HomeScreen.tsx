@@ -138,6 +138,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
   const pendingBasketScroll = useRef(false);
   const [basketOffsetY, setBasketOffsetY] = useState(0);
   const displayName = user?.display_name || user?.username || 'Adventourer';
+  const hasLaunchPoint = Boolean(currentCoords);
 
   useEffect(() => {
     const getOrCreateUserId = async () => {
@@ -351,8 +352,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
     }
     setPlaces((prev) => prev.filter((item) => item.place_id !== place.place_id));
 
+    let eventSaved = false;
+
     try {
-      const response = await axios.post(`${backendBaseURL}/api/events`, {
+      await axios.post(`${backendBaseURL}/api/events`, {
         place_id: place.place_id,
         provider: place.provider,
         provider_place_id: place.provider_place_id,
@@ -380,15 +383,40 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
           },
         },
       });
-      console.log(response.data);
-
-      if (feedback === 'accept' && activeAdventour) {
-        const result = await AdventourService.addStop(activeAdventour.id, place);
-        setActiveAdventour(result.adventour);
-      }
+      eventSaved = true;
     } catch (error) {
       console.error('Error saving feedback event:', describeAxiosError(error));
       Alert.alert('Feedback not saved', 'The card was removed locally, but Adventour could not save that swipe.');
+    }
+
+    if (eventSaved && feedback === 'accept' && activeAdventour) {
+      try {
+        const result = await AdventourService.addStop(activeAdventour.id, place);
+        setActiveAdventour(result.adventour);
+      } catch (error: any) {
+        const details = describeAxiosError(error);
+        console.error('Error adding Adventour stop:', details);
+
+        if (axios.isAxiosError(error) && error.response?.status === 409) {
+          try {
+            const refreshed = await AdventourService.getActive();
+            setActiveAdventour(refreshed);
+          } catch (refreshError) {
+            console.error('Error refreshing active Adventour:', describeAxiosError(refreshError));
+          }
+
+          Alert.alert(
+            'Current stop still active',
+            error.response.data?.error || 'Finish or rate your current stop before adding another Adventour place.',
+          );
+          return;
+        }
+
+        Alert.alert(
+          'Place liked',
+          'Your swipe was saved, but Adventour could not add this place as a trip stop yet.',
+        );
+      }
     }
   };
 
@@ -419,11 +447,26 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
     fetchSuggestions(text, null);
   };
 
-  const handleSuggestionSelect = (description: string) => {
+  const handleSuggestionSelect = async (description: string) => {
     setCity(description);
     setLocationMode('manual');
     setCurrentCoords(null);
     setSuggestions([]);
+
+    try {
+      const geocodeResponse = await axios.get(`${Config.BACKEND_BASE_URL}/geocode`, {
+        params: { address: description },
+      });
+      const resolvedLocation = {
+        latitude: Number(geocodeResponse.data.latitude),
+        longitude: Number(geocodeResponse.data.longitude),
+      };
+      if (Number.isFinite(resolvedLocation.latitude) && Number.isFinite(resolvedLocation.longitude)) {
+        setCurrentCoords(resolvedLocation);
+      }
+    } catch (error) {
+      console.error('Error resolving selected launch point:', describeAxiosError(error));
+    }
   };
 
   const loadRecommendations = useCallback(async ({ append = false, quiet = false } = {}) => {
@@ -624,12 +667,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
         <View style={styles.greetingBlock}>
           <Text style={styles.greetingText}>{greetingForNow()}, {displayName}</Text>
         </View>
-        <View style={styles.launchControls}>
-          <Text style={styles.controlLabel}>Launch point</Text>
+        <View style={[styles.launchControls, !hasLaunchPoint && styles.launchControlsRequired]}>
+          <View style={styles.launchControlHeader}>
+            <Text style={[styles.controlLabel, !hasLaunchPoint && styles.controlLabelRequired]}>
+              {hasLaunchPoint ? 'Launch point' : 'Pick a launch point'}
+            </Text>
+          </View>
           <View style={styles.locationContainer}>
             <TextInput
-              style={styles.cityInput}
-              placeholder="Enter a city or place"
+              style={[styles.cityInput, !hasLaunchPoint && styles.cityInputRequired]}
+              placeholder="City, neighborhood, or place"
               value={city}
               onChangeText={handleCityChange}
               placeholderTextColor="#6b8aa3"
@@ -782,10 +829,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
           </View>
         ) : null}
         <AdventourLaunchHero
-          locationLabel={city || (currentCoords ? 'GPS location' : 'Pick your launch point')}
+          locationLabel={city || (currentCoords ? 'GPS location' : '')}
           distanceLabel={`${radiusOption.label} range`}
           loading={loading}
           hasResults={hasLoadedRecommendations}
+          hasLaunchPoint={hasLaunchPoint}
           activeStopName={activeAdventour?.active_stop?.display?.name}
           onLaunch={handleFindPlaces}
         />
@@ -871,6 +919,20 @@ const styles = StyleSheet.create({
     marginBottom: 7,
     textTransform: 'uppercase',
   },
+  launchControlHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 7,
+  },
+  launchControlsRequired: {
+    borderColor: '#87cfe1',
+    backgroundColor: '#e8f8fb',
+  },
+  controlLabelRequired: {
+    color: '#123c69',
+    marginBottom: 0,
+  },
   input: {
     borderColor: '#eadfce',
     borderWidth: 1,
@@ -895,6 +957,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     color: '#123c69',
     fontWeight: '700',
+  },
+  cityInputRequired: {
+    borderColor: '#123c69',
+    borderWidth: 2,
   },
   locationButton: {
     width: 42,

@@ -86,9 +86,14 @@ const AppNavigator = () => {
   }
 
   const handleAuthSuccess = async (authUser: User) => {
-    setUser(authUser);
-    setProfileComplete(Boolean(authUser.profile_complete || (authUser.display_name && authUser.date_of_birth)));
-    await checkOnboarding(authUser);
+    setLoading(true);
+    try {
+      setUser(authUser);
+      setProfileComplete(Boolean(authUser.profile_complete || (authUser.display_name && authUser.date_of_birth)));
+      await checkOnboarding(authUser);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSignOut = async () => {

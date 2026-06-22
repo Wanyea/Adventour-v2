@@ -18,6 +18,7 @@ type Props = {
   distanceLabel: string;
   loading?: boolean;
   hasResults?: boolean;
+  hasLaunchPoint?: boolean;
   activeStopName?: string;
   onLaunch: () => void;
 };
@@ -130,6 +131,7 @@ const AdventourLaunchHero: React.FC<Props> = ({
   distanceLabel,
   loading,
   hasResults,
+  hasLaunchPoint = true,
   activeStopName,
   onLaunch,
 }) => {
@@ -179,33 +181,51 @@ const AdventourLaunchHero: React.FC<Props> = ({
   });
 
   const cloudDuration = loading ? 5600 : hasResults ? 6800 : 11800;
+  const launchDisabled = loading || !hasLaunchPoint;
+  const waitingForLaunchPoint = !hasLaunchPoint;
 
   return (
-    <View style={styles.hero}>
+    <View style={[styles.hero, waitingForLaunchPoint && styles.heroWaiting]}>
       <CloudCruiser variant="large" top={42} delay={0} duration={cloudDuration} opacity={0.82} />
       <CloudCruiser variant="medium" bottom={74} delay={2600} duration={cloudDuration + 1800} scale={0.9} opacity={0.76} />
       <CloudCruiser variant="small" top={116} delay={5200} duration={cloudDuration + 900} scale={0.82} opacity={0.68} />
 
-      <Image source={logo} style={styles.logo} resizeMode="contain" />
+      <Image source={logo} style={[styles.logo, waitingForLaunchPoint && styles.logoWaiting]} resizeMode="contain" />
 
-      <View style={styles.launchRow}>
+      <View style={[styles.launchRow, waitingForLaunchPoint && styles.launchRowWaiting]}>
         <View style={styles.copy}>
-          <Text style={styles.stepLabel}>Set your launch point</Text>
-          <Text style={styles.title}>Where should the balloon land?</Text>
-          <Text style={styles.subtitle} numberOfLines={2}>
-            {activeStopName
-              ? `Currently adventouring at ${activeStopName}.`
-              : `${locationLabel || 'Choose a location'} - ${distanceLabel}`}
+          <Text style={[styles.stepLabel, waitingForLaunchPoint && styles.stepLabelRequired]}>
+            {waitingForLaunchPoint ? 'Launch point needed' : 'Ready to launch'}
           </Text>
-          <TouchableOpacity style={styles.launchButton} activeOpacity={0.82} onPress={onLaunch} disabled={loading}>
-            <Text style={styles.launchButtonText}>{loading ? 'Scouting...' : hasResults ? 'Refresh picks' : 'Launch balloon'}</Text>
+          <Text style={[styles.title, waitingForLaunchPoint && styles.titleWaiting]}>
+            {waitingForLaunchPoint ? 'Give the balloon somewhere to land.' : 'Where should the balloon land?'}
+          </Text>
+          <Text style={[styles.subtitle, waitingForLaunchPoint && styles.subtitleRequired]} numberOfLines={3}>
+            {waitingForLaunchPoint
+              ? activeStopName
+                ? `Currently adventouring at ${activeStopName}. Pick a launch point above to scout more places.`
+                : 'Highlight a city, neighborhood, or place above. Then Adventour can scout picks.'
+              : activeStopName
+                ? `Currently adventouring at ${activeStopName}.`
+                : `${locationLabel} - ${distanceLabel}`}
+          </Text>
+          <TouchableOpacity
+            style={[styles.launchButton, waitingForLaunchPoint && styles.launchButtonDisabled]}
+            activeOpacity={0.82}
+            onPress={onLaunch}
+            disabled={launchDisabled}
+          >
+            <Text style={[styles.launchButtonText, waitingForLaunchPoint && styles.launchButtonTextDisabled]}>
+              {loading ? 'Scouting...' : waitingForLaunchPoint ? 'Waiting for a place' : hasResults ? 'Refresh picks' : 'Launch balloon'}
+            </Text>
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity activeOpacity={0.82} onPress={onLaunch} disabled={loading} style={styles.balloonButton}>
+        <TouchableOpacity activeOpacity={0.82} onPress={onLaunch} disabled={launchDisabled} style={styles.balloonButton}>
           <Animated.View
             style={[
               styles.balloonWrap,
+              waitingForLaunchPoint && styles.balloonWrapDisabled,
               {
                 transform: [
                   { translateY: Animated.add(floatY, launchY) },
@@ -233,6 +253,10 @@ const styles = StyleSheet.create({
     minHeight: 250,
     overflow: 'hidden',
     borderWidth: 1,
+    borderColor: '#87cfe1',
+  },
+  heroWaiting: {
+    backgroundColor: '#bfeaf4',
     borderColor: '#87cfe1',
   },
   cloud: {
@@ -267,11 +291,17 @@ const styles = StyleSheet.create({
     height: 74,
     marginLeft: -12,
   },
+  logoWaiting: {
+    opacity: 0.35,
+  },
   launchRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
     minHeight: 156,
+  },
+  launchRowWaiting: {
+    opacity: 0.48,
   },
   copy: {
     flex: 1,
@@ -284,11 +314,17 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     marginBottom: 5,
   },
+  stepLabelRequired: {
+    color: '#6b7280',
+  },
   title: {
     color: '#123c69',
     fontSize: 22,
     lineHeight: 26,
     fontWeight: '900',
+  },
+  titleWaiting: {
+    color: '#123c69',
   },
   subtitle: {
     color: '#31506b',
@@ -296,6 +332,10 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     marginTop: 5,
     fontWeight: '700',
+  },
+  subtitleRequired: {
+    color: '#6b7280',
+    fontWeight: '800',
   },
   launchButton: {
     alignSelf: 'flex-start',
@@ -307,10 +347,18 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#ff9f1c',
   },
+  launchButtonDisabled: {
+    backgroundColor: '#123c69',
+    borderColor: '#87cfe1',
+    opacity: 0.42,
+  },
   launchButtonText: {
     color: '#fff',
     fontSize: 13,
     fontWeight: '900',
+  },
+  launchButtonTextDisabled: {
+    color: '#fffaf3',
   },
   balloonButton: {
     alignSelf: 'stretch',
@@ -322,6 +370,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 4,
+  },
+  balloonWrapDisabled: {
+    opacity: 0.35,
   },
   balloon: {
     width: 106,
