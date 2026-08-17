@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import Flask
 
 from adventour_backend.models import (
@@ -5,12 +7,15 @@ from adventour_backend.models import (
     AdventourSession,
     AdventourStop,
     Friendship,
+    LocalEvent,
+    LocalEventInterest,
     Place,
     PlaceProviderRef,
     PlaceRating,
     Trip,
     TripMember,
     TripPlace,
+    TravelReservation,
     User,
     UserPlaceEvent,
     UserPlaceInteraction,
@@ -48,6 +53,15 @@ def test_delete_user_account_data_removes_private_rows_but_keeps_place_cache():
         db.session.add(provider_ref)
         db.session.flush()
 
+        event = LocalEvent(
+            title="Reset Event",
+            starts_at=datetime.utcnow(),
+            latitude=28.0,
+            longitude=-81.0,
+        )
+        db.session.add(event)
+        db.session.flush()
+
         trip = Trip(name="Reset Trip", created_by=user.id)
         db.session.add(trip)
         db.session.flush()
@@ -68,6 +82,8 @@ def test_delete_user_account_data_removes_private_rows_but_keeps_place_cache():
             UserPlaceEvent(user_id=user.id, place_id=place.id, provider_ref_id=provider_ref.id, event_type="accept"),
             UserPreferenceVector(user_id=user.id, vector_json="{}"),
             AdventourStop(session_id=session.id, place_id=place.id, provider_ref_id=provider_ref.id, order_index=0),
+            TravelReservation(user_id=user.id, adventour_session_id=session.id, reservation_type="stay", title="Reset Hotel"),
+            LocalEventInterest(event_id=event.id, user_id=user.id, status="going"),
         ])
         db.session.commit()
 
@@ -86,6 +102,9 @@ def test_delete_user_account_data_removes_private_rows_but_keeps_place_cache():
         assert UserPlaceInteraction.query.count() == 0
         assert UserPlaceEvent.query.count() == 0
         assert UserPreferenceVector.query.count() == 0
+        assert TravelReservation.query.count() == 0
+        assert LocalEventInterest.query.count() == 0
+        assert LocalEvent.query.count() == 1
         assert AdventourSession.query.count() == 0
         assert AdventourStop.query.count() == 0
         assert Place.query.count() == 1

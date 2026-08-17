@@ -148,6 +148,47 @@ class PlaceFeature(db.Model):
 
     place = db.relationship('Place', backref=db.backref('features', uselist=False))
 
+class LocalEvent(db.Model):
+    """Adventour/community event listing with outbound source and reservation links."""
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.Text)
+    city = db.Column(db.String(120), index=True)
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+    starts_at = db.Column(db.DateTime, index=True)
+    ends_at = db.Column(db.DateTime)
+    category = db.Column(db.String(80))
+    source_name = db.Column(db.String(120))
+    source_url = db.Column(db.String(500))
+    reservation_url = db.Column(db.String(500))
+    price_low = db.Column(db.Float)
+    price_high = db.Column(db.Float)
+    authenticity_score = db.Column(db.Float, default=0.75)
+    host_user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    status = db.Column(db.String(30), default='active', index=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    host_user = db.relationship('User', backref=db.backref('local_events', lazy='dynamic'))
+
+class LocalEventInterest(db.Model):
+    """User intent around local events so recommendations can become social."""
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('local_event.id'), nullable=False, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
+    status = db.Column(db.String(30), default='interested', index=True)  # interested, going
+    note = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    event = db.relationship('LocalEvent', backref=db.backref('interests', lazy='dynamic', cascade='all, delete-orphan'))
+    user = db.relationship('User', backref=db.backref('local_event_interests', lazy='dynamic'))
+
+    __table_args__ = (
+        db.UniqueConstraint('event_id', 'user_id', name='unique_local_event_interest'),
+    )
+
 class UserPlaceEvent(db.Model):
     """Normalized user event stream for recommendations and future model training."""
     id = db.Column(db.Integer, primary_key=True)
@@ -199,6 +240,28 @@ class AdventourSession(db.Model):
         order_by='AdventourStop.order_index',
         cascade='all, delete-orphan',
     )
+
+class TravelReservation(db.Model):
+    """User-owned travel booking or confirmation attached to planning/adventours."""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
+    adventour_session_id = db.Column(db.Integer, db.ForeignKey('adventour_session.id'), index=True)
+    reservation_type = db.Column(db.String(40), nullable=False, index=True)  # flight, stay, local_transport, event, place
+    title = db.Column(db.String(255), nullable=False)
+    provider = db.Column(db.String(120))
+    confirmation_code = db.Column(db.String(120))
+    starts_at = db.Column(db.DateTime)
+    ends_at = db.Column(db.DateTime)
+    cost_total = db.Column(db.Float)
+    currency = db.Column(db.String(10), default='USD')
+    booking_url = db.Column(db.String(500))
+    notes = db.Column(db.Text)
+    metadata_json = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    user = db.relationship('User', backref=db.backref('travel_reservations', lazy='dynamic'))
+    session = db.relationship('AdventourSession', backref=db.backref('travel_reservations', lazy='dynamic'))
 
 class AdventourStop(db.Model):
     """One place visited or skipped during an Adventour session."""

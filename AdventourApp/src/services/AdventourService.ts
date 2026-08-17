@@ -29,6 +29,34 @@ class AdventourService {
     return response.data.adventour;
   }
 
+  static async startFromItinerary(payload: {
+    title: string;
+    destination?: string;
+    companion_user_ids?: number[];
+    price_breakdown?: any;
+    booking_plan?: any;
+    scoring_profile?: string;
+    trip_style?: string;
+    pace?: string;
+    budget_profile?: string;
+    query_tags?: string[];
+    route_readiness?: any;
+    route_explanation?: any;
+    launch_checklist?: any;
+    local_events?: any;
+    trip_packet?: any;
+    scenario_readiness?: any;
+    filter_summary?: any;
+    learned_rerank?: any;
+    swap_summary?: any;
+    destination_scout?: any;
+    reservation_ids?: number[];
+    stops: any[];
+  }): Promise<AdventourSession> {
+    const response = await axios.post(`${Config.BACKEND_BASE_URL}/api/adventours/from-itinerary`, payload);
+    return response.data.adventour;
+  }
+
   static async addStop(sessionId: number, place: Place): Promise<{ adventour: AdventourSession; stop: AdventourStop }> {
     const response = await axios.post(`${Config.BACKEND_BASE_URL}/api/adventours/${sessionId}/stops`, {
       place_id: place.place_id,
@@ -47,6 +75,13 @@ class AdventourService {
 
   static async completeStop(sessionId: number, stopId: number, rating: number): Promise<{ adventour: AdventourSession; stop: AdventourStop }> {
     const response = await axios.post(`${Config.BACKEND_BASE_URL}/api/adventours/${sessionId}/stops/${stopId}/complete`, { rating });
+    return { adventour: response.data.adventour, stop: response.data.stop };
+  }
+
+  static async swapStop(sessionId: number, stopId: number, alternativeIndex: number): Promise<{ adventour: AdventourSession; stop: AdventourStop }> {
+    const response = await axios.post(`${Config.BACKEND_BASE_URL}/api/adventours/${sessionId}/stops/${stopId}/swap`, {
+      alternative_index: alternativeIndex,
+    });
     return { adventour: response.data.adventour, stop: response.data.stop };
   }
 

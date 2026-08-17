@@ -17,6 +17,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 type Props = {
   places: Place[];
   activeFilterLabel: string;
+  partyLabel?: string;
   totalPlaces: number;
   loadingMore?: boolean;
   canLoadMore?: boolean;
@@ -26,6 +27,41 @@ type Props = {
 };
 
 const loadedPhotoUrls = new Set<string>();
+
+const scoutProfileMeta = (profile?: string) => {
+  switch (profile) {
+    case 'authenticity_forward':
+      return {
+        label: 'Hidden gems scout',
+        icon: 'diamond-stone',
+        tone: '#e6534b',
+        backgroundColor: '#fff7ed',
+      };
+    case 'group_friendly':
+      return {
+        label: 'Group fit scout',
+        icon: 'account-heart',
+        tone: '#4c1d95',
+        backgroundColor: '#f3e8ff',
+      };
+    case 'fresh_discovery':
+      return {
+        label: 'Fresh finds scout',
+        icon: 'map-marker-star',
+        tone: '#134e4a',
+        backgroundColor: '#dff6f2',
+      };
+    case 'event_anchor':
+      return {
+        label: 'Event anchor scout',
+        icon: 'calendar-star',
+        tone: '#0f4c81',
+        backgroundColor: '#e0f2fe',
+      };
+    default:
+      return null;
+  }
+};
 
 const PlaceImage = ({ place, fallbackLabel }: { place: Place; fallbackLabel: string }) => {
   const [loaded, setLoaded] = useState(Boolean(place.photo_url && loadedPhotoUrls.has(place.photo_url)));
@@ -99,6 +135,273 @@ const TravelTimes = ({ place, muted = false }: { place: Place; muted?: boolean }
   );
 };
 
+const recommendationSignal = (place: Place) => {
+  const likedBy = place.history?.friend_liked_by || [];
+  const rejectedBy = place.history?.friend_rejected_by || [];
+  const friendHistoryFit = place.score_components?.friend_history_fit || 0;
+
+  if (likedBy.length && friendHistoryFit > 0) {
+    return {
+      label: `Liked by ${likedBy.slice(0, 2).join(', ')}`,
+      icon: 'account-heart',
+      tone: '#4c1d95',
+      backgroundColor: '#f3e8ff',
+    };
+  }
+
+  if (rejectedBy.length && friendHistoryFit < 0) {
+    return {
+      label: `Passed by ${rejectedBy.slice(0, 2).join(', ')}`,
+      icon: 'account-alert',
+      tone: '#9a3412',
+      backgroundColor: '#fff7ed',
+    };
+  }
+
+  if (place.repeat_after_exhaustion) {
+    if (place.history?.rejected) {
+      return {
+        label: 'Exhausted repeat',
+        icon: 'refresh-alert',
+        tone: '#9a3412',
+        backgroundColor: '#fff7ed',
+      };
+    }
+    return {
+      label: 'Worth another look',
+      icon: 'refresh',
+      tone: '#31506b',
+      backgroundColor: '#e8f8fb',
+    };
+  }
+
+  if ((place.score_components?.repeat_penalty || 0) > 0 || (place.history?.recent_impressions || 0) > 0) {
+    return {
+      label: 'Seen recently',
+      icon: 'history',
+      tone: '#31506b',
+      backgroundColor: '#e8f8fb',
+    };
+  }
+
+  if (
+    (place.score_components?.exploration_applied || 0) > 0
+    && place.ranking?.exploration_budget?.allowed
+  ) {
+    if (place.ranking.exploration_budget.friend_learning) {
+      const friendName = place.ranking.exploration_budget.served_learning_members?.[0];
+      return {
+        label: friendName ? `Learning ${friendName}` : 'Friend learning',
+        icon: 'account-heart-outline',
+        tone: '#123c69',
+        backgroundColor: '#e8f8fb',
+      };
+    }
+
+    return {
+      label: 'Learning pick',
+      icon: 'school-outline',
+      tone: '#123c69',
+      backgroundColor: '#e8f8fb',
+    };
+  }
+
+  if (place.local_event_match) {
+    return {
+      label: place.local_event_match.title ? 'Event nearby' : 'Event-backed',
+      icon: 'calendar-star',
+      tone: '#e6534b',
+      backgroundColor: '#fff7ed',
+    };
+  }
+
+  if (place.ranking?.party_coverage_rescue) {
+    return {
+      label: place.ranking.rescued_member ? `For ${place.ranking.rescued_member}` : 'Friend match',
+      icon: 'account-multiple-heart',
+      tone: '#4c1d95',
+      backgroundColor: '#f3e8ff',
+    };
+  }
+
+  if (place.ranking?.local_discovery_rescue) {
+    return {
+      label: 'Local discovery',
+      icon: 'map-marker-star-outline',
+      tone: '#e6534b',
+      backgroundColor: '#fff7ed',
+    };
+  }
+
+  if ((place.score_components?.value_gem || 0) >= 0.6) {
+    return {
+      label: 'Value gem',
+      icon: 'ticket-percent-outline',
+      tone: '#0f766e',
+      backgroundColor: '#dcfce7',
+    };
+  }
+
+  if ((place.score_components?.novelty || 0) >= 0.9) {
+    return {
+      label: 'Fresh pick',
+      icon: 'sparkles',
+      tone: '#134e4a',
+      backgroundColor: '#dff6f2',
+    };
+  }
+
+  if (place.authenticity_evidence?.label === 'Hidden gem') {
+    return {
+      label: 'Hidden gem',
+      icon: 'diamond-stone',
+      tone: '#e6534b',
+      backgroundColor: '#fff7ed',
+    };
+  }
+
+  if (place.authenticity_evidence?.label === 'Local-feeling') {
+    return {
+      label: 'Local-feeling',
+      icon: 'store-marker',
+      tone: '#134e4a',
+      backgroundColor: '#dff6f2',
+    };
+  }
+
+  if ((place.ranking?.member_coverage_bonus || 0) > 0) {
+    return {
+      label: 'Helps party fit',
+      icon: 'account-heart',
+      tone: '#4c1d95',
+      backgroundColor: '#f3e8ff',
+    };
+  }
+
+  if ((place.ranking?.diversity_bonus || 0) > (place.ranking?.diversity_penalty || 0)) {
+    return {
+      label: 'Adds variety',
+      icon: 'map-marker-star',
+      tone: '#123c69',
+      backgroundColor: '#e8f8fb',
+    };
+  }
+
+  return null;
+};
+
+const groupFitSummary = (place: Place) => {
+  const backendSummary = place.party_fit_summary;
+  if (backendSummary?.members?.length && backendSummary.members.length > 1) {
+    return {
+      averageFit: backendSummary.average_fit ?? backendSummary.group_fit ?? 0,
+      label: backendSummary.headline || 'Party fit',
+      detail: backendSummary.detail,
+      members: backendSummary.members.slice(0, 3),
+    };
+  }
+
+  const members = (place.member_fit || [])
+    .filter((member) => typeof member.fit === 'number')
+    .sort((left, right) => right.fit - left.fit);
+
+  if (members.length <= 1) {
+    return null;
+  }
+
+  const averageFit = members.reduce((sum, member) => sum + member.fit, 0) / members.length;
+  const helpedMembers = place.ranking?.party_coverage_rescue && place.ranking.rescued_member
+    ? [place.ranking.rescued_member]
+    : place.ranking?.served_new_members || [];
+  const label = helpedMembers.length
+    ? place.ranking?.party_coverage_rescue
+      ? `Made room for ${helpedMembers.slice(0, 2).join(', ')}`
+      : `Helps ${helpedMembers.slice(0, 2).join(', ')}`
+    : averageFit >= 0.7
+      ? 'Balanced for the party'
+      : 'Mixed party fit';
+
+  return {
+    averageFit,
+    label,
+    detail: place.ranking?.party_coverage_rescue
+      ? 'Included so this basket gives every traveler a strong match.'
+      : undefined,
+    members: members.slice(0, 3),
+  };
+};
+
+const learnedRankSignal = (place: Place) => {
+  const score = typeof place.learned_score === 'number'
+    ? place.learned_score
+    : place.ranking?.learned_model_score;
+
+  if (typeof score !== 'number') {
+    return null;
+  }
+
+  return {
+    score,
+    rank: place.learned_rank_position,
+  };
+};
+
+const RecommendationStory = ({ place, muted = false }: { place: Place; muted?: boolean }) => {
+  const story = place.recommendation_story;
+  if (!story?.headline && !story?.reasons?.length && !story?.metrics?.length) {
+    return null;
+  }
+
+  const reasons = story.reasons?.slice(0, 2) || [];
+  const cautions = story.cautions?.slice(0, 1) || [];
+  const metrics = (story.metrics || [])
+    .filter((metric) => ['match', 'local_signal', 'party_fit', 'hidden_gem', 'local_proof', 'value_gem', 'learning', 'local_event', 'session_context', 'friend_history'].includes(metric.id))
+    .slice(0, 3);
+
+  return (
+    <View style={[styles.storyBox, muted && styles.mutedStoryBox]}>
+      <View style={styles.storyHeader}>
+        <View style={styles.storyTitleRow}>
+          <Icon name="compass-outline" size={14} color={muted ? '#6b7280' : '#123c69'} />
+          <Text style={[styles.storyKicker, muted && styles.mutedStoryText]}>Why this pick</Text>
+        </View>
+        {story.authenticity_label ? (
+          <Text style={[styles.storyBadge, muted && styles.mutedStoryBadge]} numberOfLines={1}>
+            {story.authenticity_label}
+          </Text>
+        ) : null}
+      </View>
+      {story.headline ? (
+        <Text style={[styles.storyHeadline, muted && styles.mutedStoryText]} numberOfLines={2}>
+          {story.headline}
+        </Text>
+      ) : null}
+      {metrics.length ? (
+        <View style={styles.storyMetricRow}>
+          {metrics.map((metric) => (
+            <Text key={metric.id} style={[styles.storyMetricPill, muted && styles.mutedStoryMetricPill]}>
+              {metric.label} {metric.display || ''}
+            </Text>
+          ))}
+        </View>
+      ) : null}
+      {[...reasons, ...cautions].slice(0, 2).map((reason, index) => (
+        <Text
+          key={`${index}-${reason}`}
+          style={[
+            styles.storyReason,
+            index >= reasons.length && styles.storyCaution,
+            muted && styles.mutedStoryText,
+          ]}
+          numberOfLines={2}
+        >
+          {index >= reasons.length ? 'Watch: ' : ''}{reason}
+        </Text>
+      ))}
+    </View>
+  );
+};
+
 const CompactPlaceContent = ({
   place,
   fallbackLabel,
@@ -111,6 +414,14 @@ const CompactPlaceContent = ({
   const tagLabels = (place.tag_groups || []).slice(0, 3).map(tagGroupDisplayLabel);
   const primaryGroup = tagGroupMeta((place.tag_groups || [])[0] || '');
   const primaryLabel = tagLabels[0] || fallbackLabel;
+  const signal = recommendationSignal(place);
+  const learnedSignal = learnedRankSignal(place);
+  const scoutProfile = scoutProfileMeta(
+    place.scoring_profile
+    || place.score_components?.scoring_profile
+    || place.ranking?.scoring_profile,
+  );
+  const partyFit = groupFitSummary(place);
 
   return (
     <>
@@ -136,6 +447,80 @@ const CompactPlaceContent = ({
           );
         })}
       </View>
+      {signal ? (
+        <View
+          style={[
+            styles.signalPill,
+            {
+              backgroundColor: signal.backgroundColor,
+              borderColor: signal.tone,
+            },
+            muted && styles.mutedSignalPill,
+          ]}
+        >
+          <Icon name={signal.icon} size={13} color={muted ? '#6b7280' : signal.tone} />
+          <Text style={[styles.signalText, { color: muted ? '#6b7280' : signal.tone }]}>
+            {signal.label}
+          </Text>
+        </View>
+      ) : null}
+      {learnedSignal ? (
+        <View style={[styles.scoutPill, styles.learnedPill, muted && styles.mutedSignalPill]}>
+          <Icon name="brain" size={13} color={muted ? '#6b7280' : '#123c69'} />
+          <Text style={[styles.signalText, { color: muted ? '#6b7280' : '#123c69' }]}>
+            Learned rank{learnedSignal.rank ? ` #${learnedSignal.rank}` : ''} - {Math.round(learnedSignal.score * 100)}%
+          </Text>
+        </View>
+      ) : null}
+      {scoutProfile ? (
+        <View
+          style={[
+            styles.scoutPill,
+            {
+              backgroundColor: scoutProfile.backgroundColor,
+              borderColor: scoutProfile.tone,
+            },
+            muted && styles.mutedSignalPill,
+          ]}
+        >
+          <Icon name={scoutProfile.icon} size={13} color={muted ? '#6b7280' : scoutProfile.tone} />
+          <Text style={[styles.signalText, { color: muted ? '#6b7280' : scoutProfile.tone }]}>
+            {scoutProfile.label}
+          </Text>
+        </View>
+      ) : null}
+      {partyFit ? (
+        <View style={[styles.groupFitCard, muted && styles.mutedGroupFitCard]}>
+          <View style={styles.groupFitHeader}>
+            <View style={styles.groupFitTitleRow}>
+              <Icon name="account-group" size={14} color={muted ? '#6b7280' : '#4c1d95'} />
+              <Text style={[styles.groupFitTitle, muted && styles.mutedGroupFitText]}>
+                {partyFit.label}
+              </Text>
+            </View>
+            <Text style={[styles.groupFitScore, muted && styles.mutedGroupFitText]}>
+              {Math.round(partyFit.averageFit * 100)}%
+            </Text>
+          </View>
+          <View style={styles.groupFitMembers}>
+            {partyFit.members.map((member) => (
+              <View key={member.user_id} style={[styles.groupFitPill, muted && styles.mutedGroupFitPill]}>
+                <Text style={[styles.groupFitMemberName, muted && styles.mutedGroupFitText]} numberOfLines={1}>
+                  {member.display_name}
+                </Text>
+                <Text style={[styles.groupFitMemberScore, muted && styles.mutedGroupFitText]}>
+                  {Math.round(member.fit * 100)}%
+                </Text>
+              </View>
+            ))}
+          </View>
+          {partyFit.detail ? (
+            <Text style={[styles.groupFitDetail, muted && styles.mutedGroupFitText]} numberOfLines={2}>
+              {partyFit.detail}
+            </Text>
+          ) : null}
+        </View>
+      ) : null}
       <PlaceImage place={place} fallbackLabel={primaryLabel} />
       <Text style={[styles.name, muted && styles.mutedText]} numberOfLines={2}>
         {place.name}
@@ -144,6 +529,7 @@ const CompactPlaceContent = ({
         {place.vicinity}
       </Text>
       <TravelTimes place={place} muted={muted} />
+      <RecommendationStory place={place} muted={muted} />
       <View style={styles.scoreRow}>
         {place.relevance !== undefined ? (
           <Text style={styles.score}>Match {(place.relevance * 100).toFixed(0)}%</Text>
@@ -163,6 +549,7 @@ const CompactPlaceContent = ({
 const RecommendationDeck: React.FC<Props> = ({
   places,
   activeFilterLabel,
+  partyLabel,
   totalPlaces,
   loadingMore,
   canLoadMore,
@@ -267,6 +654,9 @@ const RecommendationDeck: React.FC<Props> = ({
         <View>
           <Text style={styles.basketTitle}>Basket picks</Text>
           <Text style={styles.hint}>{activeFilterLabel}: swipe right to accept, left to pass.</Text>
+          {partyLabel ? (
+            <Text style={styles.partyHint}>For {partyLabel}</Text>
+          ) : null}
         </View>
         <Text style={styles.ticketCount}>{totalPlaces}</Text>
       </View>
@@ -370,6 +760,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 1,
   },
+  partyHint: {
+    color: '#123c69',
+    fontSize: 12,
+    fontWeight: '800',
+    marginTop: 2,
+  },
   ticketCount: {
     minWidth: 32,
     textAlign: 'center',
@@ -418,7 +814,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 6,
-    marginBottom: 10,
+    marginBottom: 7,
   },
   categoryLabel: {
     alignSelf: 'flex-start',
@@ -432,6 +828,118 @@ const styles = StyleSheet.create({
   },
   mutedCategoryLabel: {
     backgroundColor: '#f3f4f6',
+    color: '#6b7280',
+  },
+  signalPill: {
+    alignSelf: 'flex-start',
+    alignItems: 'center',
+    borderRadius: 999,
+    borderWidth: 1,
+    flexDirection: 'row',
+    gap: 4,
+    marginBottom: 9,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  scoutPill: {
+    alignSelf: 'flex-start',
+    alignItems: 'center',
+    borderRadius: 999,
+    borderWidth: 1,
+    flexDirection: 'row',
+    gap: 4,
+    marginBottom: 9,
+    marginTop: -3,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  learnedPill: {
+    backgroundColor: '#e8f8fb',
+    borderColor: '#123c69',
+  },
+  mutedSignalPill: {
+    opacity: 0.58,
+  },
+  signalText: {
+    fontSize: 11,
+    fontWeight: '900',
+  },
+  groupFitCard: {
+    backgroundColor: '#f3e8ff',
+    borderColor: '#c4b5fd',
+    borderRadius: 8,
+    borderWidth: 1,
+    marginBottom: 10,
+    padding: 9,
+  },
+  mutedGroupFitCard: {
+    backgroundColor: '#f9fafb',
+    borderColor: '#e5e7eb',
+  },
+  groupFitHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 8,
+    marginBottom: 7,
+  },
+  groupFitTitleRow: {
+    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'row',
+    gap: 5,
+  },
+  groupFitTitle: {
+    color: '#4c1d95',
+    flex: 1,
+    fontSize: 12,
+    fontWeight: '900',
+  },
+  groupFitScore: {
+    color: '#4c1d95',
+    fontSize: 12,
+    fontWeight: '900',
+  },
+  groupFitMembers: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  groupFitPill: {
+    alignItems: 'center',
+    backgroundColor: '#fffdf8',
+    borderColor: '#c4b5fd',
+    borderRadius: 999,
+    borderWidth: 1,
+    flexDirection: 'row',
+    gap: 4,
+    maxWidth: '100%',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  mutedGroupFitPill: {
+    backgroundColor: '#fff',
+    borderColor: '#e5e7eb',
+  },
+  groupFitMemberName: {
+    color: '#4c1d95',
+    fontSize: 11,
+    fontWeight: '800',
+    maxWidth: 112,
+  },
+  groupFitMemberScore: {
+    color: '#4c1d95',
+    fontSize: 11,
+    fontWeight: '900',
+  },
+  groupFitDetail: {
+    color: '#4c1d95',
+    fontSize: 11,
+    fontWeight: '700',
+    lineHeight: 15,
+    marginTop: 7,
+  },
+  mutedGroupFitText: {
     color: '#6b7280',
   },
   name: {
@@ -509,6 +1017,98 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   mutedTravelText: {
+    color: '#6b7280',
+  },
+  storyBox: {
+    backgroundColor: '#e8f8fb',
+    borderColor: '#87cfe1',
+    borderRadius: 8,
+    borderWidth: 1,
+    marginBottom: 9,
+    padding: 9,
+  },
+  mutedStoryBox: {
+    backgroundColor: '#f9fafb',
+    borderColor: '#e5e7eb',
+    opacity: 0.82,
+  },
+  storyHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  storyTitleRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 5,
+  },
+  storyKicker: {
+    color: '#123c69',
+    fontSize: 10,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  storyBadge: {
+    backgroundColor: '#fffdf8',
+    borderColor: '#ff9f1c',
+    borderRadius: 999,
+    borderWidth: 1,
+    color: '#e6534b',
+    flexShrink: 1,
+    fontSize: 9,
+    fontWeight: '900',
+    maxWidth: 112,
+    overflow: 'hidden',
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    textTransform: 'uppercase',
+  },
+  mutedStoryBadge: {
+    borderColor: '#d1d5db',
+    color: '#6b7280',
+  },
+  storyHeadline: {
+    color: '#123c69',
+    fontSize: 12,
+    fontWeight: '900',
+    lineHeight: 16,
+  },
+  storyMetricRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 5,
+    marginTop: 6,
+  },
+  storyMetricPill: {
+    backgroundColor: '#fffdf8',
+    borderColor: '#87cfe1',
+    borderRadius: 999,
+    borderWidth: 1,
+    color: '#123c69',
+    fontSize: 9,
+    fontWeight: '900',
+    overflow: 'hidden',
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+  },
+  mutedStoryMetricPill: {
+    backgroundColor: '#fff',
+    borderColor: '#e5e7eb',
+    color: '#6b7280',
+  },
+  storyReason: {
+    color: '#31506b',
+    fontSize: 10,
+    fontWeight: '800',
+    lineHeight: 14,
+    marginTop: 5,
+  },
+  storyCaution: {
+    color: '#9a3412',
+  },
+  mutedStoryText: {
     color: '#6b7280',
   },
   scoreRow: {

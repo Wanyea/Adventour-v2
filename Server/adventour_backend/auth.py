@@ -16,7 +16,8 @@ env_file = os.getenv("ENV_FILE")
 if env_file:
     load_dotenv(env_file, override=True)
 else:
-    load_dotenv()
+    local_env_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env.local")
+    load_dotenv(local_env_file if os.path.exists(local_env_file) else None, override=True)
 
 try:
     import firebase_admin

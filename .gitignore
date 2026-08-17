@@ -54,3 +54,6 @@ firebase-service-account*.json
 
 # Local/deployment-only App Engine manifest. Keep secrets out of git.
 /Server/app.yaml
+
+# Local recommender training/model artifacts generated from tester behavior.
+/Server/instance/recommender/

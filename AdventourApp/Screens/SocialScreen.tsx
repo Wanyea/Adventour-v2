@@ -69,8 +69,67 @@ interface FriendAdventour {
   summary?: {
     duration_seconds?: number;
     stop_count?: number;
+    destination?: string;
+    route_readiness?: {
+      label?: string;
+      score?: number;
+    };
+    destination_scout?: {
+      selected_destination?: {
+        label?: string;
+      };
+      rank?: {
+        trip_readiness_score?: number;
+        authenticity_score?: number;
+      };
+      explanation?: {
+        headline?: string;
+      };
+    };
+    local_events?: {
+      status?: string;
+      summary?: {
+        event_count?: number;
+        route_match_count?: number;
+        reservation_ready_count?: number;
+        route_reservation_ready_count?: number;
+        top_event_title?: string | null;
+        top_route_event_title?: string | null;
+      };
+      events?: {
+        title?: string;
+        reservation_url?: string | null;
+      }[];
+    };
+    booking_plan?: {
+      summary?: {
+        readiness_score?: number;
+      };
+    };
+    trip_packet?: {
+      status?: string;
+      booking_score?: number;
+      headline?: string;
+      booking_links?: {
+        reservation_type?: string;
+      }[];
+      save_prompts?: {
+        label?: string;
+        reservation_type?: string;
+      }[];
+    };
+    launch_checklist?: {
+      can_start?: boolean;
+      headline?: string;
+    };
   };
 }
+
+type FriendAdventourBadge = {
+  id: string;
+  label: string;
+  tone?: 'ready' | 'watch' | 'accent';
+};
 
 const profileSource = (id?: string) => {
   const imageId = id as ProfileImageId | undefined;
@@ -95,6 +154,101 @@ const formatDuration = (seconds?: number) => {
   const hours = Math.floor(minutes / 60);
   const remainder = minutes % 60;
   return remainder ? `${hours}h ${remainder}m` : `${hours}h`;
+};
+
+const percentLabel = (value?: number) => (
+  typeof value === 'number' ? `${Math.round(value * 100)}%` : null
+);
+
+const friendAdventourBadges = (adventour: FriendAdventour): FriendAdventourBadge[] => {
+  const summary = adventour.summary || {};
+  const routePercent = percentLabel(summary.route_readiness?.score);
+  const destinationPercent = percentLabel(summary.destination_scout?.rank?.trip_readiness_score);
+  const bookingPercent = percentLabel(
+    summary.trip_packet?.booking_score ?? summary.booking_plan?.summary?.readiness_score,
+  );
+  const eventSummary = summary.local_events?.summary || {};
+  const eventCount = eventSummary.route_match_count ?? eventSummary.event_count ?? summary.local_events?.events?.length ?? 0;
+  const reservationCount = eventSummary.route_reservation_ready_count ?? eventSummary.reservation_ready_count ?? 0;
+  const savePromptCount = summary.trip_packet?.save_prompts?.length || 0;
+  const badges: FriendAdventourBadge[] = [
+    {
+      id: 'stops',
+      label: `${adventour.stop_count} stop${adventour.stop_count === 1 ? '' : 's'}`,
+      tone: 'ready',
+    },
+    {
+      id: 'duration',
+      label: formatDuration(summary.duration_seconds),
+    },
+  ];
+
+  if (routePercent) {
+    badges.push({
+      id: 'route',
+      label: `${routePercent} route`,
+      tone: (summary.route_readiness?.score || 0) >= 0.75 ? 'ready' : 'watch',
+    });
+  }
+  if (summary.destination_scout?.selected_destination?.label) {
+    badges.push({
+      id: 'destination-scout',
+      label: destinationPercent ? `${destinationPercent} trip pick` : 'Scout pick',
+      tone: 'accent',
+    });
+  }
+  if (eventCount) {
+    badges.push({
+      id: 'events',
+      label: reservationCount ? `${reservationCount} RSVP` : `${eventCount} event${eventCount === 1 ? '' : 's'}`,
+      tone: reservationCount ? 'accent' : 'watch',
+    });
+  }
+  if (bookingPercent || savePromptCount) {
+    badges.push({
+      id: 'booking',
+      label: savePromptCount ? `${savePromptCount} save prompt${savePromptCount === 1 ? '' : 's'}` : `${bookingPercent} booking`,
+      tone: summary.trip_packet?.status === 'ready' ? 'ready' : 'watch',
+    });
+  }
+
+  return badges.slice(0, 5);
+};
+
+const friendAdventourScoutNote = (adventour: FriendAdventour) => {
+  const scout = adventour.summary?.destination_scout;
+  const destination = scout?.selected_destination?.label || adventour.summary?.destination;
+  if (!destination) {
+    return null;
+  }
+
+  const headline = scout?.explanation?.headline;
+  return headline
+    ? `Trip scout picked ${destination}: ${headline}`
+    : `Trip scout picked ${destination} for this Adventour.`;
+};
+
+const friendAdventourPreview = (adventour: FriendAdventour) => {
+  const summary = adventour.summary || {};
+  const eventSummary = summary.local_events?.summary || {};
+  const eventTitle = eventSummary.top_route_event_title
+    || eventSummary.top_event_title
+    || summary.local_events?.events?.[0]?.title;
+  if (eventTitle) {
+    const reserveReady = Boolean(
+      eventSummary.route_reservation_ready_count
+      || eventSummary.reservation_ready_count
+      || summary.local_events?.events?.some((event) => event.reservation_url),
+    );
+    return `${reserveReady ? 'Reservation-ready event' : 'Local event'}: ${eventTitle}`;
+  }
+  if (summary.trip_packet?.headline) {
+    return summary.trip_packet.headline;
+  }
+  if (summary.route_readiness?.label) {
+    return summary.route_readiness.label;
+  }
+  return summary.destination ? `Built for ${summary.destination}` : null;
 };
 
 const SocialScreen: React.FC = () => {
@@ -292,26 +446,52 @@ const SocialScreen: React.FC = () => {
           ) : (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Adventours friends have taken</Text>
-              {friendAdventours.length ? friendAdventours.map((adventour) => (
-                <View key={adventour.id} style={styles.adventourCard}>
-                  <View style={styles.adventourHeader}>
-                    <Image source={profileSource(adventour.owner?.profile_picture)} style={styles.avatar} />
-                    <View style={styles.personText}>
-                      <Text style={styles.personName}>{adventour.title}</Text>
-                      <Text style={styles.personMeta}>
-                        by {adventour.owner?.display_name || 'a friend'} - {formatDate(adventour.ended_at)}
-                      </Text>
+              {friendAdventours.length ? friendAdventours.map((adventour) => {
+                const badges = friendAdventourBadges(adventour);
+                const preview = friendAdventourPreview(adventour);
+                const scoutNote = friendAdventourScoutNote(adventour);
+                return (
+                  <View key={adventour.id} style={styles.adventourCard}>
+                    <View style={styles.adventourHeader}>
+                      <Image source={profileSource(adventour.owner?.profile_picture)} style={styles.avatar} />
+                      <View style={styles.personText}>
+                        <Text style={styles.personName}>{adventour.title}</Text>
+                        <Text style={styles.personMeta}>
+                          by {adventour.owner?.display_name || 'a friend'} - {formatDate(adventour.ended_at)}
+                        </Text>
+                      </View>
                     </View>
+                    <View style={styles.statsRow}>
+                      {badges.map((badge) => (
+                        <Text
+                          key={badge.id}
+                          style={[
+                            styles.statPill,
+                            badge.tone === 'ready' && styles.statPillReady,
+                            badge.tone === 'watch' && styles.statPillWatch,
+                            badge.tone === 'accent' && styles.statPillAccent,
+                          ]}
+                        >
+                          {badge.label}
+                        </Text>
+                      ))}
+                    </View>
+                    {preview ? (
+                      <Text style={styles.adventourPreview} numberOfLines={2}>
+                        {preview}
+                      </Text>
+                    ) : null}
+                    {scoutNote ? (
+                      <Text style={styles.adventourScoutNote} numberOfLines={2}>
+                        {scoutNote}
+                      </Text>
+                    ) : null}
+                    <TouchableOpacity style={styles.takeButton} onPress={() => takeFriendAdventour(adventour)}>
+                      <Text style={styles.takeButtonText}>Take Adventour</Text>
+                    </TouchableOpacity>
                   </View>
-                  <View style={styles.statsRow}>
-                    <Text style={styles.statPill}>{adventour.stop_count} stops</Text>
-                    <Text style={styles.statPill}>{formatDuration(adventour.summary?.duration_seconds)}</Text>
-                  </View>
-                  <TouchableOpacity style={styles.takeButton} onPress={() => takeFriendAdventour(adventour)}>
-                    <Text style={styles.takeButtonText}>Take Adventour</Text>
-                  </TouchableOpacity>
-                </View>
-              )) : (
+                );
+              }) : (
                 <View style={styles.emptyCard}>
                   <Text style={styles.emptyTitle}>No friend Adventours yet.</Text>
                   <Text style={styles.emptyText}>When friends finish trips, their shared routes will show up here.</Text>
@@ -599,6 +779,47 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     paddingHorizontal: 9,
     paddingVertical: 5,
+  },
+  statPillReady: {
+    backgroundColor: NAVY,
+    borderColor: NAVY,
+    color: '#fffaf3',
+  },
+  statPillWatch: {
+    backgroundColor: '#fff7ed',
+    borderColor: ORANGE,
+    color: '#9a3412',
+  },
+  statPillAccent: {
+    backgroundColor: '#fee2e2',
+    borderColor: RED,
+    color: '#991b1b',
+  },
+  adventourPreview: {
+    backgroundColor: '#e8f8fb',
+    borderColor: SKY_STROKE,
+    borderRadius: 8,
+    borderWidth: 1,
+    color: '#31506b',
+    fontSize: 12,
+    fontWeight: '800',
+    lineHeight: 17,
+    marginTop: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+  },
+  adventourScoutNote: {
+    backgroundColor: '#fff7ed',
+    borderColor: ORANGE,
+    borderRadius: 8,
+    borderWidth: 1,
+    color: NAVY,
+    fontSize: 11,
+    fontWeight: '900',
+    lineHeight: 15,
+    marginTop: 8,
+    paddingHorizontal: 9,
+    paddingVertical: 7,
   },
   takeButton: {
     alignItems: 'center',

@@ -1,7 +1,9 @@
 param(
     [string]$EnvFile = ".env.local",
     [int]$Port = 8080,
-    [switch]$Install
+    [switch]$Install,
+    [switch]$LearnedRanker,
+    [string]$LearnedRankerPath
 )
 
 $ErrorActionPreference = "Stop"
@@ -16,6 +18,13 @@ $envPath = Join-Path $serverDir $EnvFile
 if (-not (Test-Path $envPath)) {
     Copy-Item (Join-Path $serverDir ".env.local.example") $envPath
     Write-Host "Created $envPath from .env.local.example"
+}
+
+$envFileLines = Get-Content -LiteralPath $envPath
+$hasDatabaseUrl = $envFileLines | Where-Object { $_ -match '^\s*DATABASE_URL\s*=' -and $_ -notmatch '^\s*#' } | Select-Object -First 1
+if (-not $hasDatabaseUrl) {
+    $env:DATABASE_URL = "sqlite:///adventour_dev.db"
+    Write-Warning "No DATABASE_URL found in $envPath. Using sqlite:///adventour_dev.db for this local backend run."
 }
 
 $validVenv = $false
@@ -57,6 +66,20 @@ try {
     $env:FLASK_ENV = "development"
     $env:PORT = "$Port"
     $env:ENV_FILE = $envPath
+    if ($LearnedRanker -or $LearnedRankerPath) {
+        if (-not $LearnedRankerPath) {
+            $LearnedRankerPath = Join-Path $serverDir "instance\recommender\recommender-model.latest.json"
+        }
+
+        $resolvedRankerPath = [System.IO.Path]::GetFullPath($LearnedRankerPath)
+        if (Test-Path $resolvedRankerPath) {
+            $env:ADVENTOUR_LEARNED_RANKER_PATH = $resolvedRankerPath
+            Write-Host "Learned ranker model: $resolvedRankerPath"
+        }
+        else {
+            Write-Warning "Learned ranker model not found at $resolvedRankerPath. Start without -LearnedRanker or run Server\recommender_refresh_model.py first."
+        }
+    }
     & $pythonExe app.py
 }
 finally {

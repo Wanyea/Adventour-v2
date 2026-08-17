@@ -31,7 +31,7 @@ def accepted_friend_ids(user_id):
 
 
 def adventour_payload(session):
-    owner = User.query.get(session.user_id)
+    owner = db.session.get(User, session.user_id)
     stops = session.stops.all()
     completed_stops = [stop for stop in stops if stop.status == 'completed']
     return {
@@ -54,6 +54,22 @@ def adventour_payload(session):
             for stop in completed_stops
         ],
     }
+
+def metadata_for_taken_friend_stop(source_stop, source_session):
+    try:
+        metadata = json.loads(source_stop.metadata_json or '{}')
+        if not isinstance(metadata, dict):
+            metadata = {}
+    except (TypeError, ValueError):
+        metadata = {}
+
+    metadata.update({
+        'source': metadata.get('source') or 'friend_adventour',
+        'source_friend_adventour_id': source_session.id,
+        'source_friend_stop_id': source_stop.id,
+        'source_friend_user_id': source_session.user_id,
+    })
+    return metadata
 
 # Friend Management Routes
 @social_bp.route('/friends', methods=['GET'])
@@ -173,11 +189,18 @@ def take_friend_adventour(session_id):
     if active:
         return jsonify({'error': 'End your active Adventour before taking a friend Adventour'}), 409
 
-    owner = User.query.get(source.user_id)
+    owner = db.session.get(User, source.user_id)
+    source_summary = json.loads(source.summary_json or '{}')
+    source_summary.update({
+        'source': source_summary.get('source') or 'friend_adventour',
+        'source_friend_adventour_id': source.id,
+        'source_friend_user_id': source.user_id,
+    })
     new_session = AdventourSession(
         user_id=user.id,
         title=f"{source.title} by {owner.display_name if owner else 'a friend'}",
         companion_user_ids_json=json.dumps({'ids': [source.user_id]}),
+        summary_json=json.dumps(source_summary),
     )
     db.session.add(new_session)
     db.session.flush()
@@ -189,7 +212,7 @@ def take_friend_adventour(session_id):
             provider_ref_id=source_stop.provider_ref_id,
             order_index=index,
             status='planned',
-            metadata_json=source_stop.metadata_json,
+            metadata_json=json.dumps(metadata_for_taken_friend_stop(source_stop, source)),
         ))
 
     db.session.commit()

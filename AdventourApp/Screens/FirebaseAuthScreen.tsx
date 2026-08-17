@@ -164,8 +164,8 @@ const FirebaseAuthScreen: React.FC<Props> = ({ onAuthSuccess }) => {
       <View style={styles.content}>
         <View style={styles.logoCard}>
           <Image source={logo} style={styles.logo} resizeMode="contain" />
+          <Text style={styles.logoTagline}>Let us guide your adventure!</Text>
         </View>
-        <Text style={styles.title}>Adventure without the planning spiral.</Text>
         <Text style={styles.subtitle}>
           {isSignUp ? 'Create your account' : 'Welcome back!'}
         </Text>
@@ -290,34 +290,41 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     padding: 20,
+    paddingTop: 44,
     zIndex: 1,
   },
   logoCard: {
     alignSelf: 'center',
-    width: 230,
-    height: 150,
+    width: '100%',
+    minHeight: 170,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
+    marginBottom: 12,
   },
   logo: {
-    width: 220,
-    height: 140,
+    width: 332,
+    maxWidth: '96%',
+    height: 144,
   },
-  title: {
-    fontSize: 24,
-    lineHeight: 29,
-    fontWeight: '900',
+  logoTagline: {
+    color: '#f24d4d',
+    fontFamily: Platform.select({
+      ios: 'Snell Roundhand',
+      android: 'cursive',
+      default: 'serif',
+    }),
+    fontSize: 17,
+    fontWeight: '700',
+    marginTop: -2,
     textAlign: 'center',
-    marginBottom: 10,
-    color: '#123c69',
   },
   subtitle: {
     fontSize: 18,
     textAlign: 'center',
-    marginBottom: 30,
+    marginTop: 0,
+    marginBottom: 26,
     color: '#31506b',
     fontWeight: '700',
   },

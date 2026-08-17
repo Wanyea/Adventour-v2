@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   Image,
+  Linking,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -16,6 +17,7 @@ type Props = {
   onOpenDirections: (stop: AdventourStop) => void;
   onArrive: (stop: AdventourStop) => void;
   onRateStop: (stop: AdventourStop, rating: number) => void;
+  onSwapStop?: (stop: AdventourStop, alternativeIndex: number) => void;
   onEnd: () => void;
 };
 
@@ -33,6 +35,32 @@ const formatDuration = (seconds?: number) => {
     return `${hours}h ${remainingMinutes}m`;
   }
   return `${minutes}m`;
+};
+
+const formatCurrency = (amount: number, currency?: string) => {
+  const code = currency && currency !== 'mixed' ? currency : 'USD';
+  return `${code} $${amount.toFixed(2)}`;
+};
+
+const formatReservationTypes = (typeCounts?: Record<string, number>) => {
+  const entries = Object.entries(typeCounts || {});
+  if (!entries.length) {
+    return 'No saved booking types yet';
+  }
+
+  return entries
+    .map(([type, count]) => `${count} ${type.replace(/_/g, ' ')}`)
+    .join(' · ');
+};
+
+const formatReservationType = (type?: string) => (
+  type ? type.replace(/_/g, ' ') : 'booking'
+);
+
+const reservationProviderLine = (provider?: string, startsAt?: string) => {
+  const parts = [provider, startsAt ? new Date(startsAt).toLocaleDateString() : undefined]
+    .filter(Boolean);
+  return parts.length ? parts.join(' - ') : 'Details saved for this Adventour';
 };
 
 const useElapsedSeconds = (start?: string) => {
@@ -63,6 +91,24 @@ const photoUrlForStop = (stop: AdventourStop) => {
   return url.startsWith('http') ? url : `${Config.BACKEND_BASE_URL}${url}`;
 };
 
+const alternativeName = (alternative: Record<string, any>) => (
+  alternative?.name || alternative?.display?.name || 'Swap option'
+);
+
+const alternativeSwapLine = (alternative: Record<string, any>) => {
+  const decision = alternative?.swap_impact?.swap_decision;
+  if (decision?.headline) {
+    return decision.headline;
+  }
+  const delta = alternative?.swap_impact?.route_score_delta;
+  if (typeof delta === 'number') {
+    const sign = delta > 0 ? '+' : '';
+    return `${sign}${Math.round(delta * 100)}% route fit`;
+  }
+  const label = alternative?.authenticity_evidence?.label;
+  return label ? `${label} alternative` : 'Keep the route, change the vibe';
+};
+
 const AdventourJourneyPanel: React.FC<Props> = ({
   adventour,
   loading,
@@ -70,15 +116,26 @@ const AdventourJourneyPanel: React.FC<Props> = ({
   onOpenDirections,
   onArrive,
   onRateStop,
+  onSwapStop,
   onEnd,
 }) => {
   const [tripLogOpen, setTripLogOpen] = useState(false);
+  const [bookingDetailsOpen, setBookingDetailsOpen] = useState(false);
   const activeStop = adventour?.active_stop || null;
+  const activeStopAlternativeSource = activeStop?.metadata?.alternatives;
+  const activeStopAlternatives = (
+    Array.isArray(activeStopAlternativeSource)
+      ? activeStopAlternativeSource
+      : []
+  ) as Record<string, any>[];
   const elapsedAtStop = useElapsedSeconds(activeStop?.arrived_at);
   const completedStops = adventour?.stops.filter((stop) => stop.status === 'completed') || [];
   const visitedStops = adventour?.stops.filter((stop) => (
     stop.status === 'completed' || stop.status === 'arrived'
   )) || [];
+  const bookingSummary = adventour?.booking_summary;
+  const reservations = adventour?.reservations || [];
+  const hasSavedBookings = Boolean(bookingSummary?.reservation_count);
   const currentPhotoUrl = activeStop ? photoUrlForStop(activeStop) : undefined;
   const statusLabel = useMemo(() => {
     if (!adventour) {
@@ -137,6 +194,27 @@ const AdventourJourneyPanel: React.FC<Props> = ({
             <Text style={styles.stopAddress} numberOfLines={1}>
               {activeStop.display?.vicinity || 'Open directions when you are ready.'}
             </Text>
+            {activeStop.status === 'planned' && activeStopAlternatives.length && onSwapStop ? (
+              <View style={styles.swapRail}>
+                <Text style={styles.swapRailLabel}>Swap ideas</Text>
+                {activeStopAlternatives.slice(0, 2).map((alternative, index) => (
+                  <TouchableOpacity
+                    key={`${alternative.provider_place_id || alternative.place_id || alternativeName(alternative)}-${index}`}
+                    style={styles.swapIdeaButton}
+                    onPress={() => onSwapStop(activeStop, index)}
+                    disabled={loading}
+                    activeOpacity={0.84}
+                  >
+                    <Text style={styles.swapIdeaName} numberOfLines={1}>
+                      {alternativeName(alternative)}
+                    </Text>
+                    <Text style={styles.swapIdeaMeta} numberOfLines={1}>
+                      {alternativeSwapLine(alternative)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            ) : null}
             <View style={styles.actionRow}>
               <TouchableOpacity style={styles.secondaryButton} onPress={() => onOpenDirections(activeStop)}>
                 <Text style={styles.secondaryButtonText}>Directions</Text>
@@ -171,6 +249,81 @@ const AdventourJourneyPanel: React.FC<Props> = ({
         <Text style={styles.progressText}>{completedStops.length} stop{completedStops.length === 1 ? '' : 's'} finished</Text>
         <Text style={styles.progressText}>{adventour.stops.length} total picked</Text>
       </View>
+
+      {hasSavedBookings && bookingSummary ? (
+        <View style={styles.bookingSummaryCard}>
+          <View style={styles.bookingSummaryHeader}>
+            <View>
+              <Text style={styles.bookingSummaryKicker}>Trip bookings</Text>
+              <Text style={styles.bookingSummaryTitle}>
+                {bookingSummary.reservation_count} saved · {Math.round(bookingSummary.readiness_score * 100)}% ready
+              </Text>
+            </View>
+            <Text style={styles.bookingSummaryCost}>
+              {formatCurrency(bookingSummary.known_cost_per_person, bookingSummary.currency)} / person
+            </Text>
+          </View>
+          <Text style={styles.bookingSummaryTypes} numberOfLines={1}>
+            {formatReservationTypes(bookingSummary.type_counts)}
+          </Text>
+          <Text style={styles.bookingSummaryMessage} numberOfLines={2}>
+            {bookingSummary.message}
+          </Text>
+          <View style={styles.bookingMetaRow}>
+            <Text style={styles.bookingMetaPill}>
+              {bookingSummary.confirmation_count} confirmed
+            </Text>
+            <Text style={styles.bookingMetaPill}>
+              {bookingSummary.booking_link_count} links
+            </Text>
+            <TouchableOpacity onPress={() => setBookingDetailsOpen((current) => !current)}>
+              <Text style={styles.bookingDetailsToggle}>{bookingDetailsOpen ? 'Hide details' : 'View details'}</Text>
+            </TouchableOpacity>
+          </View>
+          {bookingDetailsOpen && reservations.length > 0 ? (
+            <View style={styles.reservationList}>
+              {reservations.slice(0, 4).map((reservation) => (
+                <View key={reservation.id} style={styles.reservationItem}>
+                  <View style={styles.reservationHeader}>
+                    <Text style={styles.reservationType}>
+                      {formatReservationType(reservation.reservation_type)}
+                    </Text>
+                    {reservation.booking_url ? (
+                      <TouchableOpacity
+                        style={styles.reservationLinkButton}
+                        onPress={() => Linking.openURL(reservation.booking_url as string)}
+                      >
+                        <Text style={styles.reservationLinkText}>Open</Text>
+                      </TouchableOpacity>
+                    ) : null}
+                  </View>
+                  <Text style={styles.reservationTitle} numberOfLines={1}>
+                    {reservation.title}
+                  </Text>
+                  <Text style={styles.reservationProvider} numberOfLines={1}>
+                    {reservationProviderLine(reservation.provider, reservation.starts_at)}
+                  </Text>
+                  {reservation.confirmation_code ? (
+                    <Text style={styles.confirmationCode} numberOfLines={1}>
+                      Confirmation {reservation.confirmation_code}
+                    </Text>
+                  ) : null}
+                  {typeof reservation.cost_total === 'number' ? (
+                    <Text style={styles.reservationCost}>
+                      {formatCurrency(reservation.cost_total, reservation.currency)}
+                    </Text>
+                  ) : null}
+                </View>
+              ))}
+              {reservations.length > 4 ? (
+                <Text style={styles.moreReservationsText}>
+                  +{reservations.length - 4} more saved booking{reservations.length - 4 === 1 ? '' : 's'}
+                </Text>
+              ) : null}
+            </View>
+          ) : null}
+        </View>
+      ) : null}
 
       {visitedStops.length > 0 && (
         <View style={styles.tripLog}>
@@ -346,6 +499,42 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 3,
   },
+  swapRail: {
+    backgroundColor: '#dff6f2',
+    borderColor: '#9ad8e8',
+    borderRadius: 8,
+    borderWidth: 1,
+    marginTop: 9,
+    padding: 8,
+  },
+  swapRailLabel: {
+    color: '#e6534b',
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+    marginBottom: 6,
+    textTransform: 'uppercase',
+  },
+  swapIdeaButton: {
+    backgroundColor: '#fffaf3',
+    borderColor: '#f3d8b5',
+    borderRadius: 8,
+    borderWidth: 1,
+    marginTop: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 7,
+  },
+  swapIdeaName: {
+    color: '#123c69',
+    fontSize: 12,
+    fontWeight: '900',
+  },
+  swapIdeaMeta: {
+    color: '#31506b',
+    fontSize: 10,
+    fontWeight: '700',
+    marginTop: 2,
+  },
   actionRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -402,6 +591,145 @@ const styles = StyleSheet.create({
     color: '#dff6f2',
     fontSize: 11,
     fontWeight: '800',
+  },
+  bookingSummaryCard: {
+    backgroundColor: '#dff6f2',
+    borderColor: '#9ad8e8',
+    borderRadius: 8,
+    borderWidth: 1,
+    marginTop: 10,
+    padding: 10,
+  },
+  bookingSummaryHeader: {
+    alignItems: 'flex-start',
+    flexDirection: 'row',
+    gap: 10,
+    justifyContent: 'space-between',
+  },
+  bookingSummaryKicker: {
+    color: '#e6534b',
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+  },
+  bookingSummaryTitle: {
+    color: '#123c69',
+    fontSize: 13,
+    fontWeight: '900',
+    marginTop: 2,
+  },
+  bookingSummaryCost: {
+    color: '#123c69',
+    flexShrink: 0,
+    fontSize: 11,
+    fontWeight: '900',
+    marginTop: 2,
+    textAlign: 'right',
+  },
+  bookingSummaryTypes: {
+    color: '#31506b',
+    fontSize: 11,
+    fontWeight: '900',
+    marginTop: 7,
+    textTransform: 'capitalize',
+  },
+  bookingSummaryMessage: {
+    color: '#31506b',
+    fontSize: 11,
+    lineHeight: 15,
+    marginTop: 4,
+  },
+  bookingMetaRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 7,
+    marginTop: 9,
+  },
+  bookingMetaPill: {
+    backgroundColor: '#fffaf3',
+    borderColor: '#9ad8e8',
+    borderRadius: 999,
+    borderWidth: 1,
+    color: '#123c69',
+    fontSize: 10,
+    fontWeight: '900',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  bookingDetailsToggle: {
+    color: '#123c69',
+    fontSize: 11,
+    fontWeight: '900',
+    marginLeft: 2,
+    textDecorationLine: 'underline',
+  },
+  reservationList: {
+    borderTopColor: '#9ad8e8',
+    borderTopWidth: 1,
+    marginTop: 9,
+    paddingTop: 8,
+  },
+  reservationItem: {
+    backgroundColor: '#fffaf3',
+    borderColor: '#f3d8b5',
+    borderRadius: 8,
+    borderWidth: 1,
+    marginTop: 7,
+    padding: 9,
+  },
+  reservationHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  reservationType: {
+    color: '#e6534b',
+    fontSize: 10,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  reservationLinkButton: {
+    backgroundColor: '#123c69',
+    borderRadius: 999,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+  },
+  reservationLinkText: {
+    color: '#fffaf3',
+    fontSize: 10,
+    fontWeight: '900',
+  },
+  reservationTitle: {
+    color: '#111827',
+    fontSize: 13,
+    fontWeight: '900',
+    marginTop: 5,
+  },
+  reservationProvider: {
+    color: '#6b7280',
+    fontSize: 11,
+    marginTop: 2,
+  },
+  confirmationCode: {
+    color: '#123c69',
+    fontSize: 11,
+    fontWeight: '900',
+    marginTop: 5,
+  },
+  reservationCost: {
+    color: '#31506b',
+    fontSize: 11,
+    fontWeight: '900',
+    marginTop: 3,
+  },
+  moreReservationsText: {
+    color: '#31506b',
+    fontSize: 11,
+    fontWeight: '900',
+    marginTop: 8,
+    textAlign: 'center',
   },
   tripLog: {
     backgroundColor: '#fffaf3',

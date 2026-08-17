@@ -102,6 +102,44 @@ const formatDuration = (seconds?: number) => {
   return `${Math.max(1, totalMinutes)}m`;
 };
 
+const formatBookingSummary = (adventour: AdventourSession) => {
+  const summary = adventour.booking_summary;
+  if (!summary?.reservation_count) {
+    return null;
+  }
+
+  const currency = summary.currency && summary.currency !== 'mixed' ? summary.currency : 'USD';
+  const typeLabels = Object.entries(summary.type_counts || {})
+    .map(([type, count]) => `${count} ${type.replace(/_/g, ' ')}`)
+    .join(' · ');
+
+  return {
+    status: `${summary.reservation_count} booking detail${summary.reservation_count === 1 ? '' : 's'} · ${Math.round(summary.readiness_score * 100)}% ready`,
+    cost: summary.total_known_cost > 0
+      ? `${currency} $${summary.known_cost_per_person.toFixed(2)} / person`
+      : 'Cost not added yet',
+    types: typeLabels,
+  };
+};
+
+const destinationScoutNote = (adventour: AdventourSession) => {
+  const scout = adventour.summary?.destination_scout;
+  const destination = scout?.selected_destination?.label || adventour.summary?.destination;
+  if (!destination) {
+    return null;
+  }
+
+  const readiness = typeof scout?.rank?.trip_readiness_score === 'number'
+    ? `${Math.round(scout.rank.trip_readiness_score * 100)}% trip fit`
+    : null;
+  const headline = scout?.explanation?.headline;
+  return [
+    `Trip scout picked ${destination}`,
+    readiness,
+    headline,
+  ].filter(Boolean).join(' - ');
+};
+
 const backendPhotoUrl = (photoUrl?: string) => {
   if (!photoUrl) {
     return undefined;
@@ -454,6 +492,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onSignOut, onAccountDelet
           completedAdventours.slice(0, 3).map((adventour) => {
             const completedStops = completedStopsForAdventour(adventour);
             const routePins = routePinsForStops(completedStops);
+            const bookingSummary = formatBookingSummary(adventour);
+            const scoutNote = destinationScoutNote(adventour);
 
             return (
               <ImageBackground
@@ -472,6 +512,20 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onSignOut, onAccountDelet
                   <Text style={styles.adventourMeta}>
                     {adventour.summary?.stop_count || 0} stops - {formatDuration(adventour.summary?.duration_seconds)}
                   </Text>
+                  {scoutNote ? (
+                    <Text style={styles.ticketScoutNote} numberOfLines={2}>
+                      {scoutNote}
+                    </Text>
+                  ) : null}
+                  {bookingSummary ? (
+                    <View style={styles.ticketBookingSummary}>
+                      <Text style={styles.ticketBookingStatus}>{bookingSummary.status}</Text>
+                      <Text style={styles.ticketBookingCost}>{bookingSummary.cost}</Text>
+                      {bookingSummary.types ? (
+                        <Text style={styles.ticketBookingTypes} numberOfLines={1}>{bookingSummary.types}</Text>
+                      ) : null}
+                    </View>
+                  ) : null}
 
                   <View style={styles.routeMap}>
                     <View style={[styles.mapGridLine, styles.mapGridLineOne]} />
@@ -839,13 +893,47 @@ const styles = StyleSheet.create({
     color: '#e6534b',
     fontWeight: '900',
   },
+  ticketScoutNote: {
+    color: '#123c69',
+    fontSize: 10,
+    fontWeight: '900',
+    lineHeight: 13,
+    marginTop: 4,
+  },
+  ticketBookingSummary: {
+    backgroundColor: 'rgba(223, 246, 242, 0.82)',
+    borderColor: SKY_STROKE,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginTop: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+  },
+  ticketBookingStatus: {
+    color: '#123c69',
+    fontSize: 10,
+    fontWeight: '900',
+  },
+  ticketBookingCost: {
+    color: '#e6534b',
+    fontSize: 10,
+    fontWeight: '900',
+    marginTop: 1,
+  },
+  ticketBookingTypes: {
+    color: '#31506b',
+    fontSize: 9,
+    fontWeight: '800',
+    marginTop: 1,
+    textTransform: 'capitalize',
+  },
   routeMap: {
     backgroundColor: '#dff6f2',
     borderColor: SKY_STROKE,
     borderRadius: 8,
     borderWidth: 1,
-    height: 118,
-    marginTop: 10,
+    height: 88,
+    marginTop: 8,
     overflow: 'hidden',
     position: 'relative',
   },
@@ -902,7 +990,7 @@ const styles = StyleSheet.create({
     color: '#6b7280',
     fontSize: 12,
     fontWeight: '700',
-    marginTop: 43,
+    marginTop: 28,
     paddingHorizontal: 18,
     textAlign: 'center',
   },

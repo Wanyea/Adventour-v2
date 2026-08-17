@@ -3,10 +3,12 @@ from adventour_backend.models import (
     AdventourSession,
     AdventourStop,
     Friendship,
+    LocalEventInterest,
     PlaceRating,
     Trip,
     TripMember,
     TripPlace,
+    TravelReservation,
     User,
     UserPlaceEvent,
     UserPlaceInteraction,
@@ -35,10 +37,19 @@ def delete_user_account_data(user):
     ]
 
     if session_ids:
+        deleted["travel_reservations"] = _delete_query(
+            TravelReservation.query.filter(
+                (TravelReservation.user_id == user.id)
+                | (TravelReservation.adventour_session_id.in_(session_ids))
+            )
+        )
         deleted["adventour_stops"] = _delete_query(
             AdventourStop.query.filter(AdventourStop.session_id.in_(session_ids))
         )
     else:
+        deleted["travel_reservations"] = _delete_query(
+            TravelReservation.query.filter(TravelReservation.user_id == user.id)
+        )
         deleted["adventour_stops"] = 0
 
     deleted["adventour_sessions"] = _delete_query(
@@ -58,6 +69,9 @@ def delete_user_account_data(user):
     )
     deleted["place_ratings"] = _delete_query(
         PlaceRating.query.filter(PlaceRating.user_id == user.id)
+    )
+    deleted["local_event_interests"] = _delete_query(
+        LocalEventInterest.query.filter(LocalEventInterest.user_id == user.id)
     )
     deleted["friendships"] = _delete_query(
         Friendship.query.filter(

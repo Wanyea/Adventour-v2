@@ -41,6 +41,9 @@ Recommended next backend step:
 - Cloud SQL Postgres or MySQL for shared data.
 - Secret Manager or deployed env vars for `GOOGLE_API_KEY` and Firebase Admin credentials.
 
+For the end-to-end staging plan, including iPhone distribution and the
+local-vs-staging workflow, see `docs/wild-testing-staging.md`.
+
 ## Mobile Environments
 
 For Android emulator local dev:
