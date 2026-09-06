@@ -1,0 +1,7 @@
+{
+  "release": "2026-07-22.0",
+  "metros": {
+    "st_augustine": {"xmin": -81.33, "xmax": -81.30, "ymin": 29.88, "ymax": 29.91}
+  },
+  "reference_bbox": {"xmin": -87.70, "xmax": -79.90, "ymin": 24.40, "ymax": 31.10}
+}

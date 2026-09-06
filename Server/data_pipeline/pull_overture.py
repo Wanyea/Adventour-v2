@@ -1,115 +1,83 @@
-"""Pull Overture Places for the Adventour seed metros.
+﻿"""Acquire a pinned Overture regional snapshot, including postcodes and provenance.
 
-Two pulls:
-  1. Full records for Orlando + Palm Coast  -> the candidate set.
-  2. Name + brand only for all of Florida   -> chain-frequency reference.
-
-Florida-wide is a proxy for national chain presence. A national chain has many
-Florida locations; a beloved one-off does not. Cheap enough to run, and it keeps
-the bbox predicate pushdown that makes these queries fast.
-
-Output: data/ (gitignored). Nothing here touches the app or the server schema.
+From Server/: python -m data_pipeline.pull_overture --config data_pipeline/metros.json
+No database writes. Only public Overture data is acquired here.
 """
 
+import argparse
+import hashlib
+import json
 import time
 from pathlib import Path
 
 import duckdb
 
-RELEASE = "2026-07-22.0"
-PLACES = f"s3://overturemaps-us-west-2/release/{RELEASE}/theme=places/type=place/*"
-
-METROS = {
-    "orlando": dict(xmin=-81.70, xmax=-81.10, ymin=28.30, ymax=28.75),
-    "palm_coast": dict(xmin=-81.35, xmax=-81.05, ymin=29.42, ymax=29.70),
-}
-FLORIDA = dict(xmin=-87.70, xmax=-79.90, ymin=24.40, ymax=31.10)
-
-OUT = Path(__file__).resolve().parent / "data"
+from data_pipeline.metro_config import DEFAULT, bbox_clause, read_config, sql_literal
 
 
-def connect():
-    con = duckdb.connect()
-    con.execute("INSTALL spatial; LOAD spatial; INSTALL httpfs; LOAD httpfs;")
-    con.execute("SET s3_region='us-west-2';")
-    return con
+def checksum(path):
+    result = hashlib.sha256()
+    with Path(path).open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            result.update(chunk)
+    return result.hexdigest()
 
 
-def bbox_clause(b):
-    return (
-        f"bbox.xmin BETWEEN {b['xmin']} AND {b['xmax']} "
-        f"AND bbox.ymin BETWEEN {b['ymin']} AND {b['ymax']}"
-    )
-
-
-def pull_metros(con):
-    dest = OUT / "seed_places.parquet"
-    clauses = " OR ".join(f"({bbox_clause(b)})" for b in METROS.values())
-    labels = "\n".join(
-        f"WHEN {bbox_clause(b)} THEN '{name}'" for name, b in METROS.items()
-    )
-    con.execute(
-        f"""
-        COPY (
-            SELECT
-                id,
-                names.primary                  AS name,
-                categories.primary             AS category,
-                categories.alternate           AS category_alt,
-                basic_category,
-                taxonomy.hierarchy             AS taxonomy_hierarchy,
-                confidence,
-                operating_status,
-                brand.names.primary            AS brand_name,
-                brand.wikidata                 AS brand_wikidata,
-                websites,
-                socials,
-                phones,
-                addresses[1].locality          AS locality,
-                addresses[1].region            AS region,
-                bbox.xmin                      AS lon,
-                bbox.ymin                      AS lat,
-                CASE {labels} ELSE 'other' END AS metro
-            FROM read_parquet('{PLACES}')
-            WHERE ({clauses})
-              AND names.primary IS NOT NULL
-        ) TO '{dest.as_posix()}' (FORMAT PARQUET)
-        """
-    )
-    return dest
-
-
-def pull_florida_names(con):
-    """Minimal columns only -- this is a name-frequency reference, not a candidate set."""
-    dest = OUT / "florida_names.parquet"
-    con.execute(
-        f"""
-        COPY (
-            SELECT
-                lower(trim(names.primary)) AS name_norm,
-                brand.names.primary        AS brand_name
-            FROM read_parquet('{PLACES}')
-            WHERE {bbox_clause(FLORIDA)}
-              AND names.primary IS NOT NULL
-        ) TO '{dest.as_posix()}' (FORMAT PARQUET)
-        """
-    )
-    return dest
+def acquire(config, output):
+    output.mkdir(parents=True, exist_ok=True)
+    source = sql_literal(f"s3://overturemaps-us-west-2/release/{config['release']}/theme=places/type=place/*")
+    clauses = " OR ".join(f"({bbox_clause(b)})" for b in config["metros"].values())
+    labels = " ".join(f"WHEN {bbox_clause(box)} THEN {sql_literal(name)}"
+                      for name, box in config["metros"].items())
+    queries = {
+        "seed_places.parquet": f"""
+            SELECT id, names.primary AS name, categories.primary AS category,
+                   basic_category, taxonomy.hierarchy AS taxonomy_hierarchy,
+                   confidence, operating_status, brand.names.primary AS brand_name,
+                   brand.wikidata AS brand_wikidata, websites, socials, phones,
+                   addresses[1].locality AS locality, addresses[1].region AS region,
+                   addresses[1].postcode AS postcode, bbox.xmin AS lon, bbox.ymin AS lat,
+                   CASE {labels} END AS metro
+            FROM read_parquet({source}) WHERE ({clauses}) AND names.primary IS NOT NULL
+        """,
+        "reference_names.parquet": f"""
+            SELECT lower(trim(names.primary)) AS name_norm
+            FROM read_parquet({source})
+            WHERE {bbox_clause(config['reference_bbox'])} AND names.primary IS NOT NULL
+        """,
+    }
+    manifest = {"config": config, "files": {}}
+    with duckdb.connect() as con:
+        con.execute("INSTALL httpfs")
+        con.execute("LOAD httpfs")
+        con.execute("SET s3_region='us-west-2'")
+        for name, query in queries.items():
+            start = time.monotonic()
+            print(f"Pulling {name} ...", flush=True)
+            pending, target = output / f"{name}.pending", output / name
+            con.execute(f"COPY ({query}) TO {sql_literal(pending.as_posix())} (FORMAT PARQUET)")
+            count = con.execute(f"SELECT count(*) FROM read_parquet({sql_literal(pending.as_posix())})").fetchone()[0]
+            if not count:
+                raise ValueError(f"Source returned no rows for {name}; snapshot not accepted")
+            pending.replace(target)
+            manifest["files"][name] = {"sha256": checksum(target), "rows": count}
+            print(f"  {count:,} rows, {target.stat().st_size / 1e6:.1f} MB, {time.monotonic()-start:.0f}s", flush=True)
+    target = output / "snapshot.json"
+    pending = output / "snapshot.pending.json"
+    pending.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    pending.replace(target)
+    print(f"Verified snapshot manifest: {target}")
 
 
 def main():
-    OUT.mkdir(parents=True, exist_ok=True)
-    con = connect()
-
-    for label, fn in (("metros", pull_metros), ("florida names", pull_florida_names)):
-        print(f"pulling {label} ...", flush=True)
-        start = time.time()
-        dest = fn(con)
-        rows = con.execute(
-            f"SELECT count(*) FROM read_parquet('{dest.as_posix()}')"
-        ).fetchone()[0]
-        size_mb = dest.stat().st_size / 1e6
-        print(f"  {rows:,} rows -> {dest.name} ({size_mb:.1f} MB, {time.time()-start:.0f}s)")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--config", type=Path, default=DEFAULT)
+    parser.add_argument("--output", type=Path, default=Path(__file__).parent / "data" / "snapshot")
+    args = parser.parse_args()
+    try:
+        acquire(read_config(args.config), args.output)
+    except (ValueError, OSError, KeyError, duckdb.Error) as exc:
+        parser.exit(1, f"Acquisition failed; do not ingest an incomplete snapshot: {exc}\n")
 
 
 if __name__ == "__main__":

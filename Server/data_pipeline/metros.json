@@ -1,0 +1,8 @@
+{
+  "release": "2026-07-22.0",
+  "metros": {
+    "orlando": {"xmin": -81.70, "xmax": -81.10, "ymin": 28.30, "ymax": 28.75},
+    "palm_coast": {"xmin": -81.35, "xmax": -81.05, "ymin": 29.42, "ymax": 29.70}
+  },
+  "reference_bbox": {"xmin": -87.70, "xmax": -79.90, "ymin": 24.40, "ymax": 31.10}
+}

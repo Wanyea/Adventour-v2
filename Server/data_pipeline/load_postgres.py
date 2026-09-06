@@ -1,216 +1,141 @@
-"""Load the Orlando + Palm Coast seed into local Postgres.
+﻿"""Load -> filter -> score -> dedup one verified snapshot, in one transaction.
 
-Geospatial indexing is done with H3 cell IDs computed in Python and stored as
-indexed text columns, rather than PostGIS + h3-pg. Reasons:
-
-  - `h3-pg` has no reliable prebuilt Windows binary, and the portable Postgres
-    archive we run locally does not ship PostGIS at all.
-  - A radius query becomes `WHERE h3_r8 = ANY(<ring>)` plus a Haversine filter,
-    which is entirely adequate at this scale (~19k rows).
-  - The schema stays portable: it runs unchanged on any managed Postgres later,
-    and PostGIS can be layered on when there is a reason to.
-
-Run scripts/setup-local-postgres.ps1 first.
+Default is a rollback preview. --apply commits only the configured metros;
+source records and user history are never deleted. --create-db creates exactly
+ADVENTOUR_PG_DSN's database, never silently redirects to adventour.
 """
 
-import os
+import argparse
+import json
 from pathlib import Path
 
 import duckdb
 import h3
 import psycopg2
-from psycopg2.extensions import parse_dsn
-from psycopg2.extras import execute_values
+from psycopg2.extras import Json, execute_values
 
-def _dsn():
-    """Prefer an explicit URI, else assemble from standard libpq variables.
-
-    The libpq path avoids URI percent-encoding entirely -- a password containing
-    '@', '#', '/' or '%' silently corrupts a URI DSN but is fine in PGPASSWORD.
-    """
-    uri = os.environ.get("ADVENTOUR_PG_DSN")
-    if uri:
-        return uri
-    parts = {
-        "host": os.environ.get("PGHOST", "localhost"),
-        "port": os.environ.get("PGPORT", "5432"),
-        "user": os.environ.get("PGUSER", "postgres"),
-        "dbname": os.environ.get("PGDATABASE", "postgres"),
-    }
-    if os.environ.get("PGPASSWORD"):
-        parts["password"] = os.environ["PGPASSWORD"]
-    return " ".join(f"{k}={v}" for k, v in parts.items())
-
-
-DSN = _dsn()
-
-HERE = Path(__file__).resolve().parent / "data"
-PLACES = f"read_parquet('{(HERE / 'seed_places.parquet').as_posix()}')"
-NAMES = f"read_parquet('{(HERE / 'florida_names.parquet').as_posix()}')"
+from data_pipeline import index_stages
+from data_pipeline.metro_config import DEFAULT, read_config, sql_literal
+from data_pipeline.postgres_index import SCHEMA, describe, dsn, ensure_database
+from data_pipeline.pull_overture import checksum
 
 RELEVANT = ("food_and_drink", "arts_and_entertainment", "cultural_and_historic", "sports_and_recreation")
 EXCLUDED = ("christian_place_of_worship", "place_of_worship", "cemetery", "school",
             "gym", "fitness_studio", "sport_or_fitness_facility", "swimming_pool")
-
-# r8 hexagons are ~0.46 km2 -- the working resolution for "near me" queries.
-# r7 (~5 km2) is kept as a coarse bucket for wider sweeps and aggregate stats.
-H3_FINE, H3_COARSE = 8, 7
-
-SCHEMA = """
-DROP TABLE IF EXISTS places CASCADE;
-CREATE TABLE places (
-    id              text PRIMARY KEY,
-    name            text NOT NULL,
-    metro           text NOT NULL,
-    category        text,
-    basic_category  text,
-    taxonomy_bucket text,
-    confidence      double precision,
-    brand_name      text,
-    brand_wikidata  text,
-    chain_class     text NOT NULL,
-    fl_name_count   integer NOT NULL,
-    websites        text[],
-    socials         text[],
-    phones          text[],
-    locality        text,
-    region          text,
-    lat             double precision NOT NULL,
-    lon             double precision NOT NULL,
-    h3_r8           text NOT NULL,
-    h3_r7           text NOT NULL
-);
-CREATE INDEX places_h3_r8_idx        ON places (h3_r8);
-CREATE INDEX places_h3_r7_idx        ON places (h3_r7);
-CREATE INDEX places_chain_class_idx  ON places (chain_class);
-CREATE INDEX places_bucket_idx       ON places (taxonomy_bucket);
-CREATE INDEX places_metro_idx        ON places (metro);
-"""
-
-QUERY = f"""
-SELECT
-    p.id, p.name, p.metro, p.category, p.basic_category,
-    p.taxonomy_hierarchy[1] AS taxonomy_bucket,
-    p.confidence, p.brand_name, p.brand_wikidata,
-    CASE
-        WHEN p.brand_wikidata IS NOT NULL
-          OR greatest(coalesce(fe.fl_count,1), coalesce(fb.fl_count,1)) >= 10 THEN 'chain'
-        WHEN greatest(coalesce(fe.fl_count,1), coalesce(fb.fl_count,1)) >= 3 THEN 'regional'
-        ELSE 'independent'
-    END AS chain_class,
-    greatest(coalesce(fe.fl_count,1), coalesce(fb.fl_count,1)) AS fl_name_count,
-    p.websites, p.socials, p.phones, p.locality, p.region, p.lat, p.lon
-FROM {PLACES} p
-LEFT JOIN (SELECT name_norm, count(*) fl_count FROM {NAMES} GROUP BY 1) fe
-       ON lower(trim(p.name)) = fe.name_norm
-LEFT JOIN (SELECT name_norm, count(*) fl_count FROM {NAMES} GROUP BY 1) fb
-       ON lower(trim(regexp_replace(p.name,
-          '\\s+(at|of|in|-|–|—|@|\\|)\\s+.*$|\\s+\\(.*\\)$', '', 'i'))) = fb.name_norm
-WHERE p.taxonomy_hierarchy[1] IN {RELEVANT}
-  AND coalesce(p.basic_category,'') NOT IN {EXCLUDED}
-  AND coalesce(p.operating_status,'open') <> 'closed'
-  AND p.lat IS NOT NULL AND p.lon IS NOT NULL
-"""
-
-COLUMNS = (
-    "id, name, metro, category, basic_category, taxonomy_bucket, confidence, "
-    "brand_name, brand_wikidata, chain_class, fl_name_count, websites, socials, "
-    "phones, locality, region, lat, lon, h3_r8, h3_r7"
-)
+COLUMNS = ["id", "name", "metro", "category", "basic_category", "taxonomy_bucket", "confidence",
+           "brand_name", "brand_wikidata", "chain_class", "fl_name_count", "websites", "socials",
+           "phones", "locality", "region", "lat", "lon", "postcode", "h3_r8", "h3_r7"]
 
 
-def describe(dsn):
-    """Human-readable target, with the password never included."""
-    p = parse_dsn(dsn)
-    return f"{p.get('host','?')}:{p.get('port','?')}/{p.get('dbname','?')} as {p.get('user','?')}"
-
-
-def with_dbname(dsn, name):
-    p = parse_dsn(dsn)
-    p["dbname"] = name
-    return " ".join(f"{k}={v}" for k, v in p.items())
-
-
-def ensure_database(dsn, name="adventour"):
-    """Create the target database if it does not exist, then return a DSN for it.
-
-    Lets the caller point at the `postgres` maintenance database and have
-    everything else handled here. parse_dsn accepts both URI and key-value forms,
-    so this works whichever way credentials were supplied.
+def read_snapshot(folder, config):
+    manifest = json.loads((folder / "snapshot.json").read_text(encoding="utf-8"))
+    if manifest["config"] != config:
+        raise ValueError("Snapshot/config mismatch. Acquire the selected config first.")
+    for name in ("seed_places.parquet", "reference_names.parquet"):
+        if checksum(folder / name) != manifest["files"][name]["sha256"]:
+            raise ValueError(f"Snapshot checksum mismatch: {name}; reacquire the full snapshot.")
+    places = sql_literal((folder / "seed_places.parquet").as_posix())
+    names = sql_literal((folder / "reference_names.parquet").as_posix())
+    query = rf"""
+        WITH counts AS (SELECT name_norm,count(*) AS n FROM read_parquet({names}) GROUP BY 1)
+        SELECT p.id,p.name,p.metro,p.category,p.basic_category,p.taxonomy_hierarchy[1],
+               p.confidence,p.brand_name,p.brand_wikidata,
+               CASE WHEN p.brand_wikidata IS NOT NULL OR greatest(coalesce(fe.n,1),coalesce(fb.n,1))>=10
+                   THEN 'chain' WHEN greatest(coalesce(fe.n,1),coalesce(fb.n,1))>=3 THEN 'regional'
+                   ELSE 'independent' END,
+               greatest(coalesce(fe.n,1),coalesce(fb.n,1)),p.websites,p.socials,p.phones,
+               p.locality,p.region,p.lat,p.lon,p.postcode
+        FROM read_parquet({places}) p
+        LEFT JOIN counts fe ON lower(trim(p.name))=fe.name_norm
+        LEFT JOIN counts fb ON lower(trim(regexp_replace(p.name,
+            '\s+(at|of|in|-|–|—|@|\|)\s+.*$|\s+\(.*\)$','','i')))=fb.name_norm
+        WHERE p.taxonomy_hierarchy[1] IN {RELEVANT}
+          AND coalesce(p.basic_category,'') NOT IN {EXCLUDED}
+          AND coalesce(p.operating_status,'open')<>'closed'
+          AND p.lat IS NOT NULL AND p.lon IS NOT NULL
     """
-    admin = with_dbname(dsn, "postgres")
-    dsn = with_dbname(dsn, name)
+    with duckdb.connect() as con:
+        rows = con.execute(query).fetchall()
+    if {r[2] for r in rows} != set(config["metros"]) or len({r[0] for r in rows}) != len(rows):
+        raise ValueError("Empty/unexpected metro or duplicate source IDs in snapshot.")
+    enriched = []
+    for row in rows:
+        box = config["metros"][row[2]]
+        lat, lon = row[16], row[17]
+        if not (box["ymin"] <= lat <= box["ymax"] and box["xmin"] <= lon <= box["xmax"]):
+            raise ValueError(f"Source coordinate outside configured metro: {row[0]}")
+        enriched.append((*row, h3.latlng_to_cell(lat, lon, 8), h3.latlng_to_cell(lat, lon, 7)))
+    return enriched
 
-    conn = psycopg2.connect(admin)
-    conn.autocommit = True  # CREATE DATABASE cannot run inside a transaction
+
+def ingest(conn, rows, config, allow_large_change=False):
+    metros = list(config["metros"])
     with conn.cursor() as cur:
-        cur.execute("SELECT 1 FROM pg_database WHERE datname = %s", (name,))
-        if cur.fetchone() is None:
-            cur.execute(f'CREATE DATABASE "{name}"')
-            print(f"  created database '{name}'")
-        else:
-            print(f"  database '{name}' already exists")
-    conn.close()
-    return dsn
+        cur.execute("SELECT pg_advisory_xact_lock(72819385)")
+        cur.execute(SCHEMA)
+        cur.execute("SELECT id,metro,COALESCE(canonical_id,id),index_active FROM places")
+        existing = cur.fetchall()
+        incoming = {row[0]: row[2] for row in rows}
+        if any(pid in incoming and incoming[pid] != metro for pid, metro, _, _ in existing):
+            raise ValueError("Snapshot overlaps an existing metro; resolve its boundary before importing.")
+        prior = {pid: entity for pid, metro, entity, _ in existing if metro in metros}
+        for metro in metros:
+            old = {pid for pid, m, _, active in existing if m == metro and active}
+            lost = old - incoming.keys()
+            if old and len(lost) / len(old) > .30 and not allow_large_change:
+                raise ValueError(f"{metro}: {len(lost)}/{len(old)} active records absent. Review the snapshot; "
+                                 "use --allow-large-change only after accepting this retirement.")
+        # Records absent from this source snapshot remain addressable for history.
+        cur.execute("""UPDATE places SET index_active=false,tier='DROP',tier_reason='absent_from_snapshot'
+            WHERE metro=ANY(%s) AND NOT (id=ANY(%s))""", (metros, list(incoming)))
+        assignments = ",".join(f"{col}=EXCLUDED.{col}" for col in COLUMNS if col != "id")
+        execute_values(cur, f"""INSERT INTO places ({','.join(COLUMNS)}) VALUES %s
+            ON CONFLICT(id) DO UPDATE SET {assignments}, index_active=true""", rows, page_size=1000)
+        cur.execute("""UPDATE places SET source_release=%s,source_seen_at=now(),authenticity=NULL,
+            authenticity_why=NULL,score_components=NULL,score_density=NULL
+            WHERE metro=ANY(%s) AND index_active""", (config["release"], metros))
+    filtered = index_stages.filter_places(conn, metros)
+    scored = index_stages.score_places(conn, metros)
+    entities = index_stages.deduplicate(conn, metros, prior)
+    with conn.cursor() as cur:
+        cur.execute("INSERT INTO index_ingestion(release,metros,source_count,config) VALUES(%s,%s,%s,%s)",
+                    (config["release"], metros, len(rows), Json(config)))
+    return {"source_records": len(rows), "filtered": filtered, "scored": scored, "keep_entities": entities}
 
 
 def main():
-    print("reading seed ...")
-    rows = duckdb.connect().execute(QUERY).fetchall()
-    print(f"  {len(rows):,} places")
-
-    print("computing H3 cells ...")
-    enriched = []
-    for r in rows:
-        lat, lon = r[16], r[17]
-        enriched.append(
-            tuple(r)
-            + (h3.latlng_to_cell(lat, lon, H3_FINE), h3.latlng_to_cell(lat, lon, H3_COARSE))
-        )
-
-    print(f"connecting to {describe(DSN)} ...")
-    dsn = ensure_database(DSN)
-    with psycopg2.connect(dsn) as conn, conn.cursor() as cur:
-        cur.execute(SCHEMA)
-        execute_values(
-            cur, f"INSERT INTO places ({COLUMNS}) VALUES %s", enriched, page_size=1000
-        )
-        conn.commit()
-
-        print("\n=== loaded ===")
-        cur.execute(
-            """
-            SELECT metro, chain_class, count(*)
-            FROM places GROUP BY 1,2
-            ORDER BY 1, CASE chain_class
-                WHEN 'chain' THEN 1 WHEN 'regional' THEN 2 ELSE 3 END
-            """
-        )
-        for metro, cls, n in cur.fetchall():
-            print(f"  {metro:<12}{cls:<14}{n:>7,}")
-        cur.execute("SELECT count(*), count(DISTINCT h3_r8) FROM places")
-        total, cells = cur.fetchone()
-        print(f"  {'TOTAL':<12}{'':<14}{total:>7,}   across {cells:,} H3 r8 cells")
-
-        # Prove the index works the way recommendations will use it: everything
-        # within ~2km of downtown Palm Coast, nearest first.
-        print("\n=== smoke test: independents within ~2km of Palm Coast center ===")
-        lat, lon = 29.5844, -81.2079
-        ring = list(h3.grid_disk(h3.latlng_to_cell(lat, lon, H3_FINE), 3))
-        cur.execute(
-            """
-            SELECT name, basic_category,
-                   round((6371000 * acos(least(1, greatest(-1,
-                       cos(radians(%s)) * cos(radians(lat)) * cos(radians(lon) - radians(%s))
-                     + sin(radians(%s)) * sin(radians(lat))))))::numeric) AS meters
-            FROM places
-            WHERE h3_r8 = ANY(%s) AND chain_class = 'independent'
-            ORDER BY meters LIMIT 8
-            """,
-            (lat, lon, lat, ring),
-        )
-        for name, cat, meters in cur.fetchall():
-            print(f"  {str(meters):>6}m  {name[:36]:<36} {cat}")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--config", type=Path, default=DEFAULT)
+    parser.add_argument("--snapshot", type=Path, default=Path(__file__).parent / "data" / "snapshot")
+    parser.add_argument("--apply", action="store_true")
+    parser.add_argument("--create-db", action="store_true")
+    parser.add_argument("--allow-large-change", action="store_true")
+    args = parser.parse_args()
+    try:
+        config = read_config(args.config)
+        rows = read_snapshot(args.snapshot, config)
+        target = dsn()
+        print(f"Target: {describe(target)}; metros: {', '.join(config['metros'])}", flush=True)
+        if args.create_db:
+            if not args.apply:
+                raise ValueError("--create-db requires --apply; preview never creates a database.")
+            ensure_database(target)
+        conn = psycopg2.connect(target)
+        try:
+            result = ingest(conn, rows, config, args.allow_large_change)
+            if args.apply:
+                conn.commit()
+            else:
+                conn.rollback()
+            print(json.dumps(result, indent=2))
+            print("Committed." if args.apply else "Preview rolled back. Repeat with --apply to commit.")
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+    except (ValueError, OSError, KeyError, duckdb.Error, psycopg2.Error) as exc:
+        parser.exit(1, f"Ingestion refused; no partial index update committed: {exc}\n")
 
 
 if __name__ == "__main__":
