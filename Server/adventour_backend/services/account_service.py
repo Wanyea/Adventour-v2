@@ -1,3 +1,5 @@
+from sqlalchemy import text
+
 from adventour_backend.models import (
     db,
     AdventourSession,
@@ -8,10 +10,6 @@ from adventour_backend.models import (
     TripMember,
     TripPlace,
     User,
-    UserPlaceEvent,
-    UserPlaceInteraction,
-    UserPreferenceVector,
-    UserTagFeedback,
 )
 
 
@@ -44,18 +42,10 @@ def delete_user_account_data(user):
     deleted["adventour_sessions"] = _delete_query(
         AdventourSession.query.filter(AdventourSession.user_id == user.id)
     )
-    deleted["preference_vectors"] = _delete_query(
-        UserPreferenceVector.query.filter(UserPreferenceVector.user_id == user.id)
-    )
-    deleted["place_events"] = _delete_query(
-        UserPlaceEvent.query.filter(UserPlaceEvent.user_id == user.id)
-    )
-    deleted["place_interactions"] = _delete_query(
-        UserPlaceInteraction.query.filter(UserPlaceInteraction.user_id == user.id)
-    )
-    deleted["tag_feedback"] = _delete_query(
-        UserTagFeedback.query.filter(UserTagFeedback.user_id == user.id)
-    )
+    # Interactions now live in the index-backed `place_event` table.
+    deleted["place_events"] = db.session.execute(
+        text("DELETE FROM place_event WHERE user_id = :uid"), {"uid": user.id}
+    ).rowcount
     deleted["place_ratings"] = _delete_query(
         PlaceRating.query.filter(PlaceRating.user_id == user.id)
     )

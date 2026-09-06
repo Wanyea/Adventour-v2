@@ -1,0 +1,1250 @@
+{
+  "generated_at": "2026-08-19T23:31:18.903Z",
+  "metro": "orlando",
+  "labels": [
+    {
+      "id": "05490105-292b-4fdc-8bb9-3655126f2a15",
+      "name": "La Casita Pupusas",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.95,
+      "label": "solid",
+      "note": null
+    },
+    {
+      "id": "095097a6-486c-4451-be26-6253622fc311",
+      "name": "Jimmy John's",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "chain",
+      "confidence": 0.99,
+      "label": "chain",
+      "note": null
+    },
+    {
+      "id": "09f69bf0-1c91-4414-99bc-ce44c0144682",
+      "name": "UCF Art Gallery",
+      "basic_category": "art_gallery",
+      "our_chain_class": "independent",
+      "confidence": 0.96,
+      "label": "not_worth",
+      "note": "Not open all year round, just during end of semester shows. would need to be verified with the site before showing to users"
+    },
+    {
+      "id": "0b7e6b3a-25d5-4a81-9d06-a3bc92833833",
+      "name": "Island of adventure",
+      "basic_category": "amusement_park",
+      "our_chain_class": "independent",
+      "confidence": 0.97,
+      "label": "gem",
+      "note": "It's a Universal theme park that requires tickets. A must do in orlando but is pricey and would need some notice to user or link to buy tickets maybe even in advanced"
+    },
+    {
+      "id": "0bacf1ab-7b75-43a9-b7b6-c4c8e017c3d2",
+      "name": "Russian Ballet Orlando",
+      "basic_category": "performing_arts_venue",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "generic",
+      "note": "Would need tickets in advanced and see showtimes"
+    },
+    {
+      "id": "0c27d1ff-4b82-432f-9f86-bec99f48dc36",
+      "name": "Knightstop",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.65,
+      "label": "not_worth",
+      "note": "University convenience store, not a real destination"
+    },
+    {
+      "id": "10576795-4ab4-46aa-9cba-e199fe140a59",
+      "name": "Enterprise Sewing",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.95,
+      "label": "junk",
+      "note": "Sewing shop and its permanently closed and not a true destination"
+    },
+    {
+      "id": "14187096-3b69-4e81-a6e9-eadc2f0bf138",
+      "name": "Cabana Bay Beach Rst F",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.97,
+      "label": "junk",
+      "note": "This is a hotel, not a destination "
+    },
+    {
+      "id": "1841d7d1-8e44-4f46-a3b0-9a82af85665d",
+      "name": "The Mikes' Services Bc 102, Llc Dba The Ups Store 6900",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.95,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "1849f502-dbe8-4565-8251-e9bf1d702156",
+      "name": "Houlihan's",
+      "basic_category": "bar",
+      "our_chain_class": "regional",
+      "confidence": 0.92,
+      "label": "unknown",
+      "note": "Couldnt find it, seems permanently closed"
+    },
+    {
+      "id": "1a56dfec-2f32-4b5c-97f1-99e5923014bf",
+      "name": "Shift Digital Media",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.95,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "1b4529c7-7357-46c5-b8e1-8d6e5f05e92b",
+      "name": "RICHES Mosaic Interface",
+      "basic_category": "museum",
+      "our_chain_class": "independent",
+      "confidence": 0.48,
+      "label": "junk",
+      "note": "Student collection, not year round"
+    },
+    {
+      "id": "1d2d2e4c-f3fa-41ec-9490-086c9431e0b7",
+      "name": "Black Magic Pizza",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "1d8d4b04-bda1-4833-85e0-d640e27588d6",
+      "name": "Yumm Cake",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "independent",
+      "confidence": 0.55,
+      "label": "unknown",
+      "note": null
+    },
+    {
+      "id": "1d9a3073-6335-460c-889a-0401d4472764",
+      "name": "The Pop Parlour",
+      "basic_category": "coffee_shop",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "unknown",
+      "note": "Doesnt exist"
+    },
+    {
+      "id": "1f50a640-0679-41ef-9b7a-78d167ee2e7e",
+      "name": "Bricks & Bowls",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "20a30756-0b91-402c-a8d2-4f9020f02b20",
+      "name": "Kelly's Homemade Ice Cream",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "regional",
+      "confidence": 0.78,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "22569a87-8140-43b3-a5aa-0bb8fa9d1c19",
+      "name": "The Tourist Trap",
+      "basic_category": "performing_arts_venue",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "unknown",
+      "note": null
+    },
+    {
+      "id": "22edbb04-55a2-4a3c-810d-a6a1c97698d3",
+      "name": "Farm & Haus East End Market",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "unknown",
+      "note": "Permanently closed"
+    },
+    {
+      "id": "23db7b73-bd46-4b70-91e7-7c52361ebfb3",
+      "name": "Eddie V's Prime Seafood",
+      "basic_category": "restaurant",
+      "our_chain_class": "regional",
+      "confidence": 0.99,
+      "label": "solid",
+      "note": null
+    },
+    {
+      "id": "26b362ab-a4da-4191-85fc-e341a415af65",
+      "name": "Einstein Bros. Bagels",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "chain",
+      "confidence": 0.92,
+      "label": "chain",
+      "note": null
+    },
+    {
+      "id": "27332a73-1a91-4ec5-8077-faa7d2ee66c6",
+      "name": "Pho 813",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "2d701e52-1f4b-4c2f-962b-88b6c825ce63",
+      "name": "Street Art Orlando",
+      "basic_category": "art_gallery",
+      "our_chain_class": "independent",
+      "confidence": 0.32,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "2e4bc82a-6659-4b7e-926c-e2e08682bec5",
+      "name": "Isan Zaap Thai Cafe",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "2fea85b3-f681-422c-a51b-0808dd9a1ba2",
+      "name": "Chick-fil-A",
+      "basic_category": "fast_food_restaurant",
+      "our_chain_class": "chain",
+      "confidence": 0.99,
+      "label": "chain",
+      "note": null
+    },
+    {
+      "id": "356a5308-348e-494b-a1c8-e3fff0e1f2ca",
+      "name": "SmashDunk ",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.38,
+      "label": "generic",
+      "note": null
+    },
+    {
+      "id": "36c60bbd-2d11-427f-a176-432fee37d13b",
+      "name": "The Lounge - University of Central Florida",
+      "basic_category": "lounge",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "3a93c46e-27fb-42af-9dd3-6d5dd813a5f8",
+      "name": "Joffrey's Coffee & Tea Company",
+      "basic_category": "coffee_shop",
+      "our_chain_class": "regional",
+      "confidence": 0.66,
+      "label": "generic",
+      "note": null
+    },
+    {
+      "id": "3aac643e-5b3d-4dfd-bc29-92e7bd0ec85f",
+      "name": "Universal Studios",
+      "basic_category": "restaurant",
+      "our_chain_class": "chain",
+      "confidence": 0.45,
+      "label": "gem",
+      "note": "Theme park famous in orlando but requires tickets that ideally would be purchased in advanced"
+    },
+    {
+      "id": "3bcb1a0b-7615-4769-84d8-89c37266588f",
+      "name": "Tri Tue Quang Buddhist Center",
+      "basic_category": "buddhist_place_of_worship",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "junk",
+      "note": "Church, not destination "
+    },
+    {
+      "id": "3db2938e-ecc1-4c82-b5f7-4361e962ff00",
+      "name": "One Love Caribbean Grill",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.57,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "3f114b8c-3fb3-4370-af61-16ddf3439e5c",
+      "name": "Adventel Restaurant And Bakery",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.95,
+      "label": "unknown",
+      "note": "Permanently closed"
+    },
+    {
+      "id": "4192be49-6a3e-4101-82b2-6ea43e0920f5",
+      "name": "China Wok",
+      "basic_category": "restaurant",
+      "our_chain_class": "chain",
+      "confidence": 0.99,
+      "label": "chain",
+      "note": null
+    },
+    {
+      "id": "466f3284-fd4f-4a8f-a95f-40e96472503a",
+      "name": "Pizzeria Del-Dio Italian Restaurant",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.97,
+      "label": "generic",
+      "note": null
+    },
+    {
+      "id": "46ffd6b8-b795-4a92-a6b5-b70d2a13fd76",
+      "name": "UCF Marketplace",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "junk",
+      "note": "UCF student only dining"
+    },
+    {
+      "id": "485df208-d464-4a98-98e7-52873fb6abc8",
+      "name": "Topper's Creamery",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "regional",
+      "confidence": 0.92,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "48c4a625-7be0-4b4f-9b00-ef3e825ac761",
+      "name": "Kappa Alpha Theta Sorority",
+      "basic_category": "social_club",
+      "our_chain_class": "independent",
+      "confidence": 0.55,
+      "label": "junk",
+      "note": "University sorority, not a place that can be visited nor a real destination "
+    },
+    {
+      "id": "4c5022b7-2ece-47d2-bb59-ac1014960fa3",
+      "name": "District Center",
+      "basic_category": "music_venue",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "4c84d676-c3a9-481f-bbec-0920f5743d35",
+      "name": "L'Amour Bakery",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "independent",
+      "confidence": 0.24,
+      "label": "not_worth",
+      "note": null
+    },
+    {
+      "id": "4f88769b-dde5-4b43-bf15-2b015bceb0e6",
+      "name": "Florean Fortescue's Ice-Cream Parlour",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "junk",
+      "note": "Business inside of Universal theme park. Can not be visited without a ticket of admission to the theme park. this would be something suggested to someone visiting Universal Studios and has accepted that trip, NOT as an individual destination "
+    },
+    {
+      "id": "50385944-aa1b-4feb-9544-886d08f033ed",
+      "name": "Bento Sushi",
+      "basic_category": "restaurant",
+      "our_chain_class": "regional",
+      "confidence": 0.92,
+      "label": "generic",
+      "note": null
+    },
+    {
+      "id": "51c73afb-d9c4-4f54-a8c8-8f14ddaaf3bd",
+      "name": "Sonny Joseph Md Pllc",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "5403054a-6a43-4f83-b484-8e17ad061e5d",
+      "name": "Chickpeas Fresh Mediterranean Kitchen",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.39,
+      "label": "not_worth",
+      "note": null
+    },
+    {
+      "id": "551f070c-3c54-4967-aba3-429df66c8cd9",
+      "name": "Linda's La Cantina Steakhouse",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "559ae594-bb2f-4666-b98d-70329a1073c5",
+      "name": "Sweet Storm",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "unknown",
+      "note": null
+    },
+    {
+      "id": "55d9be56-e78a-4e51-831a-c74072d1c2fd",
+      "name": "Oceanic Transport Ent Inc Dba World Cafe",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.95,
+      "label": "unknown",
+      "note": null
+    },
+    {
+      "id": "595044d5-461c-4f0b-8d32-3539d57c651e",
+      "name": "Universal’s Great Movie Escape",
+      "basic_category": "gaming_venue",
+      "our_chain_class": "independent",
+      "confidence": 0.95,
+      "label": "generic",
+      "note": "Escape room on Universal property. You dont need a ticket to the theme park to experience it but you do have to pay for parking and need a reservation for this"
+    },
+    {
+      "id": "59880ca1-364d-468b-b4e0-fa6d17ae862c",
+      "name": "Art From The Heart",
+      "basic_category": "art_gallery",
+      "our_chain_class": "independent",
+      "confidence": 0.55,
+      "label": "unknown",
+      "note": null
+    },
+    {
+      "id": "5bc86456-a5ae-4752-a5af-ccfb7087e27c",
+      "name": "Evoo Fresh Mediterranean Kitchen",
+      "basic_category": "restaurant",
+      "our_chain_class": "regional",
+      "confidence": 0.92,
+      "label": "not_worth",
+      "note": null
+    },
+    {
+      "id": "5c308cdb-46c4-41af-82ea-bb987299e16a",
+      "name": "Topper's Creamery Ucf",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "independent",
+      "confidence": 0.75,
+      "label": "not_worth",
+      "note": "Used to be ice cream place at university campus, doesnt exist anymore"
+    },
+    {
+      "id": "5f18a976-2abd-494b-a47f-f9dfb6f2fa7f",
+      "name": "The Pub - Orlando",
+      "basic_category": "bar",
+      "our_chain_class": "regional",
+      "confidence": 0.99,
+      "label": "solid",
+      "note": null
+    },
+    {
+      "id": "5f81ac97-4b7a-4d1f-880f-0ac01224f725",
+      "name": "Wow Fresh Smoothie",
+      "basic_category": "non_alcoholic_beverage_venue",
+      "our_chain_class": "independent",
+      "confidence": 0.95,
+      "label": "solid",
+      "note": null
+    },
+    {
+      "id": "644c4167-eee3-4fb4-8b4e-3d781a931cff",
+      "name": "Colonel Joe Kittinger Park",
+      "basic_category": "park",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "generic",
+      "note": null
+    },
+    {
+      "id": "661fd33c-bb8d-4f2d-85d9-ff2f0e24d478",
+      "name": "Lfp, Llc Dba La Boucherie",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.95,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "67e5938f-b7ee-4054-86fc-b1217dd343ff",
+      "name": "Mamak Asian Street Food",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "67f2d561-11dc-44d0-b924-310ef42ac21d",
+      "name": "Smoke & Donuts Bbq",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.75,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "69b29ca8-6d8f-40be-a27f-da8c77c02a59",
+      "name": "Barnes & Noble Café",
+      "basic_category": "coffee_shop",
+      "our_chain_class": "independent",
+      "confidence": 0.77,
+      "label": "chain",
+      "note": null
+    },
+    {
+      "id": "6ae53e11-81fb-4ab8-839d-f3b4976acc1c",
+      "name": "98Forty Tapas & Tequila",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "independent",
+      "confidence": 1,
+      "label": "solid",
+      "note": null
+    },
+    {
+      "id": "6c228f2f-55ba-4611-8ad9-7d49436c3c65",
+      "name": "Mrs. Fields Cookies",
+      "basic_category": "fast_food_restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.94,
+      "label": "unknown",
+      "note": null
+    },
+    {
+      "id": "6ee3a92a-e050-48bf-8f89-4dc33efc62db",
+      "name": "Subway",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "chain",
+      "confidence": 0.92,
+      "label": "chain",
+      "note": null
+    },
+    {
+      "id": "6efef152-8d03-4dac-9236-471bfee0d8b3",
+      "name": "Voodoo Bayou",
+      "basic_category": "restaurant",
+      "our_chain_class": "regional",
+      "confidence": 0.99,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "703a0f9f-f60b-4fdd-8986-07fb73cdfac3",
+      "name": "Wackadoo's",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "73700bab-b099-43e3-be3b-ae188def8096",
+      "name": "Dunkin'",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "chain",
+      "confidence": 0.99,
+      "label": "chain",
+      "note": null
+    },
+    {
+      "id": "74041c0a-0ad6-4526-adc9-94e655efd15d",
+      "name": "The King Craf Shack Llc Dba The King Crab Shack",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.95,
+      "label": "unknown",
+      "note": null
+    },
+    {
+      "id": "74224f47-9d43-416f-8be8-dae8cbe4bb03",
+      "name": "Bird of Paradise",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "not_worth",
+      "note": "Used to be a restaurant but closed for good"
+    },
+    {
+      "id": "77243a92-722b-4791-bf28-fcefbc621699",
+      "name": "Beneplace",
+      "basic_category": "ticket_office_or_booth",
+      "our_chain_class": "independent",
+      "confidence": 0.95,
+      "label": "trap",
+      "note": "tourist scam for tickets"
+    },
+    {
+      "id": "77964c04-03d0-4198-b5bb-81b55f4bc510",
+      "name": "Logan's Roadhouse",
+      "basic_category": "restaurant",
+      "our_chain_class": "chain",
+      "confidence": 0.97,
+      "label": "not_worth",
+      "note": null
+    },
+    {
+      "id": "7ade31b0-94aa-4486-8203-c8b5ce9048c9",
+      "name": "Kandied Bakery",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "independent",
+      "confidence": 0.95,
+      "label": "not_worth",
+      "note": null
+    },
+    {
+      "id": "7af80495-4115-4ba0-a5bb-4cef9dc78ed4",
+      "name": "Dr. Fill Up",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.55,
+      "label": "junk",
+      "note": "Doesnt exist anymore"
+    },
+    {
+      "id": "7d021350-df86-4d47-bf4c-8eefc38d9dad",
+      "name": "ANA Masters of Marketing",
+      "basic_category": "event_venue",
+      "our_chain_class": "independent",
+      "confidence": 0.77,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "7d4b388a-c597-448e-8812-400ca6733638",
+      "name": "Arby's",
+      "basic_category": "fast_food_restaurant",
+      "our_chain_class": "chain",
+      "confidence": 0.99,
+      "label": "chain",
+      "note": null
+    },
+    {
+      "id": "7d750fe1-2a39-47eb-86ad-722464f02274",
+      "name": "Java City",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "independent",
+      "confidence": 0.55,
+      "label": "junk",
+      "note": "Doesnt exist anymore"
+    },
+    {
+      "id": "7e5e5a36-742d-442e-8caf-3c4bfe96b5fa",
+      "name": "Sushi Lola's",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "generic",
+      "note": null
+    },
+    {
+      "id": "7e9e9b3a-c003-44c4-97d9-f37f7f3bf77e",
+      "name": "Voleyball Court At Festival Park, Orlando Fl",
+      "basic_category": "park",
+      "our_chain_class": "independent",
+      "confidence": 0.83,
+      "label": "not_worth",
+      "note": null
+    },
+    {
+      "id": "7ea5a6be-b5d8-4582-ab1a-ad351ab70f66",
+      "name": "Gringos Locos UCF",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.93,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "7fd80ff5-f1e2-41db-ad01-a4c5d8e70d29",
+      "name": "The Marketplace",
+      "basic_category": "restaurant",
+      "our_chain_class": "regional",
+      "confidence": 0.55,
+      "label": "unknown",
+      "note": null
+    },
+    {
+      "id": "81d5407d-d46d-4d80-83ef-f3fc37e72b06",
+      "name": "Einstein Bros. Bagels",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "chain",
+      "confidence": 0.96,
+      "label": "chain",
+      "note": null
+    },
+    {
+      "id": "84e02482-219c-4c77-aa33-dbad1ff9ff62",
+      "name": "Café Osceola",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.97,
+      "label": "not_worth",
+      "note": "Buffet in hotel, not destination "
+    },
+    {
+      "id": "856d7ec4-34ca-4919-bbcc-45bd5c07f2f4",
+      "name": "Knightro's",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "not_worth",
+      "note": "College student dining, not destination "
+    },
+    {
+      "id": "85fd0829-9bcf-4b46-8bad-465ea4e5d99b",
+      "name": "Roka Hula",
+      "basic_category": "bar",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "8a4e8b5a-ed24-468f-a811-b98818cac887",
+      "name": "Burger U",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "8d0c6317-da1f-472c-b3e0-2b30479fd3ea",
+      "name": "The Twisted Handle",
+      "basic_category": "bar",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "not_worth",
+      "note": "Permanently closed"
+    },
+    {
+      "id": "907d9b38-c185-4f78-8efc-85870cf9c498",
+      "name": "Rehearsal Hall",
+      "basic_category": "theatre_venue",
+      "our_chain_class": "independent",
+      "confidence": 0.97,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "914b9a7c-abf0-445c-9dd0-696ec31ffe31",
+      "name": "Orlando Shakespeare Theater",
+      "basic_category": "theatre_venue",
+      "our_chain_class": "independent",
+      "confidence": 0.77,
+      "label": "gem",
+      "note": "Need tickets to shows in advance"
+    },
+    {
+      "id": "915cfde4-5588-42a5-943c-697cc3a84f5c",
+      "name": "Kalalou Caribbean Bar & Grill",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "solid",
+      "note": null
+    },
+    {
+      "id": "9173e45f-5c89-45d8-8c1c-bf67774e0c63",
+      "name": "Rosetta Bakery",
+      "basic_category": "cafe",
+      "our_chain_class": "regional",
+      "confidence": 0.99,
+      "label": "solid",
+      "note": null
+    },
+    {
+      "id": "91a3c738-99d9-4720-97b8-12e2efe42903",
+      "name": "Kelly's Homemade Ice Cream",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "regional",
+      "confidence": 0.99,
+      "label": "solid",
+      "note": null
+    },
+    {
+      "id": "92789d82-64a7-4af5-aeb5-f6c77a237dbb",
+      "name": "Blue Jacket Grille",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "unknown",
+      "note": null
+    },
+    {
+      "id": "9a37a840-4071-4b3d-b807-6741e3e89cf9",
+      "name": "Foxtail Coffee",
+      "basic_category": "coffee_shop",
+      "our_chain_class": "chain",
+      "confidence": 0.99,
+      "label": "chain",
+      "note": "A regional chain though so i wouldnt omit it compeltely"
+    },
+    {
+      "id": "9b6ab5bc-ba8c-408f-9000-fc9ef9c3a4d7",
+      "name": "Baby Dolls",
+      "basic_category": "dance_club",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "9d133999-1a59-44b5-b706-9daa9b5a743a",
+      "name": "Mad Eats Orlando Llc Dba Santiago's Bod",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.95,
+      "label": "solid",
+      "note": "real name is Santiago's Bodega"
+    },
+    {
+      "id": "9d782857-c619-4e3c-af69-c2019c3aa400",
+      "name": "BART",
+      "basic_category": "bar",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "unknown",
+      "note": "Permanently closed"
+    },
+    {
+      "id": "9debf8df-a814-46d6-bc30-ed524803073d",
+      "name": "Brio Italian Grille",
+      "basic_category": "restaurant",
+      "our_chain_class": "regional",
+      "confidence": 0.72,
+      "label": "generic",
+      "note": null
+    },
+    {
+      "id": "9f42a1f7-d55b-45f5-b369-53f59466b873",
+      "name": "63 South",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "not_worth",
+      "note": "Student dining, not destination "
+    },
+    {
+      "id": "a01086b1-441d-4774-a2d9-6f21c619de2b",
+      "name": "Speed-The-Plow at Orlando Fringe",
+      "basic_category": "movie_theater",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "junk",
+      "note": "Show during a festival from 2015, not a destination "
+    },
+    {
+      "id": "a0b951cd-010b-4b0f-a515-fb7d1b076dd1",
+      "name": "Theatre UCF",
+      "basic_category": "performing_arts_venue",
+      "our_chain_class": "independent",
+      "confidence": 0.96,
+      "label": "generic",
+      "note": "performing arts center at a university, need tickets in advanced and not every day"
+    },
+    {
+      "id": "a1013118-a07e-4355-8c3f-215d0f572fd4",
+      "name": "Berkins",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "independent",
+      "confidence": 0.66,
+      "label": "unknown",
+      "note": null
+    },
+    {
+      "id": "a19e3ad9-b784-482c-81d8-aad604de5771",
+      "name": "Anh Hong Restaurant",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "a261a622-a4ce-4894-8411-74b997fb05e7",
+      "name": "Junior's Diner",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "unknown",
+      "note": null
+    },
+    {
+      "id": "a344a5cc-4120-421c-b7cf-382114ab9b51",
+      "name": "Chatham's Place Restaurant",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.94,
+      "label": "solid",
+      "note": null
+    },
+    {
+      "id": "a6f40b53-781b-43de-b3d2-1f1ed11030e7",
+      "name": "Bakery 1908",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "b0918be8-d2d8-4218-96e2-a37c81c6d26a",
+      "name": "The Dessert Lady",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "junk",
+      "note": "Permanently closed"
+    },
+    {
+      "id": "b2addaa8-c3ab-4f10-a24b-c871583d4c58",
+      "name": "Millenia Park",
+      "basic_category": "park",
+      "our_chain_class": "regional",
+      "confidence": 0.95,
+      "label": "junk",
+      "note": "Apartment complex (Aqua)"
+    },
+    {
+      "id": "b32ffa23-1207-4fc2-a92f-6878ecd63a8c",
+      "name": "WunderBAR",
+      "basic_category": "smoothie_juice_bar",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "generic",
+      "note": null
+    },
+    {
+      "id": "b76cfcb1-914a-46e3-bee6-2ab72a7f1ce3",
+      "name": "PokeKai",
+      "basic_category": "restaurant",
+      "our_chain_class": "regional",
+      "confidence": 0.94,
+      "label": "unknown",
+      "note": "Permanently closed"
+    },
+    {
+      "id": "bb34475a-155d-4b6e-af48-7ee96f42b92b",
+      "name": "Le Recif Restaurant",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.65,
+      "label": "not_worth",
+      "note": null
+    },
+    {
+      "id": "bb48009b-caa0-4153-aef2-c4b5464d42f7",
+      "name": "Noches Azul",
+      "basic_category": "lounge",
+      "our_chain_class": "independent",
+      "confidence": 0.66,
+      "label": "unknown",
+      "note": null
+    },
+    {
+      "id": "bd9055d0-5d63-42b2-b9b6-1dd77aa28493",
+      "name": "Viking Grill",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "unknown",
+      "note": null
+    },
+    {
+      "id": "c1306af6-7188-439f-a747-4bfdf25bf18c",
+      "name": "Pescao",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "unknown",
+      "note": null
+    },
+    {
+      "id": "c308c152-89f2-427a-8a16-7c0e69b0cb72",
+      "name": "UCF Tennis courts",
+      "basic_category": "sport_court",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "not_worth",
+      "note": "University tennis courts not open to the public"
+    },
+    {
+      "id": "c3e3c077-2bae-43bb-8183-36a09df08fdb",
+      "name": "Robinson Observatory",
+      "basic_category": "science_attraction",
+      "our_chain_class": "independent",
+      "confidence": 0.64,
+      "label": "not_worth",
+      "note": "University observatory not open to the public"
+    },
+    {
+      "id": "c8069056-6248-434c-9e8d-2dc165434ca6",
+      "name": "Otto Pizza",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.65,
+      "label": "unknown",
+      "note": null
+    },
+    {
+      "id": "cac8b01d-0496-4eba-9f8e-0b670b154d1e",
+      "name": "Thee Dollhouse Orlando",
+      "basic_category": "dance_club",
+      "our_chain_class": "independent",
+      "confidence": 0.94,
+      "label": "not_worth",
+      "note": null
+    },
+    {
+      "id": "cb7f7afa-dce3-4a09-9e61-a89510b61b30",
+      "name": "Kyoto Sushi And Grill",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.77,
+      "label": "solid",
+      "note": null
+    },
+    {
+      "id": "ce89441c-e604-4771-a1e0-20d27de13343",
+      "name": "Fat-Boy's Bar-B-Q",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.59,
+      "label": "not_worth",
+      "note": "Permanently closed"
+    },
+    {
+      "id": "cfb77dc6-6d9f-45a0-a63e-26854d625847",
+      "name": "Bentos Burgers",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.3,
+      "label": "generic",
+      "note": null
+    },
+    {
+      "id": "d37273f8-c985-4a20-a8ff-fa4495493f29",
+      "name": "Psychic Soul Healer Kim",
+      "basic_category": "psychic_advising",
+      "our_chain_class": "independent",
+      "confidence": 0.83,
+      "label": "not_worth",
+      "note": null
+    },
+    {
+      "id": "d38bb091-c3b0-4273-a6ae-d9479689b93b",
+      "name": "UCF Dining Services",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.97,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "d4bd81d0-0ba6-4dd1-a7b0-06768d421e6b",
+      "name": "Dimsum King & Seafood",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.88,
+      "label": "solid",
+      "note": null
+    },
+    {
+      "id": "da732f8c-8141-44e3-a7b5-84fb8ebb4365",
+      "name": "La Maison Du Goût",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "solid",
+      "note": null
+    },
+    {
+      "id": "daa309d1-17d7-4cb6-9dad-3cee6819ae94",
+      "name": "Wingstop",
+      "basic_category": "restaurant",
+      "our_chain_class": "chain",
+      "confidence": 0.99,
+      "label": "chain",
+      "note": null
+    },
+    {
+      "id": "dc227805-b871-47a7-8e0d-dcacc2fbe5f3",
+      "name": "Southern Fried Sunday Annual Benefit",
+      "basic_category": "performing_arts_venue",
+      "our_chain_class": "independent",
+      "confidence": 0.68,
+      "label": "unknown",
+      "note": null
+    },
+    {
+      "id": "dc98d8c7-a1c9-4edb-a60f-51789488d8ae",
+      "name": "Red Brick Pizza",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "not_worth",
+      "note": null
+    },
+    {
+      "id": "de679adc-eea7-461f-b769-d764033e8869",
+      "name": "Orlando House Party",
+      "basic_category": "music_venue",
+      "our_chain_class": "independent",
+      "confidence": 0.32,
+      "label": "unknown",
+      "note": null
+    },
+    {
+      "id": "deb1cc54-40d4-4e29-bca3-da1def5d1990",
+      "name": "Charlie's Kitchen & Grill",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.96,
+      "label": "unknown",
+      "note": "Permanently closed"
+    },
+    {
+      "id": "e53e19d1-b627-42b9-945d-1c3353aed755",
+      "name": "Lobby Bar",
+      "basic_category": "bar",
+      "our_chain_class": "regional",
+      "confidence": 0.55,
+      "label": "unknown",
+      "note": null
+    },
+    {
+      "id": "e5db531e-3400-4ade-af93-a508b94d098f",
+      "name": "Cafe Bustelo",
+      "basic_category": "coffee_shop",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "not_worth",
+      "note": null
+    },
+    {
+      "id": "eb1ae510-d057-42be-bcd1-db9f1dc998d6",
+      "name": "Knowbeforeugo Discount Park Tickets, Hotels, Car Rentals,currency Exchange,i-ride Trolley",
+      "basic_category": "ticket_office_or_booth",
+      "our_chain_class": "independent",
+      "confidence": 1,
+      "label": "not_worth",
+      "note": "Tourist ticket scam"
+    },
+    {
+      "id": "eb309136-9e7c-41d1-953b-1663dc73f442",
+      "name": "La Cueva De Guanajuato",
+      "basic_category": "dance_club",
+      "our_chain_class": "independent",
+      "confidence": 0.65,
+      "label": "unknown",
+      "note": null
+    },
+    {
+      "id": "ef0a00b0-f297-4bf0-b750-107256e1923c",
+      "name": "Krazy Good Food",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "solid",
+      "note": null
+    },
+    {
+      "id": "efd6a182-5911-4672-a8e4-f006d862dd9c",
+      "name": "Småland",
+      "basic_category": "amusement_park",
+      "our_chain_class": "independent",
+      "confidence": 0.63,
+      "label": "unknown",
+      "note": null
+    },
+    {
+      "id": "f27a0ae3-7ac6-414f-a486-7153422123ee",
+      "name": "Trailer de Carne en Vara",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "solid",
+      "note": null
+    },
+    {
+      "id": "f2bf15a2-fe18-4fe6-8ecf-471e697b66e1",
+      "name": "Mennello Museum of American Art",
+      "basic_category": "museum",
+      "our_chain_class": "independent",
+      "confidence": 1,
+      "label": "generic",
+      "note": null
+    },
+    {
+      "id": "f3fb9a18-c553-47f8-8b76-80e496ff4076",
+      "name": "French Cafe",
+      "basic_category": "coffee_shop",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "unknown",
+      "note": null
+    },
+    {
+      "id": "f45ea18d-5561-4dc7-8563-f9cf626aeb3a",
+      "name": "CFS Coffee Dr. Phillips",
+      "basic_category": "coffee_shop",
+      "our_chain_class": "independent",
+      "confidence": 0.98,
+      "label": "solid",
+      "note": null
+    },
+    {
+      "id": "f4e7dd98-76b7-47f4-bcd2-5efc0c84c3de",
+      "name": "Florida Buffet",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.43,
+      "label": "unknown",
+      "note": null
+    },
+    {
+      "id": "f76c08f8-6c5e-4c7d-a67d-2252e093dfd5",
+      "name": "Wack A Doo's Grub Brew",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.65,
+      "label": "unknown",
+      "note": null
+    }
+  ],
+  "freeform": {
+    "missing": "Haan Coffee, Mamak, Hawkers, East End Market, Talay, Sixety Vines Sand Lake, Pho Bar Vietnamese Kitchen - Sand Lake, bartaco, Half Barrel Beer Project, DOMU, Jinya, Solorzano's Pizzeria, KURA, Agave Azul, Pio Pio Restaurant, Matcha Cafe Maiko, Dragonfly Robata Grill & Sushi, Arcade Time Entertainment, Arcade Monsters International Drive, Level99, Activate Orlando, Lake Eola Park, Leu gardens",
+    "traps": "Gatorland, WonderWorks",
+    "areas": "Mills, East End, Winter Park",
+    "auth": "",
+    "wrong": "",
+    "evsources": "",
+    "events": "",
+    "venues": "",
+    "evwould": ""
+  }
+}

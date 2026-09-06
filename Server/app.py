@@ -4,20 +4,16 @@ from adventour_backend.services.google_services_api import GoogleServicesAPI
 from adventour_backend.models import (
     db,
     User,
-    UserTagFeedback,
     PlaceRating,
-    Place,
-    PlaceProviderRef,
-    UserPlaceEvent,
-    PlaceFeature,
     AdventourSession,
     AdventourStop,
 )
 from adventour_backend.auth import require_auth, optional_auth
 from adventour_backend.social_routes import social_bp
-from adventour_backend.services.recommender_service import RecommendationService
 from adventour_backend.services.google_services_api import first_photo_url
 from adventour_backend.services.account_service import delete_user_account_data
+from adventour_backend.services import local_index_service
+from adventour_backend.services import place_event_service
 
 from dotenv import load_dotenv
 from urllib.parse import quote_plus
@@ -86,7 +82,6 @@ db.init_app(app)
 
 # Register blueprints
 app.register_blueprint(social_bp, url_prefix='/api')
-recommendation_service = RecommendationService()
 
 
 def ensure_local_schema():
@@ -193,31 +188,9 @@ def serialize_user(user):
         "profile_complete": bool(user.display_name and user.date_of_birth),
     }
 
-def resolve_place_reference(data):
-    adventour_place_id = data.get("place_id")
-    provider = data.get("provider")
-    provider_place_id = data.get("provider_place_id")
-
-    place = db.session.get(Place, adventour_place_id) if adventour_place_id else None
-    provider_ref = None
-    if provider and provider_place_id:
-        provider_ref = PlaceProviderRef.query.filter_by(
-            provider=provider,
-            provider_place_id=str(provider_place_id),
-        ).first()
-        if not place and provider_ref:
-            place = provider_ref.place
-
-    if not provider_ref and place:
-        provider_ref = PlaceProviderRef.query.filter_by(place_id=place.id).first()
-
-    return place, provider_ref
-
 def serialize_adventour_stop(stop):
     metadata = parse_json_object(stop.metadata_json)
     display = metadata.get("display") or {}
-    place = stop.place
-    provider_ref = stop.provider_ref
     duration_seconds = None
     if stop.arrived_at:
         end_time = stop.departed_at or datetime.utcnow()
@@ -226,9 +199,9 @@ def serialize_adventour_stop(stop):
     return {
         "id": stop.id,
         "session_id": stop.session_id,
-        "place_id": stop.place_id,
-        "provider": provider_ref.provider if provider_ref else metadata.get("provider"),
-        "provider_place_id": provider_ref.provider_place_id if provider_ref else metadata.get("provider_place_id"),
+        "place_id": stop.entity_id,
+        "provider": metadata.get("provider"),
+        "provider_place_id": metadata.get("provider_place_id"),
         "order_index": stop.order_index,
         "status": stop.status,
         "selected_at": isoformat_or_none(stop.selected_at),
@@ -239,7 +212,7 @@ def serialize_adventour_stop(stop):
         "rating": stop.rating,
         "notes": stop.notes,
         "display": {
-            "name": display.get("name") or (place.canonical_name if place else None),
+            "name": display.get("name"),
             "vicinity": display.get("vicinity"),
             "types": display.get("types") or [],
             "photo_url": display.get("photo_url"),
@@ -247,8 +220,11 @@ def serialize_adventour_stop(stop):
             "rating": display.get("rating"),
             "user_ratings_total": display.get("user_ratings_total"),
             "price_level": display.get("price_level"),
-            "latitude": display.get("latitude") or (place.latitude if place else None),
-            "longitude": display.get("longitude") or (place.longitude if place else None),
+            # Coordinates come from the snapshot taken when the card was shown.
+            # The index is rebuilt independently, so a stop must not depend on a
+            # record still existing to render its own history.
+            "latitude": display.get("latitude"),
+            "longitude": display.get("longitude"),
         },
     }
 
@@ -297,7 +273,6 @@ def onboarding():
         return jsonify({"error": "User authentication required"}), 401
 
     user.preferences = ",".join(tags)
-    recommendation_service.rebuild_preference_vector(user, commit=False)
     db.session.commit()
     return jsonify({"message": "Onboarding preferences saved"}), 200
 
@@ -433,60 +408,6 @@ def delete_current_user():
         "deleted": deleted,
     }), 200
 
-@app.route('/feedback', methods=['POST'])
-@optional_auth
-def save_feedback():
-    data = request.json
-    user_uuid = data.get('user_id')
-    
-    # Try to get authenticated user first
-    user = None
-    if hasattr(g, 'current_user'):
-        user = g.current_user
-    elif user_uuid:
-        # Fallback to old UUID-based system
-        user = User.query.filter_by(uuid=user_uuid).first()
-        if not user:
-            user = User(uuid=user_uuid)
-            db.session.add(user)
-            db.session.commit()
-    
-    if not user:
-        return jsonify({"error": "User authentication required"}), 401
-
-    feedback = UserTagFeedback(
-        user_id=user.id,
-        place_id=data['place_id'],
-        verdict=data['feedback'],  # 'accept' or 'reject'
-        place_tags=",".join(data['tags']),
-    )
-    db.session.add(feedback)
-
-    place = None
-    provider_ref = None
-    provider_place_id = data.get('provider_place_id') or data.get('place_id')
-    provider = data.get('provider', 'google')
-    if provider_place_id:
-        provider_ref = PlaceProviderRef.query.filter_by(
-            provider=provider,
-            provider_place_id=str(provider_place_id)
-        ).first()
-        place = provider_ref.place if provider_ref else None
-    if place:
-        recommendation_service.record_event(
-            user=user,
-            place=place,
-            provider_ref=provider_ref,
-            event_type=data['feedback'],
-            context=data.get('context', 'solo'),
-            metadata={"legacy_feedback": True, "tags": data.get('tags', [])},
-            commit=False,
-        )
-        recommendation_service.rebuild_preference_vector(user, commit=False)
-
-    db.session.commit()
-    return jsonify({"message": "Feedback saved successfully!"}), 201
-
 @app.route('/places/rate', methods=['POST'])
 @require_auth
 def rate_place():
@@ -525,23 +446,6 @@ def rate_place():
         )
         db.session.add(place_rating)
 
-    provider = data.get('provider', 'google')
-    provider_ref = PlaceProviderRef.query.filter_by(
-        provider=provider,
-        provider_place_id=str(place_id)
-    ).first()
-    if provider_ref:
-        recommendation_service.record_event(
-            user=user,
-            place=provider_ref.place,
-            provider_ref=provider_ref,
-            event_type="rate",
-            event_value=rating,
-            context=data.get('context', 'solo'),
-            metadata={"review_present": bool(review)},
-            commit=False,
-        )
-        recommendation_service.rebuild_preference_vector(user, commit=False)
     
     db.session.commit()
     return jsonify({"message": "Place rated successfully!"}), 201
@@ -559,36 +463,22 @@ def record_place_event():
     if not event_type:
         return jsonify({"error": "event_type is required"}), 400
 
-    place = None
-    provider_ref = None
-
-    if adventour_place_id:
-        place = Place.query.get(adventour_place_id)
-    if provider and provider_place_id:
-        provider_ref = PlaceProviderRef.query.filter_by(
-            provider=provider,
-            provider_place_id=str(provider_place_id)
-        ).first()
-        if not place and provider_ref:
-            place = provider_ref.place
-
-    if not place:
-        return jsonify({"error": "Unknown place. Request recommendations before recording events."}), 404
-
     try:
-        recommendation_service.record_event(
-            user=user,
-            place=place,
-            provider_ref=provider_ref,
+        stored = place_event_service.record(
+            db=db,
+            user_id=user.id,
+            place_id=adventour_place_id or provider_place_id,
             event_type=event_type,
             event_value=data.get("event_value"),
             context=data.get("context", "solo"),
-            metadata=data.get("metadata", {}),
         )
     except ValueError as exc:
         return jsonify({"error": str(exc)}), 400
+    except Exception:
+        logger.exception("Event recording failed")
+        return jsonify({"error": "Event recording failed"}), 500
 
-    return jsonify({"message": "Event recorded"}), 201
+    return jsonify({"message": "Event recorded", "event": stored}), 201
 
 @app.route('/api/adventours/active', methods=['GET'])
 @require_auth
@@ -632,9 +522,9 @@ def add_adventour_stop(session_id):
     if not session:
         return jsonify({"error": "Active Adventour not found"}), 404
 
-    place, provider_ref = resolve_place_reference(data)
-    if not place:
-        return jsonify({"error": "Unknown place. Request recommendations before adding a stop."}), 404
+    entity_id = data.get("place_id")
+    if not entity_id:
+        return jsonify({"error": "place_id is required"}), 400
 
     active_stop = (
         AdventourStop.query
@@ -661,22 +551,17 @@ def add_adventour_stop(session_id):
     }
     stop = AdventourStop(
         session_id=session.id,
-        place_id=place.id,
-        provider_ref_id=provider_ref.id if provider_ref else None,
+        entity_id=str(entity_id),
+        record_id=str(data.get("provider_place_id")) if data.get("provider_place_id") else None,
         order_index=order_index,
         status="navigating",
         navigation_started_at=datetime.utcnow(),
         metadata_json=json.dumps(metadata),
     )
     db.session.add(stop)
-    recommendation_service.record_event(
-        user=user,
-        place=place,
-        provider_ref=provider_ref,
-        event_type="navigate",
-        context="adventour",
-        metadata={"adventour_session_id": session.id, "display": display},
-        commit=False,
+    place_event_service.record(
+        db=db, user_id=user.id, place_id=entity_id,
+        event_type="navigate", context="adventour",
     )
     db.session.commit()
 
@@ -697,14 +582,9 @@ def arrive_adventour_stop(session_id, stop_id):
 
     stop.status = "arrived"
     stop.arrived_at = stop.arrived_at or datetime.utcnow()
-    recommendation_service.record_event(
-        user=user,
-        place=stop.place,
-        provider_ref=stop.provider_ref,
-        event_type="arrival",
-        context="adventour",
-        metadata={"adventour_session_id": session.id, "adventour_stop_id": stop.id},
-        commit=False,
+    place_event_service.record(
+        db=db, user_id=user.id, place_id=stop.entity_id,
+        event_type="arrival", context="adventour",
     )
     db.session.commit()
 
@@ -738,17 +618,10 @@ def complete_adventour_stop(session_id, stop_id):
         stop.notes = data.get("notes")
 
     if rating:
-        recommendation_service.record_event(
-            user=user,
-            place=stop.place,
-            provider_ref=stop.provider_ref,
-            event_type="rate",
-            event_value=rating,
-            context="adventour",
-            metadata={"adventour_session_id": session.id, "adventour_stop_id": stop.id},
-            commit=False,
+        place_event_service.record(
+            db=db, user_id=user.id, place_id=stop.entity_id,
+            event_type="rate", event_value=rating, context="adventour",
         )
-        recommendation_service.rebuild_preference_vector(user, commit=False)
     db.session.commit()
 
     return jsonify({"adventour": serialize_adventour_session(session), "stop": serialize_adventour_stop(stop)}), 200
@@ -803,48 +676,42 @@ def profile_history():
     if event_type not in ("accept", "reject"):
         return jsonify({"error": "event_type must be accept or reject"}), 400
 
-    events = (
-        UserPlaceEvent.query
-        .filter_by(user_id=user.id, event_type=event_type)
-        .order_by(UserPlaceEvent.occurred_at.desc())
-        .limit(limit)
-        .all()
-    )
+    rows = db.session.execute(text("""
+        SELECT e.id AS event_id, e.entity_id, e.event_type, e.occurred_at, e.score_snapshot,
+               p.name, p.basic_category, p.taxonomy_bucket,
+               COALESCE(p.canonical_lat, p.lat) AS lat, COALESCE(p.canonical_lon, p.lon) AS lon
+        FROM place_event e
+        LEFT JOIN places p ON p.id = e.record_id OR p.id = e.entity_id
+        WHERE e.user_id = :uid AND e.event_type = :etype
+        ORDER BY e.occurred_at DESC
+        LIMIT :lim
+    """), {"uid": user.id, "etype": event_type, "lim": limit}).mappings().all()
 
     places = []
-    for event in events:
-        place = db.session.get(Place, event.place_id)
-        if not place:
+    seen = set()
+    for r in rows:
+        if r["entity_id"] in seen:
             continue
-
-        provider_ref = None
-        if event.provider_ref_id:
-            provider_ref = db.session.get(PlaceProviderRef, event.provider_ref_id)
-        if not provider_ref:
-            provider_ref = PlaceProviderRef.query.filter_by(place_id=place.id).first()
-
-        feature = PlaceFeature.query.filter_by(place_id=place.id).first()
-        metadata = json.loads(event.metadata_json or "{}")
-        display = metadata.get("display") or {}
-        types = display.get("types") or list((feature and json.loads(feature.category_vector or "{}") or {}).keys())
+        seen.add(r["entity_id"])
         places.append({
-            "event_id": event.id,
-            "place_id": place.id,
-            "provider": provider_ref.provider if provider_ref else None,
-            "provider_place_id": provider_ref.provider_place_id if provider_ref else None,
-            "name": display.get("name") or place.canonical_name,
-            "vicinity": display.get("vicinity"),
-            "latitude": place.latitude,
-            "longitude": place.longitude,
-            "event_type": event.event_type,
-            "occurred_at": event.occurred_at.isoformat() if event.occurred_at else None,
-            "category": display.get("category") or (event.context if event.context in ("food", "activity") else None),
-            "types": types,
-            "rating": display.get("rating"),
-            "user_ratings_total": display.get("user_ratings_total"),
-            "price_level": display.get("price_level"),
-            "photo_url": display.get("photo_url"),
-            "photo_attributions": display.get("photo_attributions") or [],
+            "event_id": r["event_id"],
+            "place_id": r["entity_id"],
+            "provider": "adventour_index",
+            "provider_place_id": r["entity_id"],
+            "name": r["name"],
+            "vicinity": None,
+            "latitude": float(r["lat"]) if r["lat"] is not None else None,
+            "longitude": float(r["lon"]) if r["lon"] is not None else None,
+            "event_type": r["event_type"],
+            "occurred_at": r["occurred_at"].isoformat() if r["occurred_at"] else None,
+            "category": "food" if r["taxonomy_bucket"] == "food_and_drink" else "activity",
+            "types": local_index_service._types_for(r["basic_category"], r["taxonomy_bucket"]),
+            "rating": None,
+            "user_ratings_total": None,
+            "price_level": None,
+            "photo_url": None,
+            "photo_attributions": [],
+            "score": float(r["score_snapshot"]) if r["score_snapshot"] is not None else None,
         })
 
     return jsonify({
@@ -866,35 +733,36 @@ def place_details():
     provider_place_id = request.args.get("provider_place_id")
     adventour_place_id = request.args.get("place_id")
 
-    place = db.session.get(Place, adventour_place_id) if adventour_place_id else None
-    provider_ref = None
-    if provider and provider_place_id:
-        provider_ref = PlaceProviderRef.query.filter_by(
-            provider=provider,
-            provider_place_id=str(provider_place_id)
-        ).first()
-        if not place and provider_ref:
-            place = provider_ref.place
+    indexed = None
+    if adventour_place_id:
+        indexed = db.session.execute(text("""
+            SELECT COALESCE(canonical_id, id) AS entity_id, name, basic_category,
+                   taxonomy_bucket, authenticity, authenticity_why,
+                   COALESCE(canonical_lat, lat) AS lat, COALESCE(canonical_lon, lon) AS lon
+            FROM places WHERE id = :pid OR canonical_id = :pid LIMIT 1
+        """), {"pid": str(adventour_place_id)}).mappings().first()
 
     candidate = None
     if provider == "google" and provider_place_id:
         candidate = GoogleServicesAPI.fetch_place_details(provider_place_id)
 
-    feature = PlaceFeature.query.filter_by(place_id=place.id).first() if place else None
     display = place_display_payload(candidate) if candidate else {}
-    types = display.get("types") or list((feature and json.loads(feature.category_vector or "{}") or {}).keys())
+    types = display.get("types") or (
+        local_index_service._types_for(indexed["basic_category"], indexed["taxonomy_bucket"])
+        if indexed else []
+    )
 
-    if not place and not display:
+    if not indexed and not display:
         return jsonify({"error": "Unknown place"}), 404
 
     return jsonify({
-        "place_id": place.id if place else None,
-        "provider": provider_ref.provider if provider_ref else provider,
-        "provider_place_id": provider_ref.provider_place_id if provider_ref else provider_place_id,
-        "name": display.get("name") or (place.canonical_name if place else None),
+        "place_id": indexed["entity_id"] if indexed else None,
+        "provider": provider or "adventour_index",
+        "provider_place_id": provider_place_id,
+        "name": display.get("name") or (indexed["name"] if indexed else None),
         "vicinity": display.get("vicinity"),
-        "latitude": place.latitude if place else None,
-        "longitude": place.longitude if place else None,
+        "latitude": float(indexed["lat"]) if indexed and indexed["lat"] is not None else None,
+        "longitude": float(indexed["lon"]) if indexed and indexed["lon"] is not None else None,
         "types": types,
         "rating": display.get("rating"),
         "user_ratings_total": display.get("user_ratings_total"),
@@ -938,13 +806,13 @@ def create_recommendations():
             longitude,
             data.get("constraints", {}),
         )
-        result = recommendation_service.recommend(
-            user=user,
+        # Candidate retrieval runs against our own index. No paid API call ever
+        # populates a deck -- see docs/sourcing-cost-decision-brief.md.
+        result = local_index_service.recommend(
+            db=db,
             location={"latitude": float(latitude), "longitude": float(longitude)},
             radius_meters=int(data.get("radius_meters", 3200)),
-            member_ids=data.get("member_ids", []),
             constraints=data.get("constraints", {}),
-            mode=data.get("mode", "spontaneous"),
         )
     except ValueError as exc:
         return jsonify({"error": str(exc)}), 400
@@ -953,42 +821,6 @@ def create_recommendations():
         return jsonify({"error": "Recommendation request failed", "detail": str(exc)}), 500
 
     return jsonify(result), 200
-
-@app.route('/api/dev/seed-place', methods=['POST'])
-def seed_dev_place():
-    """Create a local development place near a coordinate for recommender smoke tests."""
-    if os.getenv("ADVENTOUR_DEV_AUTH") != "true":
-        return jsonify({"error": "Dev tools are disabled"}), 403
-
-    data = request.json or {}
-    name = data.get("name") or "Adventour Local Test Cafe"
-    latitude = float(data.get("latitude", 37.421998333333335))
-    longitude = float(data.get("longitude", -122.084))
-
-    place = Place.query.filter_by(normalized_name=name.lower()).first()
-    if not place:
-        place = Place(
-            canonical_name=name,
-            normalized_name=name.lower(),
-            latitude=latitude,
-            longitude=longitude,
-            source_confidence=1.0,
-        )
-        db.session.add(place)
-    else:
-        place.latitude = latitude
-        place.longitude = longitude
-
-    db.session.commit()
-
-    return jsonify({
-        "place": {
-            "id": place.id,
-            "name": place.canonical_name,
-            "latitude": place.latitude,
-            "longitude": place.longitude,
-        }
-    }), 201
 
 @app.route('/places/<place_id>/ratings', methods=['GET'])
 def get_place_ratings(place_id):
@@ -1070,161 +902,6 @@ def places_autocomplete():
         radius_meters,
     )
     return jsonify({"predictions": predictions})
-
-@app.route('/fetch-places', methods=['POST'])
-def fetch_places():
-    """
-    Fetch places from Google Places API based on tags and location.
-    Only return places with business_status 'OPERATIONAL'.
-    """
-    data = request.json
-    tags = data.get("tags", [])
-    location = data.get("location")
-
-    if not tags or not location:
-        return jsonify({"error": "Tags and location are required"}), 400
-
-    try:
-        # Fetch places using GoogleServicesAPI
-        all_places = GoogleServicesAPI.fetch_places(tags, location)
-
-        # Filter places with 'business_status' as 'OPERATIONAL'
-        operational_places = [
-            place for place in all_places
-            if place.get('business_status') == 'OPERATIONAL'
-        ]
-
-        return jsonify(operational_places)
-    except Exception as e:
-        return jsonify({"error": f"Error fetching places: {str(e)}"}), 500
-
-@app.route('/recommendations', methods=['GET'])
-@optional_auth
-def get_recommendations():
-    # Try to get authenticated user first
-    user = None
-    if hasattr(g, 'current_user'):
-        user = g.current_user
-    else:
-        # Fallback to old user_id parameter
-        user_id = request.args.get('user_id')
-        if user_id:
-            user = User.query.filter_by(uuid=user_id).first()
-    
-    address = request.args.get('address')
-    latitude = request.args.get('latitude')
-    longitude = request.args.get('longitude')
-
-    if not user:
-        return jsonify({"error": "User authentication required"}), 401
-
-    # Resolve coordinates
-    if latitude and longitude:
-        try:
-            lat, lng = float(latitude), float(longitude)
-            coordinates = {"latitude": lat, "longitude": lng}
-        except ValueError:
-            return jsonify({"error": "Invalid latitude or longitude format"}), 400
-    elif address:
-        try:
-            coordinates = GoogleServicesAPI.fetch_city_coordinates(address)
-            if not coordinates:
-                return jsonify({"error": "Unable to resolve address to coordinates"}), 404
-        except Exception as e:
-            return jsonify({"error": f"Error resolving address: {str(e)}"}), 500
-    else:
-        return jsonify({"error": "Either coordinates or address must be provided"}), 400
-
-    feedback_entries = UserTagFeedback.query.filter_by(user_id=user.id).all()
-
-    tag_scores = {}
-    rejected_place_ids = set()
-
-    if feedback_entries:
-        for fb in feedback_entries:
-            tags = fb.place_tags.split(',')
-            weight = 3 if fb.verdict == 'accept' else -1
-            for i, tag in enumerate(tags[:3]):
-                tag_scores[tag] = tag_scores.get(tag, 0) + (3 - i) * weight
-            if fb.verdict == 'reject':
-                rejected_place_ids.add(fb.place_id)
-
-        max_score = max(tag_scores.values(), default=1)
-        tag_scores = {tag: score / max_score for tag, score in tag_scores.items()}
-    else:
-        # Fallback to onboarding preferences
-        if user.preferences:
-            tags = user.preferences.split(',')
-            tag_scores = {tag: 1.0 for tag in tags}
-        else:
-            return jsonify({"error": "No feedback or preferences available"}), 404
-
-    # Fetch and score places
-    try:
-        places = GoogleServicesAPI.fetch_places(list(tag_scores.keys()), coordinates)
-    except Exception as e:
-        return jsonify({"error": f"Error fetching places: {str(e)}"}), 500
-
-    scored_places = []
-    for place in places:
-        place_id = place.get('place_id')
-        if place_id in rejected_place_ids:
-            continue
-
-        types = place.get('types', [])
-        raw_score = sum(tag_scores.get(tag, 0) for tag in types)
-        max_possible = len(types) * max(tag_scores.values(), default=1)
-        relevance = raw_score / max_possible if max_possible else 0
-
-        # Authenticity & sentiment boosts
-        boost = 1.0
-        if is_hidden_gem(place):
-            boost = 2.0  # Highest boost for hidden gems
-        else:
-            # Sentiment analysis on reviews (if available)
-            sentiment = 0
-            if 'reviews' in place:
-                sentiment = review_sentiment_score(place['reviews'])
-            if sentiment > 0.1:  # threshold for positive sentiment
-                boost = 1.5  # Slightly lower than hidden gem
-
-        # Down-rank if chain
-        if is_chain(place.get('name', '')):
-            boost *= 0.5
-
-        final_score = relevance * boost
-
-        # --- Composite likelihood score ---
-        likelihood = relevance
-        if is_hidden_gem(place):
-            likelihood += 0.4
-        likelihood += 0.3 * (sentiment if 'sentiment' in locals() else 0)
-        if is_chain(place.get('name', '')):
-            likelihood -= 0.3
-        likelihood = max(0, min(likelihood, 1))
-
-        # --- Fun label --- (not in use yet)
-        if likelihood >= 0.9:
-            fun_label = "Perfect for you! 😍"
-        elif likelihood >= 0.7:
-            fun_label = "Great match! 👍"
-        elif likelihood >= 0.5:
-            fun_label = "Worth a try! 🤔"
-        else:
-            fun_label = "Maybe not your vibe 😐"
-
-        if final_score > 0:
-            scored_places.append({
-                "place": place,
-                "relevance": round(final_score, 2),
-                "hidden_gem": is_hidden_gem(place),
-                "sentiment_score": sentiment if 'sentiment' in locals() else 0,
-                "likelihood": round(likelihood, 2)
-            })
-
-    scored_places.sort(key=lambda x: x["relevance"], reverse=True)
-    return jsonify(scored_places)
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", "8080")))

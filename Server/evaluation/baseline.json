@@ -1,0 +1,206 @@
+{
+  "generated_at": "2026-08-20T03:39:28.546867+00:00",
+  "metros": {
+    "palm_coast": {
+      "labelled": 131,
+      "judged": 131,
+      "missing_from_index": 0,
+      "junk_filter": {
+        "sample_is_keep_only": false,
+        "recall": 0.8571428571428571,
+        "recall_n": 49,
+        "precision": 0.9629629629629629,
+        "false_positives": 0,
+        "false_positive_names": [],
+        "residual_bad_rate": 0.2077922077922078,
+        "residual_bad_n": 16,
+        "served_n": 77,
+        "residual_bad_rate_incl_unknown": 0.2077922077922078,
+        "served_incl_unknown_n": 77
+      },
+      "chain": {
+        "human_chain_n": 12,
+        "matched": 10,
+        "agreement": 0.8333333333333334,
+        "flagged_but_liked": 0,
+        "flagged_but_liked_names": []
+      },
+      "signals": {
+        "authenticity_score": {
+          "auc": 0.953548644338118,
+          "n_pos": 33,
+          "n_neg": 76,
+          "ci": [
+            0.9020903409448301,
+            1.0
+          ]
+        },
+        "overture_confidence": {
+          "auc": 0.7771132376395534,
+          "n_pos": 33,
+          "n_neg": 76,
+          "ci": [
+            0.6745754633338694,
+            0.8796510119452374
+          ]
+        },
+        "has_website": {
+          "auc": 0.63018341307815,
+          "n_pos": 33,
+          "n_neg": 76,
+          "ci": [
+            0.5127495828516929,
+            0.747617243304607
+          ]
+        },
+        "has_socials": {
+          "auc": 0.632177033492823,
+          "n_pos": 33,
+          "n_neg": 76,
+          "ci": [
+            0.5148414396215432,
+            0.7495126273641027
+          ]
+        },
+        "cell_density_inverted": {
+          "auc": 0.26814194577352474,
+          "n_pos": 33,
+          "n_neg": 76,
+          "ci": [
+            0.17257894189453787,
+            0.3637049496525116
+          ]
+        }
+      },
+      "coverage": {
+        "named": 14,
+        "names": [
+          "Swillerbees Craft Donuts & Coffee in Palm Coast",
+          "Swillerbees Craft Donuts & Coffee in Flagler Beach",
+          "Captains BBQ",
+          "european village restaurants",
+          "a1a burrito works",
+          "oceanside",
+          "Golden Lion",
+          "Hooligans Palm Coast",
+          "Funky Pelican",
+          "Next Door Bistro",
+          "Tortugas Florida Kitchen & Bar",
+          "Break Awayz",
+          "Whaam Burger",
+          "Cantina Louie (Palm Coast)"
+        ]
+      },
+      "in_sample": {
+        "junk_filter": true,
+        "authenticity": true
+      }
+    },
+    "orlando": {
+      "labelled": 137,
+      "judged": 107,
+      "missing_from_index": 0,
+      "junk_filter": {
+        "sample_is_keep_only": false,
+        "recall": 0.125,
+        "recall_n": 24,
+        "precision": 0.8571428571428571,
+        "false_positives": 0,
+        "false_positive_names": [],
+        "residual_bad_rate": 0.41,
+        "residual_bad_n": 41,
+        "served_n": 100,
+        "residual_bad_rate_incl_unknown": 0.3153846153846154,
+        "served_incl_unknown_n": 130
+      },
+      "chain": {
+        "human_chain_n": 11,
+        "matched": 10,
+        "agreement": 0.9090909090909091,
+        "flagged_but_liked": 1,
+        "flagged_but_liked_names": [
+          "Universal Studios"
+        ]
+      },
+      "signals": {
+        "authenticity_score": {
+          "auc": 0.637719298245614,
+          "n_pos": 19,
+          "n_neg": 60,
+          "ci": [
+            0.4880805100021025,
+            0.7873580864891255
+          ]
+        },
+        "overture_confidence": {
+          "auc": 0.6368421052631579,
+          "n_pos": 19,
+          "n_neg": 60,
+          "ci": [
+            0.48715346315920105,
+            0.7865307473671147
+          ]
+        },
+        "has_website": {
+          "auc": 0.5890350877192982,
+          "n_pos": 19,
+          "n_neg": 60,
+          "ci": [
+            0.43759784829368625,
+            0.7404723271449103
+          ]
+        },
+        "has_socials": {
+          "auc": 0.5684210526315789,
+          "n_pos": 19,
+          "n_neg": 60,
+          "ci": [
+            0.4167992351825436,
+            0.7200428700806143
+          ]
+        },
+        "cell_density_inverted": {
+          "auc": 0.3846491228070175,
+          "n_pos": 19,
+          "n_neg": 60,
+          "ci": [
+            0.24558183660438065,
+            0.5237164090096544
+          ]
+        }
+      },
+      "coverage": {
+        "named": 23,
+        "names": [
+          "Haan Coffee",
+          "Mamak",
+          "Hawkers",
+          "East End Market",
+          "Talay",
+          "Sixety Vines Sand Lake",
+          "Pho Bar Vietnamese Kitchen - Sand Lake",
+          "bartaco",
+          "Half Barrel Beer Project",
+          "DOMU",
+          "Jinya",
+          "Solorzano's Pizzeria",
+          "KURA",
+          "Agave Azul",
+          "Pio Pio Restaurant",
+          "Matcha Cafe Maiko",
+          "Dragonfly Robata Grill & Sushi",
+          "Arcade Time Entertainment",
+          "Arcade Monsters International Drive",
+          "Level99",
+          "Activate Orlando",
+          "Lake Eola Park",
+          "Leu gardens"
+        ]
+      },
+      "in_sample": {
+        "junk_filter": false,
+        "authenticity": false
+      }
+    }
+  }
+}

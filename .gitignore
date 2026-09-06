@@ -54,3 +54,8 @@ firebase-service-account*.json
 
 # Local/deployment-only App Engine manifest. Keep secrets out of git.
 /Server/app.yaml
+
+# QA debris and generated artifacts
+AdventourApp/qa_*.png
+Server/data_pipeline/qa/*.html
+Server/**/__pycache__/

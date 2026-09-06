@@ -1,0 +1,1201 @@
+{
+  "generated_at": "2026-08-18T01:34:31.792Z",
+  "metro": "palm_coast",
+  "labels": [
+    {
+      "id": "0055a47f-e3bd-4b58-a023-d54006f019f0",
+      "name": "Three Finger Charlies",
+      "basic_category": "bar",
+      "our_chain_class": "independent",
+      "confidence": 0.55,
+      "label": "not_worth",
+      "note": null
+    },
+    {
+      "id": "068d0ae9-0f61-4de6-84de-dc1183b3b239",
+      "name": "Pierogi Shop",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.98,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "0e13f607-5e81-4835-99b3-9a4fb300c21c",
+      "name": "Flagler Outdoor Rink",
+      "basic_category": "skating_rink",
+      "our_chain_class": "independent",
+      "confidence": 0.82,
+      "label": "not_worth",
+      "note": "Just an outdoor rink. not even a park. i wouldnt recommend places like this to anyone."
+    },
+    {
+      "id": "1062077c-f290-4a29-a9af-7b501c67b459",
+      "name": "Sevyn Inc.",
+      "basic_category": "music_venue",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "not_worth",
+      "note": "Also its closed for good."
+    },
+    {
+      "id": "134e9a0d-36c0-47f7-97c1-35865105eece",
+      "name": "Duffy's Delight Llc",
+      "basic_category": "fast_food_restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.65,
+      "label": "not_worth",
+      "note": "I might have recommended it but its closed for good."
+    },
+    {
+      "id": "1830a882-01c0-412d-b263-48f58e87dfd4",
+      "name": "The Fog Room Vapor Co.",
+      "basic_category": "lounge",
+      "our_chain_class": "independent",
+      "confidence": 0.98,
+      "label": "not_worth",
+      "note": null
+    },
+    {
+      "id": "19661e7a-fa0a-4914-82ee-51262561eed7",
+      "name": "Destined For Greatness Ministries Inc.",
+      "basic_category": "religious_organization",
+      "our_chain_class": "independent",
+      "confidence": 0.64,
+      "label": "junk",
+      "note": "Religious company, not real destination"
+    },
+    {
+      "id": "1a26045f-b63d-4304-9c02-63f4956ace87",
+      "name": "Gourmet Deli",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "independent",
+      "confidence": 0.95,
+      "label": "not_worth",
+      "note": "Grocery Store, wouldnt recommend it"
+    },
+    {
+      "id": "1d072b44-7627-46a3-b295-88f40e1a6287",
+      "name": "Woodhaven Condominium Association",
+      "basic_category": "historic_site",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "junk",
+      "note": "Condo office"
+    },
+    {
+      "id": "1d9978e2-7ef5-48ed-9ab6-89b71af85b61",
+      "name": "SUBWAY",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "chain",
+      "confidence": 0.77,
+      "label": "chain",
+      "note": null
+    },
+    {
+      "id": "207c9f07-2128-4c63-bae0-69e92bad2e56",
+      "name": "Cypress Knoll Golf & Country Club",
+      "basic_category": "golf_course",
+      "our_chain_class": "independent",
+      "confidence": 0.97,
+      "label": "generic",
+      "note": "If someone had interest in golf I would, otherwise its forgettable and not a true destination"
+    },
+    {
+      "id": "20a09c44-a0c9-4aec-a121-fafe824ba2be",
+      "name": "CLC Blast Kids",
+      "basic_category": "religious_organization",
+      "our_chain_class": "independent",
+      "confidence": 0.81,
+      "label": "junk",
+      "note": "Daycare, not a true destination"
+    },
+    {
+      "id": "20c68d25-af36-4875-b0fe-cf6a16460f3b",
+      "name": "Waterside At Palm Coast Condominiums",
+      "basic_category": "historic_site",
+      "our_chain_class": "regional",
+      "confidence": 0.91,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "237d3540-6a6d-49b1-b26b-a9f56a07130e",
+      "name": "Cole And Oliver Co",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.95,
+      "label": "junk",
+      "note": "Doesnt exist"
+    },
+    {
+      "id": "26141464-ad16-470e-9ad1-249198572782",
+      "name": "Red Koi",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.94,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "26512b29-08e2-49d1-aa06-55f69cb2e89d",
+      "name": "Frosti Ice Cream",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "independent",
+      "confidence": 0.31,
+      "label": "solid",
+      "note": null
+    },
+    {
+      "id": "297a6c9d-9b9b-4284-8bc2-264cc37d2fa3",
+      "name": "AATWings",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.69,
+      "label": "not_worth",
+      "note": "Doesn't seem to exist anymore. Also no real location, it looks like a out of home restaurant. "
+    },
+    {
+      "id": "2d8850ad-5fc5-487d-8983-a9c76b695f16",
+      "name": "Aliki Oceanfront Townhomes",
+      "basic_category": "historic_site",
+      "our_chain_class": "independent",
+      "confidence": 0.77,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "2fd3ef37-1ce6-4214-a471-4352d59da615",
+      "name": "Schnitzel-Time",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.94,
+      "label": "solid",
+      "note": "Seems permanently closed however."
+    },
+    {
+      "id": "33b46e0b-ee7b-4690-947c-979b35099673",
+      "name": "Joe's NY Pizza and Pasta",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.97,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "35c03000-a88b-4a28-9c47-49cf1f892d27",
+      "name": "Hammock Dunes",
+      "basic_category": "golf_course",
+      "our_chain_class": "independent",
+      "confidence": 0.77,
+      "label": "not_worth",
+      "note": "Again, if the user liked golf id consider sending them here. otherwise, its not a real destination of choice to most people"
+    },
+    {
+      "id": "3625ccbd-970d-43f2-afa8-29f9e7c406ad",
+      "name": "Spartan Academy Palm Coast | Brazilian Jiu Jitsu & more",
+      "basic_category": "sport_or_recreation_club",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "junk",
+      "note": "Karate gym, not a destination people would want to visit"
+    },
+    {
+      "id": "36e7b228-55e5-4b79-92fd-55f6d5d74018",
+      "name": "Disabled American Veterans",
+      "basic_category": "bar",
+      "our_chain_class": "chain",
+      "confidence": 0.41,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "38fe0313-39d9-49a6-9f98-1b7cfe8bcf7a",
+      "name": "Pine Lakes Golf Club",
+      "basic_category": "golf_course",
+      "our_chain_class": "independent",
+      "confidence": 0.96,
+      "label": "not_worth",
+      "note": "Again, golf"
+    },
+    {
+      "id": "39b13659-44b5-4321-87fb-cb4b903c0daa",
+      "name": "Gambia Wood Apartments",
+      "basic_category": "historic_site",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "3db49cb1-3e29-4fb0-9005-a8ed1a8a7c22",
+      "name": "Houligan's",
+      "basic_category": "bar",
+      "our_chain_class": "regional",
+      "confidence": 0.99,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "4713e4e1-fbb5-4318-bc35-eabe49ea5453",
+      "name": "Kingdom To America Ministries",
+      "basic_category": "religious_organization",
+      "our_chain_class": "independent",
+      "confidence": 0.65,
+      "label": "junk",
+      "note": "Another religious business, not real destination"
+    },
+    {
+      "id": "4aa0792b-7a41-4995-85f3-f77a1f06e391",
+      "name": "Taco Bell",
+      "basic_category": "fast_food_restaurant",
+      "our_chain_class": "chain",
+      "confidence": 0.96,
+      "label": "chain",
+      "note": null
+    },
+    {
+      "id": "4cd1724e-2c34-4e70-aa76-35684b927a3c",
+      "name": "Collettis Italian Deli",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "52963f25-a532-48c5-a465-96ba7adbafa5",
+      "name": "Fancy Sushi",
+      "basic_category": "restaurant",
+      "our_chain_class": "regional",
+      "confidence": 0.97,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "5311ec92-369b-42e0-8f8f-5983ed08c376",
+      "name": "Jersey Mike's Subs",
+      "basic_category": "fast_food_restaurant",
+      "our_chain_class": "chain",
+      "confidence": 0.77,
+      "label": "chain",
+      "note": null
+    },
+    {
+      "id": "5595a0fe-a335-459f-a4b8-2d46f5a547ff",
+      "name": "Conservatory Golf Course at Hammock Beach Resort",
+      "basic_category": "golf_course",
+      "our_chain_class": "independent",
+      "confidence": 0.98,
+      "label": "not_worth",
+      "note": "Again, another golf course"
+    },
+    {
+      "id": "55f54bb9-8749-4b7e-8653-28817cf9e94e",
+      "name": "McDonald's",
+      "basic_category": "fast_food_restaurant",
+      "our_chain_class": "chain",
+      "confidence": 0.97,
+      "label": "chain",
+      "note": null
+    },
+    {
+      "id": "56f15f3a-8f2d-4764-abfd-a3b2fe61a2df",
+      "name": "Moes Southwest Grill",
+      "basic_category": "restaurant",
+      "our_chain_class": "chain",
+      "confidence": 1,
+      "label": "chain",
+      "note": null
+    },
+    {
+      "id": "579934e1-faca-4393-8f87-695bf31e8e2b",
+      "name": "Debra Jean's",
+      "basic_category": "cafe",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "5bb0a5a5-d826-42b8-92e6-f54708d61312",
+      "name": "Oceanside at Beverly Beach Condominiums",
+      "basic_category": "historic_site",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "5ca2b528-3e64-4f10-8ef0-fac4702df4ff",
+      "name": "R&amp M Restaurant Co Llc",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.95,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "5cb91e10-dfca-4910-8621-7d43be1f6e09",
+      "name": "Anthony's East Coast Pizza",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.75,
+      "label": "solid",
+      "note": null
+    },
+    {
+      "id": "603056bd-de39-4963-b284-c58dd09e1825",
+      "name": "Woody's Bar-b-que",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.62,
+      "label": "chain",
+      "note": "Admittedly a very limited chain in FL, id recommend it if someone in the area wanted BBQ"
+    },
+    {
+      "id": "6061ac16-ab3a-453f-a812-90acc27cf852",
+      "name": "Michoacana Bacana",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.95,
+      "label": "junk",
+      "note": "Permanently closed. Didnt look good"
+    },
+    {
+      "id": "609f2b4a-43f9-4c7b-b033-e3695ce0532e",
+      "name": "Copper Lotus Cafe and Bistro",
+      "basic_category": "cafe",
+      "our_chain_class": "independent",
+      "confidence": 0.97,
+      "label": "solid",
+      "note": null
+    },
+    {
+      "id": "638a7b1d-e2e9-48c3-84ed-2ef40e63e501",
+      "name": "P Section",
+      "basic_category": "historic_site",
+      "our_chain_class": "independent",
+      "confidence": 0.48,
+      "label": "junk",
+      "note": "Not a \"destination\" but instead a neighborhood. Just a collection of streets that start with the letter P. Palm Coast is sectioned into street names starting with a letter"
+    },
+    {
+      "id": "64a2fb00-28ee-4984-af4e-298719af1bf8",
+      "name": "Hidden Treasure Raw Bar & Grill",
+      "basic_category": "bar",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "generic",
+      "note": "Would have recommended it, permanently closed though."
+    },
+    {
+      "id": "67e72520-274c-4208-8097-56830875318c",
+      "name": "Tijuana Flats",
+      "basic_category": "restaurant",
+      "our_chain_class": "chain",
+      "confidence": 0.99,
+      "label": "chain",
+      "note": null
+    },
+    {
+      "id": "693cf25e-40a0-4a0e-a810-38b66c60bf50",
+      "name": "Stoner's Pizza Joint Palm Coast",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "6a49a8b3-3a4a-42f4-afc8-0ec2129c5b27",
+      "name": "Hammock Trail",
+      "basic_category": "recreational_trail_or_path",
+      "our_chain_class": "independent",
+      "confidence": 0.51,
+      "label": "solid",
+      "note": null
+    },
+    {
+      "id": "6dc0f5fb-0b8f-44b2-87a1-33fcde331717",
+      "name": "Nautilus Condominium",
+      "basic_category": "historic_site",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "70499826-0959-4573-aa82-3125d8afac35",
+      "name": "Epic Theatres of Palm Coast",
+      "basic_category": "movie_theater",
+      "our_chain_class": "independent",
+      "confidence": 1,
+      "label": "chain",
+      "note": "Only movie theater in palm coast though. if theater is recommended i feel a movie and showtimes should show at least"
+    },
+    {
+      "id": "731e9175-04b8-4858-908e-b0105fa349ef",
+      "name": "Washington Oaks State Park",
+      "basic_category": "park",
+      "our_chain_class": "regional",
+      "confidence": 0.58,
+      "label": "solid",
+      "note": null
+    },
+    {
+      "id": "78cc6879-1ce3-4d21-8305-f76b1037e0e2",
+      "name": "Richie's Taqueria",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "solid",
+      "note": null
+    },
+    {
+      "id": "7b40e4eb-255d-4dbc-a821-590001f1ea97",
+      "name": "Finn's Beachside Pub",
+      "basic_category": "bar",
+      "our_chain_class": "independent",
+      "confidence": 0.98,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "7c24c6f1-cb30-4e4d-84d1-09c1cb45f4ee",
+      "name": "Whaam Burger",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "7cb54c8b-b30f-42e0-96da-6fdca548cf30",
+      "name": "Beach Belly Bob's Sandwich Shop",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.96,
+      "label": "not_worth",
+      "note": "Would have recommended it but its permanently closed"
+    },
+    {
+      "id": "7de66031-5d53-4528-8a7e-8b0d7b338817",
+      "name": "Perfect Pizza Pie, Inc",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.95,
+      "label": "generic",
+      "note": null
+    },
+    {
+      "id": "80cea05d-e34a-4032-9ef3-539ca7bb6d60",
+      "name": "Toasties_redefined",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.62,
+      "label": "generic",
+      "note": "Good but only open 1 day a week. VERY local business"
+    },
+    {
+      "id": "8a2eb827-5cea-4dba-99f3-70928cb543c0",
+      "name": "Reserve at Brookhaven Apartments",
+      "basic_category": "historic_site",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "8b0f1ee8-dbf0-4788-a8c2-e5235573501b",
+      "name": "Cantina Mr. Pancho Mexican Grill",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "not_worth",
+      "note": "Permanently closed, would have recommended it"
+    },
+    {
+      "id": "8e9e353f-d2d2-48a9-afea-36134a737787",
+      "name": "Old Salt Park",
+      "basic_category": "park",
+      "our_chain_class": "independent",
+      "confidence": 0.91,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "8f4712a6-18b9-4268-ab95-c502136008f4",
+      "name": "Subway",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "chain",
+      "confidence": 0.96,
+      "label": "chain",
+      "note": null
+    },
+    {
+      "id": "8ff4176e-5880-424d-ba95-41bd4f54b68a",
+      "name": "Pak's \"Karate\"",
+      "basic_category": "sport_or_recreation_club",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "9313824b-edc1-4700-8ca8-b2068b6db8e8",
+      "name": "Madison Green Apartments",
+      "basic_category": "historic_site",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "946e2281-aa8e-4183-ad15-9536adc4d5f4",
+      "name": "Delfinos Italian Chophouse",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "9472002a-7950-40c0-94ee-0019c0f11ff0",
+      "name": "Wowza Wall Art",
+      "basic_category": "art_gallery",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "generic",
+      "note": null
+    },
+    {
+      "id": "967d0db5-ad1d-43cb-b8b7-2cf7d179446b",
+      "name": "Joanne B King Park",
+      "basic_category": "park",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "generic",
+      "note": null
+    },
+    {
+      "id": "96a5ba6f-f6d0-4242-9855-d22932356ffb",
+      "name": "Romero's Tuscany By The Sea",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "980fc77f-236f-41dd-a6e7-1d7c0bc31c99",
+      "name": "Akl Restaurant Group Llc",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.95,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "9ace63f8-9f4b-4af1-9684-8e19e8531018",
+      "name": "Amedeo Ministries Inc.",
+      "basic_category": "religious_organization",
+      "our_chain_class": "independent",
+      "confidence": 0.6,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "9c5bd361-dfd4-4950-9d2e-1672a86ca126",
+      "name": "Tuscan Reserve Apartments",
+      "basic_category": "historic_site",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "9cab108c-1133-4ba1-89b4-b678fdc1ec7f",
+      "name": "Temple Beth Shalom-palm Coast",
+      "basic_category": "jewish_place_of_worship",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "9d6a804a-9ed0-4c37-8013-6698047169b5",
+      "name": "Samis Pizza",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "not_worth",
+      "note": "permanently closed or I'd recommend"
+    },
+    {
+      "id": "9dd1f9f4-7eb8-4baf-ae18-a70e0a91628f",
+      "name": "Loopers Par & Grille",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "9e149237-eea4-4229-8aae-21c9602e1a08",
+      "name": "Bronx House Pizza - Hammock Beach",
+      "basic_category": "restaurant",
+      "our_chain_class": "regional",
+      "confidence": 0.99,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "9ecd3366-571c-4317-9cf5-57ce8d9a0f85",
+      "name": "So Good Mochi",
+      "basic_category": "food_truck_stand",
+      "our_chain_class": "independent",
+      "confidence": 0.11,
+      "label": "not_worth",
+      "note": "Good and local but mobile food vendor, not a stationary place."
+    },
+    {
+      "id": "a0d0c982-3ff7-4fde-9c60-3e710b6b473d",
+      "name": "Pointe Grand Palm Coast",
+      "basic_category": "historic_site",
+      "our_chain_class": "independent",
+      "confidence": 0.97,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "a2cb1882-559a-49a2-9419-a8313430535d",
+      "name": "Country Club Harbor Hoa Inc",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.64,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "a2e1a92e-40dc-4876-95ce-35cb1015c25e",
+      "name": "Flagler Surf Lessons Inc",
+      "basic_category": "recreational_equipment_rental",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "a44c0188-1698-44e3-a3a4-db8b9834112c",
+      "name": "Tidelands Condominium Association",
+      "basic_category": "historic_site",
+      "our_chain_class": "independent",
+      "confidence": 0.43,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "a49852de-8d82-495a-9a56-1e2cdedee7ca",
+      "name": "Kool Beenz Coffee and Smoothies",
+      "basic_category": "coffee_shop",
+      "our_chain_class": "independent",
+      "confidence": 0.96,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "a5f9581b-e475-4155-9dac-fc996183d776",
+      "name": "Hmj Foods, Inc",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.95,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "a6cb6011-6085-433b-9766-46aa647a0bee",
+      "name": "Goshin Ryu Karate",
+      "basic_category": "sport_or_recreation_club",
+      "our_chain_class": "independent",
+      "confidence": 0.53,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "a79a6c68-b366-44b2-b607-8f23fb305388",
+      "name": "Palma Bella Condominium",
+      "basic_category": "historic_site",
+      "our_chain_class": "independent",
+      "confidence": 0.74,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "a9e61964-7e5c-4aac-8037-438344bebc31",
+      "name": "Dex N Angie House of Flavor",
+      "basic_category": "restaurant",
+      "our_chain_class": "regional",
+      "confidence": 0.85,
+      "label": "not_worth",
+      "note": "Mobile catering. not destination"
+    },
+    {
+      "id": "ad925e57-c2d7-499e-93d4-6efb44d891c4",
+      "name": "The Baliker Gallery",
+      "basic_category": "art_gallery",
+      "our_chain_class": "independent",
+      "confidence": 0.98,
+      "label": "solid",
+      "note": null
+    },
+    {
+      "id": "b08304e7-8f6f-46cd-81bf-cfbe27cca77c",
+      "name": "Flager County Rough Riders, Inc.",
+      "basic_category": "amusement_park",
+      "our_chain_class": "independent",
+      "confidence": 0.87,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "b161ff06-2e09-4573-8405-1e24db490d00",
+      "name": "Vessel Sandwich Co.",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "independent",
+      "confidence": 0.98,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "b1d41de7-f2d7-4269-ad8a-9d58077ec13e",
+      "name": "Subway",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "chain",
+      "confidence": 0.99,
+      "label": "chain",
+      "note": null
+    },
+    {
+      "id": "b30580e5-9408-436a-8a3d-357b61800dde",
+      "name": "Rustic Dough Works",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "independent",
+      "confidence": 0.14,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "b7960101-a620-40fb-88ce-37368c6f7f22",
+      "name": "Waterside Park",
+      "basic_category": "park",
+      "our_chain_class": "independent",
+      "confidence": 0.55,
+      "label": "solid",
+      "note": null
+    },
+    {
+      "id": "bc8f9bcd-c13d-4a63-a6ac-d4dd3dc67729",
+      "name": "China King",
+      "basic_category": "restaurant",
+      "our_chain_class": "chain",
+      "confidence": 0.98,
+      "label": "generic",
+      "note": null
+    },
+    {
+      "id": "c0b13076-28f2-443f-8b2a-15d60674d076",
+      "name": "Ship Shape Water Fitness Specialists LLC",
+      "basic_category": null,
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "c0ec0127-5154-42a5-bf11-e2c9b402f9f6",
+      "name": "DREAM BIG with Katia.",
+      "basic_category": "art_gallery",
+      "our_chain_class": "independent",
+      "confidence": 0.13,
+      "label": "not_worth",
+      "note": "Art classes studio for kids. Need reservation and very demographic dependent "
+    },
+    {
+      "id": "c21386f9-958f-40ae-922d-72f597f38273",
+      "name": "Oceanside Beach Bar & Grill",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "c3ad8be1-cb36-46b3-8fec-a2a33875b5e7",
+      "name": "Rise at the Island",
+      "basic_category": "restaurant",
+      "our_chain_class": "regional",
+      "confidence": 0.95,
+      "label": "not_worth",
+      "note": "Would have recommended it, permanently closed or I'd recommend"
+    },
+    {
+      "id": "c6f39c44-f09e-43b0-aca5-500c95b6dc6b",
+      "name": "Florida Agricultural Legacy Learning Center, Inc.",
+      "basic_category": "museum",
+      "our_chain_class": "independent",
+      "confidence": 0.95,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "c73fe185-fe47-462b-a29a-f24b0fa2ff29",
+      "name": "James A Merrill Jr Llc",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.95,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "c825ec2c-43dd-4fd5-84d3-5f65d36cd6ee",
+      "name": "Marineland Dolphin Adventure",
+      "basic_category": "amusement_park",
+      "our_chain_class": "independent",
+      "confidence": 0.8,
+      "label": "gem",
+      "note": "Might need tickets though. should mention or link them"
+    },
+    {
+      "id": "c8465998-9475-4681-8948-c9509bcd0bad",
+      "name": "The NET by George , seafood",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.98,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "c88fab15-cc87-49a7-824a-ce73117d13c8",
+      "name": "The Brown Dog",
+      "basic_category": "bar",
+      "our_chain_class": "independent",
+      "confidence": 0.98,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "c94c3ee9-989c-43f6-801c-2d6c2e2876e6",
+      "name": "FBCPC VBS",
+      "basic_category": "religious_organization",
+      "our_chain_class": "independent",
+      "confidence": 0.31,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "c9c8d307-0c94-4b26-a1df-871e372bc476",
+      "name": "Dixie Highway",
+      "basic_category": "historic_site",
+      "our_chain_class": "independent",
+      "confidence": 0.75,
+      "label": "junk",
+      "note": "Just a road. "
+    },
+    {
+      "id": "caa3e372-a9e2-4d5b-bbcb-f15b5d430c39",
+      "name": "Surf Club Condominium",
+      "basic_category": "historic_site",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "cb469b1f-615e-4dfd-baca-8cbde4cf7d66",
+      "name": "Palm Harbor Golf Club",
+      "basic_category": "golf_course",
+      "our_chain_class": "independent",
+      "confidence": 0.93,
+      "label": "not_worth",
+      "note": "Another golf club"
+    },
+    {
+      "id": "cb5a9d09-c22f-4ded-a92a-24ebda1355b6",
+      "name": "Ger-Rain’s Tiki Shack",
+      "basic_category": "bar",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "junk",
+      "note": "Couldn't find it anywhere"
+    },
+    {
+      "id": "d24e60b3-588e-41f6-9e07-e3567c22251d",
+      "name": "Flagler Beach Historical Museum",
+      "basic_category": "museum",
+      "our_chain_class": "independent",
+      "confidence": 0.96,
+      "label": "generic",
+      "note": null
+    },
+    {
+      "id": "d25c2a55-2e74-461e-9d19-ff467021d693",
+      "name": "Bella Vista Apartments",
+      "basic_category": "historic_site",
+      "our_chain_class": "regional",
+      "confidence": 0.92,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "d7cfd5a7-a7f7-4737-99bd-df63d762be5c",
+      "name": "Turtle Shack Cafe",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.63,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "d942c9bf-b448-4d6d-8342-6d3d45eb2d4d",
+      "name": "Ocean Hammock Golf Club",
+      "basic_category": null,
+      "our_chain_class": "independent",
+      "confidence": 0.93,
+      "label": "not_worth",
+      "note": "Another golf club"
+    },
+    {
+      "id": "da760d5a-2d7f-4ee1-bdd9-c65de1784c3b",
+      "name": "Johnny D's Beach Bar and Grill",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.97,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "da8fd09d-9727-4783-8cfd-57b0b3caea8b",
+      "name": "Burger Bros Pc",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "dd264f20-1308-49b5-850c-f0d7e3b2ea32",
+      "name": "Sonny's BBQ",
+      "basic_category": "restaurant",
+      "our_chain_class": "chain",
+      "confidence": 0.99,
+      "label": "chain",
+      "note": null
+    },
+    {
+      "id": "de9b176c-5e19-48ea-b43e-cded8606c97e",
+      "name": "Aliki Gold Coast Condos",
+      "basic_category": "historic_site",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "e2f09dec-96d1-449c-b9e3-9e205d893f81",
+      "name": "Conservatory Golf Course",
+      "basic_category": null,
+      "our_chain_class": "independent",
+      "confidence": 0.86,
+      "label": null,
+      "note": "another golf course"
+    },
+    {
+      "id": "e43b93a6-3378-4c2f-ac80-5ab1036c362e",
+      "name": "Flagler Bar",
+      "basic_category": "bar",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "gem",
+      "note": "Assuming this is Flagler Tavern"
+    },
+    {
+      "id": "e5017e2a-b202-476b-a1da-c2114ee0ab34",
+      "name": "Swillerbees Craft Donuts & Coffee",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "independent",
+      "confidence": 0.98,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "e953cce5-f953-4f3a-80b8-e92f3532de9c",
+      "name": "The Wandering Hoagie",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.75,
+      "label": "junk",
+      "note": "Permanently closed"
+    },
+    {
+      "id": "e9be4a22-cf9e-455c-9c2f-35b72c22bcd7",
+      "name": "Great Wall",
+      "basic_category": "restaurant",
+      "our_chain_class": "regional",
+      "confidence": 0.98,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "e9c9c8cd-0d7a-467a-88ec-3a385800f992",
+      "name": "Graham Swamp West Trailhead Parking Lot",
+      "basic_category": "recreational_trail_or_path",
+      "our_chain_class": "independent",
+      "confidence": 0.97,
+      "label": "solid",
+      "note": "Would not recommended the parking lot specifically but the trial is nice. "
+    },
+    {
+      "id": "e9d608f3-fbcc-476a-9bc1-cf6717eb87a7",
+      "name": "Ethan Networks Inc",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.95,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "ea187990-a4c1-464f-8ffe-0066e8b4d804",
+      "name": "Ocean View Condominium",
+      "basic_category": "historic_site",
+      "our_chain_class": "independent",
+      "confidence": 0.97,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "ea99ba74-9788-4b77-b0a9-bdb1891d5afc",
+      "name": "Sushi 99",
+      "basic_category": "restaurant",
+      "our_chain_class": "regional",
+      "confidence": 0.98,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "eb3578e5-efd0-4680-91fc-916a31d261a7",
+      "name": "Cambria Condominium",
+      "basic_category": "historic_site",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "ed4fb44f-49ee-4ecf-b7c4-c0ba8566086b",
+      "name": "Texas Roadhouse",
+      "basic_category": "restaurant",
+      "our_chain_class": "chain",
+      "confidence": 0.99,
+      "label": "chain",
+      "note": null
+    },
+    {
+      "id": "ee63d2b4-5d5f-4b77-8612-8439c108fe14",
+      "name": "Flagler-Palm Coast High School Baseball Field",
+      "basic_category": "sport_field",
+      "our_chain_class": "independent",
+      "confidence": 0.97,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "f2f60105-d1ea-40ac-9a09-03c855977c2f",
+      "name": "Yomii Frozen Yogurt",
+      "basic_category": "casual_eatery",
+      "our_chain_class": "independent",
+      "confidence": 0.92,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "f67fe1b2-bfa5-42b4-882c-aa9eecb86c92",
+      "name": "Salsas Mexican Restaurant",
+      "basic_category": "restaurant",
+      "our_chain_class": "regional",
+      "confidence": 0.98,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "f7f62b67-7865-4dbb-8f05-94dbce547a84",
+      "name": "Los Dos Potrillos Mexican Restaurant",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.95,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "f883645f-07b0-4e3a-ad17-a686072e284f",
+      "name": "A1A Burrito Works Taco Shop",
+      "basic_category": "restaurant",
+      "our_chain_class": "regional",
+      "confidence": 0.99,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "f9fa7cd9-66db-44e4-b567-89dd4a615aa6",
+      "name": "Waterfront Park",
+      "basic_category": "park",
+      "our_chain_class": "regional",
+      "confidence": 0.97,
+      "label": "gem",
+      "note": null
+    },
+    {
+      "id": "fb73df73-2b91-49a5-afa5-01674c96f5ef",
+      "name": "P & L Stables, Inc.",
+      "basic_category": null,
+      "our_chain_class": "independent",
+      "confidence": 0.91,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "fbdfdb4e-f7f2-4d47-9370-ab904cff015d",
+      "name": "Dex N Angie House Of Flavor",
+      "basic_category": "restaurant",
+      "our_chain_class": "regional",
+      "confidence": 0.55,
+      "label": "junk",
+      "note": "Mobile catering, dont recommend"
+    },
+    {
+      "id": "fbe4a06b-7bec-40bb-8855-92d5b8804a07",
+      "name": "Pine Lake Apartments",
+      "basic_category": "historic_site",
+      "our_chain_class": "independent",
+      "confidence": 0.99,
+      "label": "junk",
+      "note": null
+    },
+    {
+      "id": "ff19f774-a8d4-45dc-aeeb-b2d4a8b25ecc",
+      "name": "Bartolome Colom",
+      "basic_category": "restaurant",
+      "our_chain_class": "independent",
+      "confidence": 0.65,
+      "label": "junk",
+      "note": null
+    }
+  ],
+  "freeform": {
+    "missing": "Swillerbees Craft Donuts & Coffee in Palm Coast, Swillerbees Craft Donuts & Coffee in Flagler Beach, Captains BBQ, european village restaurants, a1a burrito works, oceanside, Golden Lion, Hooligans Palm Coast, Funky Pelican, Next Door Bistro, Tortugas Florida Kitchen & Bar, Break Awayz, Whaam Burger, Cantina Louie (Palm Coast)",
+    "areas": "European Village, Swillerbees Craft Donuts & Coffee in Flagler Beach, Golden Lion, Hooligans Palm  Coast, Next Door Bistro",
+    "wrong": "Recommended streets and neighborhoods and historical sites, many businesses were listed as permanently closed, there are may golf courses in palm coast so i cant fault you too hard for showing them all but not sure if they count as destinations per say.",
+    "auth": "A place with good food or fun activities that are frequented by tourists and loved by locals. Just because it is popular doesn't mean it can't be authentic but at the same time a popular tourist trap doesn't necessitate then branding of authentic. Being a \"must-do\" can sometimes be categorized as authentic to that region or city. ",
+    "traps": ""
+  }
+}
