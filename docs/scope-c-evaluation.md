@@ -64,11 +64,17 @@ not waive failures or overwrite the immutable historical baseline. No v2 baselin
 has been accepted yet. Compare eligibility changes and review their examples
 before accepting one; never reset it to hide a regression.
 
-Current [verification report](verification/2026-09-05/evaluation-v2.json): strict
+Current [verification report](verification/2026-09-05/evaluation-core.json): strict
 exits **1**, no held-out metro and no comparable v2 baseline. Canonical serving
 sample: Orlando bad **40/88** judged (118 including unknown); Palm Coast **15/65**.
 These are development observations, not a ranking improvement. Earlier historical
 AUC figures are not directly comparable after changing population/representative.
+
+The core checkpoint aligns representative choice with serving (eligible active
+member ordered by cluster size, score and ID), including provider/global-report
+suppression. Original-record tiers remain the filter diagnostic. The development
+results are unchanged from the preceding tooling report. This is a consistency
+repair, not a measured ranking improvement.
 
 Eight focused tests cover the exposed evaluator and importer failure modes. The
 next independent evidence requires fresh human labels, with the

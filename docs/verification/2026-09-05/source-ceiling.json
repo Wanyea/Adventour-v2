@@ -1,0 +1,50 @@
+{
+  "checked_files": 48,
+  "exemptions": [
+    "generated dependency lockfiles",
+    "third-party node_modules and vendor"
+  ],
+  "largest": [
+    [
+      1015,
+      "AdventourApp\\Screens\\ProfileScreen.tsx"
+    ],
+    [
+      771,
+      "AdventourApp\\HomeScreen.tsx"
+    ],
+    [
+      715,
+      "AdventourApp\\Screens\\SocialScreen.tsx"
+    ],
+    [
+      636,
+      "AdventourApp\\src\\components\\RecommendationDeck.tsx"
+    ],
+    [
+      531,
+      "AdventourApp\\src\\components\\AdventourJourneyPanel.tsx"
+    ],
+    [
+      432,
+      "AdventourApp\\Screens\\FirebaseAuthScreen.tsx"
+    ],
+    [
+      383,
+      "AdventourApp\\src\\components\\AdventourLaunchHero.tsx"
+    ],
+    [
+      380,
+      "AdventourApp\\Screens\\ProfileSetupScreen.tsx"
+    ],
+    [
+      372,
+      "AdventourApp\\src\\services\\AuthService.ts"
+    ],
+    [
+      313,
+      "AdventourApp\\Screens\\OnboardingScreen.tsx"
+    ]
+  ],
+  "violations": []
+}

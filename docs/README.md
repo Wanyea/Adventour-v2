@@ -11,7 +11,7 @@ It is not the same as the current Phase 1. The complete approved direction is in
 
 | Phase | Work | Status |
 |---|---|---|
-| 1 | Trustworthy core, evaluation, field kit and safe metro ingestion | Active: first tooling checkpoint; core repairs next |
+| 1 | Trustworthy core, evaluation, field kit and safe metro ingestion | Core/tooling implemented; emulator review and owner acceptance checkpoint |
 | 2 | Discovery quality, hours/closure experiments and local events | Planned; not open |
 | 3 | Friends, Beacon, taking Adventours and group recommendations | Planned; not open |
 | 4 | Full-trip planning and ticket/reservation links | Planned; not open |
@@ -36,7 +36,7 @@ source discovery; they do not expand the seed metros.
 - The repaired harness reports serving eligibility separately from all-tier
   diagnostics, preserves original sampling provenance, and fails strict when
   independent validation is absent. The current
-  [report](verification/2026-09-05/evaluation-v2.json) exits 1. Do not interpret
+  [report](verification/2026-09-05/evaluation-core.json) exits 1. Do not interpret
   changed metric populations as improved recommendation quality.
 - The field kit has stable manifests, independent quality/closure/access/booking
   answers and a validated multi-metro importer. Focused contracts pass; rendered
@@ -45,10 +45,20 @@ source discovery; they do not expand the seed metros.
 - Transactional metro ingestion ran in an isolated database; the emulator showed
   a [St. Augustine deck](verification/2026-09-05/st-augustine-deck.png). An isolated
   test checks refresh/identity/history preservation and rollback. The owner-run
-  acceptance check remains. Provider-boundary enforcement, exact served-decision
-  logging and the full core lifecycle remain Phase 1 work. No application screen
-  has changed in this first slice. The source limit is 1,200 lines per authored
-  app file; generated lockfiles and third-party dependencies are exempt.
+  acceptance check remains.
+- The core emulator walkthrough completed dev login, age gate, onboarding, typed
+  launch, swipe, directions, arrival, rating/review and saved history. The exact
+  serving decision is preserved in events; synthetic activity is marked as test
+  data. [Screen/evidence checklist](verification/2026-09-05/phase1-core.md).
+- Candidate suppression, canonical H3 geometry, filtering before the batch limit,
+  owned-only stop writes and high-intent Google quotas are implemented. Google
+  content caches and paid candidate/geocoding paths were removed. The app displays
+  a structural index score and its breakdown, not “Match 98%.” See the
+  [core contract](core-contract.md) for behavior and verification limits.
+- The source limit is 1,200 lines per authored app file; generated lockfiles and
+  third-party dependencies are exempt. Home is 771 lines after cohesive extraction;
+  Profile is the largest at 1,015. Thirteen focused backend checks and TypeScript
+  compilation pass. No new screen, navigation entry, palette or dependency.
 
 Ranking is not declared solved. The failed approaches in HANDOFF describe specific
 experiments; they do not rule out semantic, cross-source or venue-owned evidence.

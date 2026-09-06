@@ -44,6 +44,19 @@ in `adventour_ingest_check_20260905`. The emulator displayed Gaufre's & Goods,
 [screen](verification/2026-09-05/st-augustine-deck.png). This proves ingestion to
 display, not quality. The working Orlando/Palm Coast index was not reingested.
 
-Next: align serving with canonical geometry and suppression, exact decision
-snapshots, provider boundary and core lifecycle. Offline HTML rendered review and
-an unaided human return remain outstanding; the browser tool blocked file URLs.
+Core checkpoint: serving now uses canonical H3 geometry and suppression; events
+reference immutable owned decisions; provider access is uncached, accepted-only
+and quota-limited. The emulator completed onboarding, typed launch, swipe,
+directions, arrival, review, completion and saved history under a separate dev
+identity. The original owner's profile/history was preserved. See the
+[review packet](verification/2026-09-05/phase1-core.md) and
+[core contract](core-contract.md). Home is 771 lines; Profile 1,015 is the largest
+authored app source. Thirteen focused backend checks and TypeScript pass.
+
+Phase 1 remains open for review/acceptance. Offline HTML rendered review and an
+unaided human return remain outstanding; the browser tool blocked file URLs.
+The owner-run metro workflow, live Firebase login, and live Google verification
+are not claimed demonstrated. Strict correctly fails for missing held-out labels
+and an accepted v2 comparison baseline. No ranking improvement or Phase 2 work is
+claimed. The next slice is closing these explicit acceptance gaps, not expanding
+features or starting the next phase.

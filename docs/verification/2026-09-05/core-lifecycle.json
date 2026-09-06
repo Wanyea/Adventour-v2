@@ -1,0 +1,305 @@
+{
+  "profile": {
+    "places": [
+      {
+        "category": "food",
+        "decision_id": "00a83aa2-c5e6-4f69-a4c9-f8233d17b01f",
+        "event_id": 14,
+        "event_type": "accept",
+        "explanation": "Structural index score from source confidence, social-link presence and nearby indexed places. It is not a probability of liking this place.",
+        "latitude": 29.555891036987305,
+        "longitude": -81.21524047851562,
+        "name": "La Pizza Nostra",
+        "occurred_at": "2026-09-05T23:24:11.861530-04:00",
+        "own_rating": 4,
+        "own_review": "Emulator test review. Not a real visit.",
+        "photo_attributions": [],
+        "photo_url": null,
+        "place_id": "f7827854-907b-461a-a77a-30670702ebfc",
+        "price_level": null,
+        "provider": "adventour_index",
+        "provider_place_id": "f7827854-907b-461a-a77a-30670702ebfc",
+        "rating": null,
+        "score": 0.977,
+        "score_components": {
+          "chain_multiplier": 1.0,
+          "confidence": 0.6438731402158737,
+          "density": 0.183176592271205,
+          "socials": 0.15
+        },
+        "types": [
+          "restaurant"
+        ],
+        "user_ratings_total": null,
+        "vicinity": null
+      }
+    ],
+    "user": {
+      "date_of_birth": "1995-01-01",
+      "display_name": "phase1screen",
+      "id": 3,
+      "preferences": [
+        "coffee_sweets",
+        "outdoors"
+      ],
+      "profile_picture": null,
+      "username": "phase1screen"
+    }
+  },
+  "sessions": {
+    "adventours": [
+      {
+        "active_stop": null,
+        "companion_user_ids": [],
+        "ended_at": "2026-09-06T03:26:58.155730Z",
+        "id": 2,
+        "started_at": "2026-09-06T03:23:28.397882Z",
+        "status": "completed",
+        "stops": [
+          {
+            "arrived_at": "2026-09-06T03:25:53.032177Z",
+            "decision_id": "00a83aa2-c5e6-4f69-a4c9-f8233d17b01f",
+            "departed_at": "2026-09-06T03:26:33.552094Z",
+            "display": {
+              "latitude": 29.555891036987305,
+              "longitude": -81.21524047851562,
+              "name": "La Pizza Nostra",
+              "photo_attributions": [],
+              "photo_url": null,
+              "price_level": null,
+              "rating": null,
+              "types": [
+                "restaurant"
+              ],
+              "user_ratings_total": null,
+              "vicinity": "772 m away"
+            },
+            "duration_seconds": 40,
+            "id": 3,
+            "navigation_started_at": "2026-09-06T03:24:11.868720Z",
+            "notes": "Emulator test review. Not a real visit.",
+            "order_index": 0,
+            "place_id": "f7827854-907b-461a-a77a-30670702ebfc",
+            "provider": "adventour_index",
+            "provider_place_id": "f7827854-907b-461a-a77a-30670702ebfc",
+            "rating": 4,
+            "selected_at": "2026-09-06T03:24:11.871224Z",
+            "session_id": 2,
+            "status": "completed"
+          }
+        ],
+        "summary": {
+          "duration_seconds": 209,
+          "rated_stop_count": 1,
+          "stop_count": 1
+        },
+        "title": "Palm Coast, FL Adventour"
+      }
+    ]
+  },
+  "events": [
+    {
+      "event_type": "impression",
+      "entity_id": "7567ac68-2a18-424c-85f9-d7998d9c12e3",
+      "decision_id": "53387d46-99ad-4480-96e5-79e22e868495",
+      "score_snapshot": 0.9823,
+      "components_snapshot": {
+        "density": 0.183176592271205,
+        "socials": 0.15,
+        "confidence": 0.6491309561133385,
+        "chain_multiplier": 1.0
+      },
+      "test_activity": true,
+      "occurred_at": "2026-09-05 23:23:38.368889-04:00"
+    },
+    {
+      "event_type": "reject",
+      "entity_id": "7567ac68-2a18-424c-85f9-d7998d9c12e3",
+      "decision_id": "53387d46-99ad-4480-96e5-79e22e868495",
+      "score_snapshot": 0.9823,
+      "components_snapshot": {
+        "density": 0.183176592271205,
+        "socials": 0.15,
+        "confidence": 0.6491309561133385,
+        "chain_multiplier": 1.0
+      },
+      "test_activity": true,
+      "occurred_at": "2026-09-05 23:23:53.011755-04:00"
+    },
+    {
+      "event_type": "impression",
+      "entity_id": "f7827854-907b-461a-a77a-30670702ebfc",
+      "decision_id": "00a83aa2-c5e6-4f69-a4c9-f8233d17b01f",
+      "score_snapshot": 0.977,
+      "components_snapshot": {
+        "density": 0.183176592271205,
+        "socials": 0.15,
+        "confidence": 0.6438731402158737,
+        "chain_multiplier": 1.0
+      },
+      "test_activity": true,
+      "occurred_at": "2026-09-05 23:23:53.832298-04:00"
+    },
+    {
+      "event_type": "accept",
+      "entity_id": "f7827854-907b-461a-a77a-30670702ebfc",
+      "decision_id": "00a83aa2-c5e6-4f69-a4c9-f8233d17b01f",
+      "score_snapshot": 0.977,
+      "components_snapshot": {
+        "density": 0.183176592271205,
+        "socials": 0.15,
+        "confidence": 0.6438731402158737,
+        "chain_multiplier": 1.0
+      },
+      "test_activity": true,
+      "occurred_at": "2026-09-05 23:24:11.861530-04:00"
+    },
+    {
+      "event_type": "save",
+      "entity_id": "f7827854-907b-461a-a77a-30670702ebfc",
+      "decision_id": "00a83aa2-c5e6-4f69-a4c9-f8233d17b01f",
+      "score_snapshot": 0.977,
+      "components_snapshot": {
+        "density": 0.183176592271205,
+        "socials": 0.15,
+        "confidence": 0.6438731402158737,
+        "chain_multiplier": 1.0
+      },
+      "test_activity": true,
+      "occurred_at": "2026-09-05 23:24:11.861530-04:00"
+    },
+    {
+      "event_type": "navigate",
+      "entity_id": "f7827854-907b-461a-a77a-30670702ebfc",
+      "decision_id": "00a83aa2-c5e6-4f69-a4c9-f8233d17b01f",
+      "score_snapshot": 0.977,
+      "components_snapshot": {
+        "density": 0.183176592271205,
+        "socials": 0.15,
+        "confidence": 0.6438731402158737,
+        "chain_multiplier": 1.0
+      },
+      "test_activity": true,
+      "occurred_at": "2026-09-05 23:24:12.145629-04:00"
+    },
+    {
+      "event_type": "impression",
+      "entity_id": "c7c71090-3a8f-4a4e-8763-659743f55d11",
+      "decision_id": "50706884-6d85-41c3-a0dd-3a0ea2ba7d4b",
+      "score_snapshot": 0.9768,
+      "components_snapshot": {
+        "density": 0.183176592271205,
+        "socials": 0.15,
+        "confidence": 0.6436425417661668,
+        "chain_multiplier": 1.0
+      },
+      "test_activity": true,
+      "occurred_at": "2026-09-05 23:25:35.456023-04:00"
+    },
+    {
+      "event_type": "arrival",
+      "entity_id": "f7827854-907b-461a-a77a-30670702ebfc",
+      "decision_id": "00a83aa2-c5e6-4f69-a4c9-f8233d17b01f",
+      "score_snapshot": 0.977,
+      "components_snapshot": {
+        "density": 0.183176592271205,
+        "socials": 0.15,
+        "confidence": 0.6438731402158737,
+        "chain_multiplier": 1.0
+      },
+      "test_activity": true,
+      "occurred_at": "2026-09-05 23:25:53.028368-04:00"
+    },
+    {
+      "event_type": "rate",
+      "entity_id": "f7827854-907b-461a-a77a-30670702ebfc",
+      "decision_id": "00a83aa2-c5e6-4f69-a4c9-f8233d17b01f",
+      "score_snapshot": 0.977,
+      "components_snapshot": {
+        "density": 0.183176592271205,
+        "socials": 0.15,
+        "confidence": 0.6438731402158737,
+        "chain_multiplier": 1.0
+      },
+      "test_activity": true,
+      "occurred_at": "2026-09-05 23:26:33.550480-04:00"
+    },
+    {
+      "event_type": "share",
+      "entity_id": "f7827854-907b-461a-a77a-30670702ebfc",
+      "decision_id": "00a83aa2-c5e6-4f69-a4c9-f8233d17b01f",
+      "score_snapshot": 0.977,
+      "components_snapshot": {
+        "density": 0.183176592271205,
+        "socials": 0.15,
+        "confidence": 0.6438731402158737,
+        "chain_multiplier": 1.0
+      },
+      "test_activity": true,
+      "occurred_at": "2026-09-05 23:29:27.014251-04:00"
+    },
+    {
+      "event_type": "impression",
+      "entity_id": "7567ac68-2a18-424c-85f9-d7998d9c12e3",
+      "decision_id": "32b2bdfa-7801-408a-89d7-959eb2abd452",
+      "score_snapshot": 0.9823,
+      "components_snapshot": {
+        "density": 0.183176592271205,
+        "socials": 0.15,
+        "confidence": 0.6491309561133385,
+        "chain_multiplier": 1.0
+      },
+      "test_activity": true,
+      "occurred_at": "2026-09-05 23:31:06.519412-04:00"
+    },
+    {
+      "event_type": "impression",
+      "entity_id": "91a1924f-6f4f-47c8-8602-7ab8d9f30bfc",
+      "decision_id": "a018ed64-fe21-489e-9013-ec7737a683dc",
+      "score_snapshot": 0.968,
+      "components_snapshot": {
+        "density": 0.183176592271205,
+        "socials": 0.15,
+        "confidence": 0.6348388493061066,
+        "chain_multiplier": 1.0
+      },
+      "test_activity": true,
+      "occurred_at": "2026-09-05 23:31:58.002475-04:00"
+    },
+    {
+      "event_type": "closed_report",
+      "entity_id": "91a1924f-6f4f-47c8-8602-7ab8d9f30bfc",
+      "decision_id": "a018ed64-fe21-489e-9013-ec7737a683dc",
+      "score_snapshot": 0.968,
+      "components_snapshot": {
+        "density": 0.183176592271205,
+        "socials": 0.15,
+        "confidence": 0.6348388493061066,
+        "chain_multiplier": 1.0
+      },
+      "test_activity": true,
+      "occurred_at": "2026-09-05 23:33:09.995993-04:00"
+    },
+    {
+      "event_type": "impression",
+      "entity_id": "1fe0e1e6-c18c-49b0-9378-5c9adf5a6e10",
+      "decision_id": "e686bd42-093a-4202-b5c4-7f2322cca6b1",
+      "score_snapshot": 0.9459,
+      "components_snapshot": {
+        "density": 0.16396732757769542,
+        "socials": 0.15,
+        "confidence": 0.6319405227899552,
+        "chain_multiplier": 1.0
+      },
+      "test_activity": true,
+      "occurred_at": "2026-09-05 23:33:10.847562-04:00"
+    }
+  ],
+  "report_isolation": {
+    "test_user_coffee_cards": 8,
+    "other_test_user_coffee_cards": 9,
+    "reported_entity": "91a1924f-6f4f-47c8-8602-7ab8d9f30bfc",
+    "verified": true
+  },
+  "note": "Synthetic emulator activity; not independent human quality or closure evidence."
+}
