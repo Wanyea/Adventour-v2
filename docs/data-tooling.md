@@ -93,6 +93,9 @@ postcodes. It never drops `places` or deletes source records. Absent records bec
 inactive and remain addressable for history; absence is not proof of closure.
 Existing canonical identities are retained. Ambiguous proposed merges spanning
 two existing entities stay separate for explicit review.
+The former standalone `apply_junk_filter.py`, `score_authenticity.py`, `run_dedup.py`
+and `add_postcode.py` scripts were removed: their global partial writes bypassed
+this transaction. The pure filter/scorer/dedup algorithms remain in use.
 
 Copy `data_pipeline/st_augustine_example.json`, change the metro name and bounding
 box, and choose a broader reference bounding box containing the metro. That area
