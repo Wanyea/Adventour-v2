@@ -1,9 +1,10 @@
-﻿# Adventour v2 — current state
+# Adventour v2 — current state
 
-Updated 2026-09-05. Read [HANDOFF.md](../HANDOFF.md) for the closed 23-feature
+Updated 2026-09-06. Read [HANDOFF.md](../HANDOFF.md) for the closed 23-feature
 product and stopping point, then [AGENTS.md](../AGENTS.md) for the working agreement.
 
-**Phase 1 is approved and in progress on `codex-astra`.** The earlier data-foundation
+**Phase 2 is approved and in progress on `codex-astra`.** The owner authorized
+a joint Phase 1/2 review afterward; Phase 1 acceptance gaps remain open. The earlier data-foundation
 scope is complete; its evidence is preserved in [scope-a-evidence.md](scope-a-evidence.md).
 It is not the same as the current Phase 1. The complete approved direction is in
 [takeover-plan.md](takeover-plan.md), with the current slice in
@@ -12,7 +13,7 @@ It is not the same as the current Phase 1. The complete approved direction is in
 | Phase | Work | Status |
 |---|---|---|
 | 1 | Trustworthy core, evaluation, field kit and safe metro ingestion | Core/tooling implemented; emulator review and owner acceptance checkpoint |
-| 2 | Discovery quality, hours/closure experiments and local events | Planned; not open |
+| 2 | Discovery quality, hours/closure experiments and local events | Active; personal ranking first |
 | 3 | Friends, Beacon, taking Adventours and group recommendations | Planned; not open |
 | 4 | Full-trip planning and ticket/reservation links | Planned; not open |
 | 5 | Travel map, achievements and all-23-feature acceptance | Planned; not open |

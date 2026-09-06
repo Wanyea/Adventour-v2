@@ -1,11 +1,11 @@
-# Adventour completion plan — Phase 1 approved and active
+# Adventour completion plan — Phase 2 approved and active
 
 Prepared 2026-09-05 after reading HANDOFF.md completely, AGENTS.md, the references in
 HANDOFF §7, and both label files including their written answers. HANDOFF §5 is the
 closed feature list; §6 is the stopping point. This replaces the inherited scope
 sequence for the work authorized by the owner. Phase 1 was explicitly approved
-on 2026-09-05 ("Go ahead with Phase 1"). Later phases remain the roadmap and are
-not open. The verification below records the pre-implementation baseline.
+on 2026-09-05 ("Go ahead with Phase 1"). Phase 2 was approved 2026-09-06 with joint review afterward, overriding the
+review/merge prerequisite for this transition only. Phases 3?5 remain closed. The verification below records the pre-implementation baseline.
 
 ## Verified starting point
 
@@ -374,4 +374,5 @@ Mechanical removals are separate reviewable commits, not mixed with behavior cha
   blank. No answer is inferred from silence. It can be resolved as part of this
   plan's approval before event UI work starts.
 - Phase 1 approved 2026-09-05. See active-scope.md for the current checkpoint.
-  Later phases open only after the preceding phase is reviewed and merged.
+  Phase 2 approved 2026-09-06 with joint review afterward; the normal review/merge
+  gate resumes for Phase 3.

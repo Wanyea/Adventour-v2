@@ -9,9 +9,10 @@ Work happens in **one scope at a time**. The active scope is named in `docs/acti
 If a change doesn't belong to the active scope, don't make it — note it and move on.
 
 Current roadmap: `docs/takeover-plan.md` (five phases, ending at HANDOFF §6).
-**Phase 1 — Trustworthy core and owner-operated evidence loop** was approved on
-2026-09-05 and is active. The earlier A/B/C/D sequence is superseded; its measured
-results remain in `docs/scope-a-evidence.md`. Later phases are not open.
+**Phase 2 — Discovery and fresh local events** is active, approved 2026-09-06.
+The owner authorized moving on and reviewing phases 1 and 2 together. This
+overrides the review/merge gate below for this transition only; Phase 1 acceptance
+gaps remain visible. Earlier A/B/C/D results remain in `docs/scope-a-evidence.md`.
 
 Do not begin a scope without an approved plan. Do not start the next scope until the current one merges.
 
