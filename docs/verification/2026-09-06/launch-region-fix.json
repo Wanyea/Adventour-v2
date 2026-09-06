@@ -1,0 +1,33 @@
+{
+  "new_york": {
+    "status": 400,
+    "response": {
+      "error": "Destination not available or ambiguous. Choose a suggested city or place, or use GPS."
+    }
+  },
+  "new_york_spelled_out": {
+    "status": 400,
+    "response": {
+      "error": "Destination not available or ambiguous. Choose a suggested city or place, or use GPS."
+    }
+  },
+  "orlando": {
+    "status": 200,
+    "response": {
+      "description": "Orlando, FL",
+      "latitude": 28.503226808249607,
+      "longitude": -81.41292445157724,
+      "place_id": null,
+      "source": "adventour_index"
+    }
+  },
+  "new_york_events": {
+    "status": 200,
+    "response": {
+      "checked_at": "2026-09-06T22:54:33.536804+00:00",
+      "coverage_note": "Limited calendar coverage. No results does not mean no local events.",
+      "events": [],
+      "freshness_note": "Removed after ending or 24 hours without source verification."
+    }
+  }
+}

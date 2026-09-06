@@ -4,6 +4,14 @@ The approved surface is a dated section below the swipe deck in Discover. Events
 are queried around the selected launch point (50 km, next 14 days), independently
 of the phone GPS. The regular place deck and navigation tabs remain unchanged.
 
+Launch correction after owner review: city suggestions use acquired metro names,
+not arbitrary POI address localities. A single Orlando record labelled New York,
+NY had manufactured a false New York launch at Orlando coordinates. New York is
+not currently acquired: typed New York now shows an unavailable-destination
+message and clears the preceding deck/events. Exact indexed place-name launches
+and GPS remain supported; unverified address-locality/neighborhood strings are
+not a standalone geocoder. Real New York coordinates return zero indexed events.
+
 ## Source and storage boundary
 
 The initial working source is UCF's documented JSON feeds. Its

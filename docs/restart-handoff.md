@@ -2,6 +2,13 @@
 
 ## Current checkpoint after resuming (supersedes the pause record below)
 
+Latest owner-review correction: reproduced New York, NY mapping to Orlando via a
+bad POI address. City lookup now uses acquired metro names; exact place names/GPS
+remain available. New York is not acquired and shows a coverage message. Launch
+edits clear old decks/events and invalidate older responses. Emulator Orlando →
+New York verified; 19 tests and TypeScript pass; Home814 lines. Backend session14576
+supersedes16976 below. See phase2-results.md and new-york-launch-fixed.png.
+
 Phase 2 was resumed after reading HANDOFF and AGENTS. Current review entry point:
 [phase2-results.md](phase2-results.md). Event implementation/runbook/source limits:
 [local-events.md](local-events.md). Phase 2 remains active; Phase 3 is not authorized.

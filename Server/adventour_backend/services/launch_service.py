@@ -11,13 +11,13 @@ def suggestions(db, query):
         return []
     rows = db.session.execute(text("""
         WITH locations AS (
-            SELECT initcap(lower(trim(locality))) AS label,upper(trim(region)) AS region,
+            -- POI address localities are not a city gazetteer: an Orlando record
+            -- can say New York, NY. Only acquired metro names define city launches.
+            SELECT initcap(replace(metro,'_',' ')) AS label,
+                   mode() WITHIN GROUP (ORDER BY upper(trim(region)))
+                       FILTER (WHERE nullif(trim(region),'') IS NOT NULL) AS region,
                    avg(lat) AS lat,avg(lon) AS lon,0 AS priority
-            FROM places WHERE index_active AND locality IS NOT NULL
-            GROUP BY lower(trim(locality)),upper(trim(region))
-            UNION ALL
-            SELECT initcap(replace(metro,'_',' ')),region,avg(lat),avg(lon),1
-            FROM places WHERE index_active GROUP BY metro,region
+            FROM places WHERE index_active GROUP BY metro
             UNION ALL
             SELECT name,region,COALESCE(canonical_lat,lat),COALESCE(canonical_lon,lon),2
             FROM places WHERE index_active AND tier='KEEP'
@@ -47,9 +47,7 @@ def resolve(db, query):
              or r['description'].split(',')[0].lower() == query.strip().lower()]
     if len(exact) == 1:
         return exact[0]
-    if len(rows) == 1:
-        return rows[0]
-    raise ValueError("Choose a suggested indexed city or place; this launch point is ambiguous or not covered.")
+    raise ValueError("Destination not available or ambiguous. Choose a suggested city or place, or use GPS.")
 
 
 def coordinates(latitude, longitude):

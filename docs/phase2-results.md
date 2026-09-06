@@ -4,6 +4,27 @@ Scope: features 4/6/7 and 19/20, with hours/access research for 17/18. Phase 2
 remains active; this is not final product acceptance. Phase 1's open acceptance
 items remain in active-scope.md. No Phase 3 work has started.
 
+## Owner-reported launch correction
+
+Reproduced New York, NY displaying Orlando cards and UCF events. The cause was
+`JJ Art And Design Productions` (owned record 99960d7d-ef5a-4d68-bdd1-b7552e8c51dd):
+its address says New York/NY but its coordinates are 28.5533,-81.3742 in the
+Orlando acquisition. Aggregating POI localities had made it a city suggestion.
+The event radius filter itself correctly returned no events at real NYC coordinates.
+
+City suggestions now derive only from acquired metro names, using the dominant
+nonblank region label per metro. Exact place-name suggestions remain; a lone
+partial match no longer silently resolves to a business. This does not add NYC
+coverage or a general city/neighborhood gazetteer. Editing/selecting a launch
+clears old cards/events and ignores responses belonging to the earlier launch.
+
+Verified Orlando → New York in the updated emulator: the previous UCF list clears
+and New York shows a coverage message. Evidence: `new-york-launch-before.png`,
+`new-york-events-before.png`, `new-york-launch-fixed.png`, `launch-region-fix.json`.
+19 backend tests pass, including an isolated SQL regression with the bad locality;
+TypeScript passes. Home is now 814 lines. No source index rows or user history
+were changed by this correction.
+
 ## Personal discovery
 
 `personal_v1` ranks the complete eligible radius pool using saved interests,

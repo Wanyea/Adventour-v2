@@ -54,6 +54,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
   const [currentCoords, setCurrentCoords] = useState<Coordinates | null>(null);
   const [locationMode, setLocationMode] = useState<LocationMode>('none');
   const [suggestions, setSuggestions] = useState<any[]>([]); 
+  const [launchError, setLaunchError] = useState('');
+  const launchVersion = useRef(0);
   const [emptyMessage, setEmptyMessage] = useState<string>('');
   const [hasLoadedRecommendations, setHasLoadedRecommendations] = useState(false);
   const [autoRefillAvailable, setAutoRefillAvailable] = useState(false);
@@ -305,6 +307,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
   };
 
   const fetchSuggestions = async (input: string, biasLocation: Coordinates | null = currentCoords) => {
+    const version = launchVersion.current;
     if (autocompleteTimer.current) {
       clearTimeout(autocompleteTimer.current);
     }
@@ -320,18 +323,40 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
         biasLocation,
         radiusOption.meters,
       );
+      if (version !== launchVersion.current) return;
       setSuggestions(autocompleteSuggestions);
+      setLaunchError(autocompleteSuggestions.length ? '' : 'No matching destination is available. Choose another city or use GPS.');
     }, 350);
   };
 
+  const clearLaunchResults = () => {
+    const version = ++launchVersion.current;
+    if (autocompleteTimer.current) clearTimeout(autocompleteTimer.current);
+    setCurrentCoords(null);
+    setSuggestions([]);
+    setLaunchError('');
+    setPlaces([]);
+    setSelectedPlace(null);
+    setHasLoadedRecommendations(false);
+    setTagGroupCounts({});
+    setAutoRefillAvailable(false);
+    setLoading(false);
+    setLoadingMore(false);
+    autoRefillInFlight.current = false;
+    pendingBasketScroll.current = false;
+    recentlyDecidedPlaceIds.current.clear();
+    return version;
+  };
+
   const handleCityChange = (text: string) => {
+    clearLaunchResults();
     setCity(text);
     setLocationMode(text.trim() ? 'manual' : 'none');
-    setCurrentCoords(null);
     fetchSuggestions(text, null);
   };
 
   const handleSuggestionSelect = async (description: string) => {
+    const version = clearLaunchResults();
     Keyboard.dismiss();
     setCity(description);
     setLocationMode('manual');
@@ -342,6 +367,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
       const geocodeResponse = await axios.get(`${Config.BACKEND_BASE_URL}/geocode`, {
         params: { address: description },
       });
+      if (version !== launchVersion.current) return;
       const resolvedLocation = {
         latitude: Number(geocodeResponse.data.latitude),
         longitude: Number(geocodeResponse.data.longitude),
@@ -350,11 +376,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
         setCurrentCoords(resolvedLocation);
       }
     } catch (error) {
+      if (version !== launchVersion.current) return;
+      setLaunchError('Destination not available. Choose another city or use GPS.');
       console.error('Error resolving selected launch point:', describeAxiosError(error));
     }
   };
 
   const loadRecommendations = useCallback(async ({ append = false, quiet = false, tagGroup = selectedTagGroup } = {}) => {
+    const version = launchVersion.current;
     if (append) {
       if (autoRefillInFlight.current) {
         return;
@@ -400,6 +429,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
         const geocodeResponse = await axios.get(`${Config.BACKEND_BASE_URL}/geocode`, {
           params: { address: city.trim() },
         });
+        if (version !== launchVersion.current) return;
         const resolvedLocation = {
           latitude: Number(geocodeResponse.data.latitude),
           longitude: Number(geocodeResponse.data.longitude),
@@ -419,6 +449,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
         return;
       }
 
+      if (version !== launchVersion.current) return;
       setTagGroupCounts(recommendationResponse.data.tag_group_counts || {});
       const recommendations = recommendationResponse.data.recommendations || [];
       const results = recommendations
@@ -460,10 +491,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
         setHasLoadedRecommendations(true);
       }
     } catch (error: unknown) {
+      if (version !== launchVersion.current) return;
       const details = describeAxiosError(error);
       console.error(`Error during ${step}:`, details);
       const message = step === 'geocode'
-        ? 'Unable to resolve that destination. Try a more specific city, state, or address.'
+        ? 'Destination not available. Choose a suggested city or place, or use GPS.'
         : 'Unable to load recommendations for that destination.';
       setEmptyMessage(message);
       if (!append) {
@@ -474,7 +506,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
         Alert.alert('Error', message);
       }
     } finally {
-      if (append) {
+      if (version !== launchVersion.current) {
+        // A newer launch owns the loading state.
+      } else if (append) {
         setLoadingMore(false);
         autoRefillInFlight.current = false;
       } else {
@@ -507,7 +541,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
   };
 
   const useCurrentLocation = async () => {
+    const version = clearLaunchResults();
     const granted = await requestLocationPermission();
+    if (version !== launchVersion.current) return;
     if (!granted) {
       Alert.alert("Permission Denied", "Location access is required.");
       return;
@@ -515,6 +551,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
 
     Geolocation.getCurrentPosition(
       async (position) => {
+        if (version !== launchVersion.current) return;
         const { latitude, longitude } = position.coords;
         setCurrentCoords({ latitude, longitude });
         setLocationMode('gps');
@@ -523,6 +560,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
           const response = await axios.get(`${Config.BACKEND_BASE_URL}/geocode`, {
             params: { latitude, longitude },
           });
+          if (version !== launchVersion.current) return;
 
           const { city, state } = response.data;
           if (city && state) {
@@ -531,11 +569,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
             Alert.alert('Error', 'Unable to resolve location to a city and state.');
           }
         } catch (error) {
+          if (version !== launchVersion.current) return;
           console.error('Error fetching geocoded location:', error);
           setCity(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
         }
       },
       (error) => {
+        if (version !== launchVersion.current) return;
         console.error('Geolocation error:', error);
         Alert.alert("Location Error", error.message);
       },
@@ -588,6 +628,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
               </View>
             </TouchableOpacity>
           </View>
+          {launchError ? <Text style={styles.suggestionText}>{launchError}</Text> : null}
         </View>
         {suggestions.length > 0 && (
           <View style={styles.suggestionsList}>
