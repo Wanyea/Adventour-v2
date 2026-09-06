@@ -43,3 +43,22 @@ def test_text_resolution_does_not_select_a_partial_business_match(monkeypatch):
     monkeypatch.setattr(launch, 'suggestions', lambda query: [point])
     with pytest.raises(ValueError): launch.resolve('New York')
     assert launch.resolve(point['description']) == point
+
+
+@pytest.mark.parametrize('properties,expected', [
+    ({'name': 'New York', 'state': 'New York', 'type': 'city',
+      'osm_key': 'place', 'osm_value': 'city'}, 'New York, New York, United States (City)'),
+    ({'name': 'New York', 'type': 'state', 'osm_key': 'place', 'osm_value': 'state'},
+     'New York, United States (State)'),
+    ({'name': 'Bar Harbor', 'state': 'Maine', 'type': 'city',
+      'osm_key': 'place', 'osm_value': 'town'}, 'Bar Harbor, Maine, United States (Town)'),
+    ({'name': 'Woodstock', 'city': 'Woodstock', 'state': 'Vermont', 'type': 'district',
+      'osm_key': 'place', 'osm_value': 'village'}, 'Woodstock, Vermont, United States (Village)'),
+    ({'name': 'Greenwich Village', 'city': 'New York', 'state': 'New York', 'type': 'district',
+      'osm_key': 'place', 'osm_value': 'suburb'},
+     'Greenwich Village, New York, New York, United States (Neighborhood)'),
+    ({'housenumber': '123', 'street': 'Main Street', 'city': 'New York', 'state': 'New York',
+      'type': 'house'}, '123 Main Street, New York, New York, United States'),
+])
+def test_launch_labels_preserve_geographic_levels(properties, expected):
+    assert launch._description(dict(properties, country='United States')) == expected

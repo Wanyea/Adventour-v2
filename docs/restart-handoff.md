@@ -2,6 +2,11 @@
 
 ## Current checkpoint after resuming (supersedes the pause record below)
 
+Latest label follow-up: New York city/state now have distinct typed labels;
+new-york-city-state-labels.png shows both on the emulator. Ten focused launch
+tests pass. Owner also requested a live NYC event-source preview; the six-hour
+worker currently refreshes UCF only, not automatic new-city discovery.
+
 Latest owner-review correction: the acquired-metro-only launch restriction was
 rejected and replaced with worldwide Photon/OSM lookup. New York now selects real
 NYC coordinates and remains valid even with no indexed events/places. Orlando
@@ -10,7 +15,7 @@ empty state. Both API and emulator verified; London also verified through the
 live API. 21 backend tests and TypeScript pass. See phase2-results.md and the
 new-york-worldwide-*.png / worldwide-orlando-events.png evidence. Earlier
 new-york-launch-fixed.png and launch-region-fix.json are superseded evidence of
-the rejected restriction, not the desired behavior. Backend session43880 is the
+the rejected restriction, not the desired behavior. Backend session95609 is the
 current normal .env.local service; Metro9447 remains running. Sessions are
 transient and must be restarted after reboot.
 
@@ -44,7 +49,7 @@ Phase 2 was resumed after reading HANDOFF and AGENTS. Current review entry point
 - The six-hour event worker is running locally. It is not installed as a Windows
   startup task. Restart with `python -m data_pipeline.refresh_events --watch`
   from Server using its venv and ENV_FILE=.env.local. Logs are ignored at repo root.
-- Current backend exec session43880 (normal .env.local, port8080), Metro9447,
+- Current backend exec session95609 (normal .env.local, port8080), Metro9447,
   event worker parentPID44780. These are ephemeral, not restart configuration.
   Synthetic backend sessions are stopped. Emulator backend is 10.0.2.2:8080;
   adb reverse cannot redirect that native URL to another server port.

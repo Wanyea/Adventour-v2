@@ -29,6 +29,32 @@ def coordinates(latitude, longitude):
             'source': 'device_coordinates'}
 
 
+def _description(properties):
+    layer = properties.get('type')
+    place_kind = properties.get('osm_value') if properties.get('osm_key') == 'place' else None
+    kind = {'city': 'City', 'town': 'Town', 'village': 'Village', 'hamlet': 'Hamlet',
+            'suburb': 'Neighborhood', 'neighbourhood': 'Neighborhood',
+            'state': 'State', 'country': 'Country'}.get(place_kind)
+    kind = kind or {'city': 'City', 'district': 'District', 'locality': 'Locality',
+                    'county': 'County', 'state': 'State', 'country': 'Country',
+                    'street': 'Street'}.get(layer)
+    street = ' '.join(str(properties.get(k) or '') for k in ('housenumber', 'street')).strip()
+    local = [properties.get('name') or street]
+    if layer not in ('state', 'country', 'county'):
+        local.extend([properties.get('district'), properties.get('city')])
+    # Remove redundant settlement fields, but preserve distinct hierarchy levels:
+    # New York city and New York state legitimately have the same name.
+    parts = list(dict.fromkeys(str(p) for p in local if p))
+    if not parts:
+        return ''
+    if layer not in ('state', 'country') and properties.get('state'):
+        parts.append(str(properties['state']))
+    if layer != 'country' and properties.get('country'):
+        parts.append(str(properties['country']))
+    label = ', '.join(parts)
+    return f'{label} ({kind})' if kind else label
+
+
 def _search(query):
     global _next_request
     now = time.monotonic()
@@ -57,10 +83,7 @@ def _search(query):
             lon, lat = feature['geometry']['coordinates']
             point = coordinates(lat, lon)
             properties = feature['properties']
-            street = ' '.join(str(properties.get(k) or '') for k in ('housenumber', 'street')).strip()
-            parts = [properties.get('name') or street, properties.get('district'),
-                     properties.get('city'), properties.get('state'), properties.get('country')]
-            description = ', '.join(dict.fromkeys(str(p) for p in parts if p))
+            description = _description(properties)
             if not description:
                 continue
             results.append({'description': description, 'latitude': point['latitude'],

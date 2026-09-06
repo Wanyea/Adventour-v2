@@ -40,6 +40,14 @@ Orlando events at NYC coordinates. No owned index records or user history were
 rewritten by the fix. See local-events.md for the geocoder's transient cache,
 attribution and public-service limits. No paid API supplies candidates.
 
+Follow-up label correction: the city and state named New York had been collapsed
+by string deduplication. Suggestions now preserve the city/state hierarchy and
+label City/Town/Village/Neighborhood/State where the source supplies that type.
+Live queries for "New York, New York" and "Bar Harbor, Maine" return the correct
+city and town; the NYC city and state are separately labelled on the emulator
+(`new-york-city-state-labels.png`). All ten focused launch tests pass. No app
+source/layout changed in this follow-up; coordinates and regional filters remain.
+
 ## Personal discovery
 
 `personal_v1` ranks the complete eligible radius pool using saved interests,
