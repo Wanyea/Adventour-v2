@@ -17,7 +17,7 @@ import PlaceDetailsModal from './src/components/PlaceDetailsModal';
 import AdventourJourneyPanel from './src/components/AdventourJourneyPanel';
 import AdventourLaunchHero from './src/components/AdventourLaunchHero';
 import LocalEventsSection from './src/components/LocalEventsSection';
-import GoogleAutocompleteService from './src/GoogleAutocompleteService';
+import LaunchLocationService, { LaunchSuggestion } from './src/LaunchLocationService';
 import Config from './src/Config';
 import { recordPlaceEvent } from './src/services/PlaceEventService';
 import Geolocation from '@react-native-community/geolocation';
@@ -53,7 +53,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
   const [city, setCity] = useState<string>(''); 
   const [currentCoords, setCurrentCoords] = useState<Coordinates | null>(null);
   const [locationMode, setLocationMode] = useState<LocationMode>('none');
-  const [suggestions, setSuggestions] = useState<any[]>([]); 
+  const [suggestions, setSuggestions] = useState<LaunchSuggestion[]>([]);
   const [launchError, setLaunchError] = useState('');
   const launchVersion = useRef(0);
   const [emptyMessage, setEmptyMessage] = useState<string>('');
@@ -306,7 +306,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
     }
   };
 
-  const fetchSuggestions = async (input: string, biasLocation: Coordinates | null = currentCoords) => {
+  const fetchSuggestions = async (input: string) => {
     const version = launchVersion.current;
     if (autocompleteTimer.current) {
       clearTimeout(autocompleteTimer.current);
@@ -318,15 +318,17 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
     }
 
     autocompleteTimer.current = setTimeout(async () => {
-      const autocompleteSuggestions = await GoogleAutocompleteService.fetchAutocompleteSuggestions(
-        input,
-        biasLocation,
-        radiusOption.meters,
-      );
-      if (version !== launchVersion.current) return;
-      setSuggestions(autocompleteSuggestions);
-      setLaunchError(autocompleteSuggestions.length ? '' : 'No matching destination is available. Choose another city or use GPS.');
-    }, 350);
+      try {
+        const matches = await LaunchLocationService.fetchAutocompleteSuggestions(input);
+        if (version !== launchVersion.current) return;
+        setSuggestions(matches);
+        setLaunchError(matches.length ? '' : 'No matching location found. Try a more specific city or address.');
+      } catch {
+        if (version !== launchVersion.current) return;
+        setSuggestions([]);
+        setLaunchError('Location search is temporarily unavailable. Try again or use GPS.');
+      }
+    }, 650);
   };
 
   const clearLaunchResults = () => {
@@ -352,33 +354,22 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
     clearLaunchResults();
     setCity(text);
     setLocationMode(text.trim() ? 'manual' : 'none');
-    fetchSuggestions(text, null);
+    fetchSuggestions(text);
   };
 
-  const handleSuggestionSelect = async (description: string) => {
-    const version = clearLaunchResults();
+  const handleSuggestionSelect = (suggestion: LaunchSuggestion) => {
+    clearLaunchResults();
     Keyboard.dismiss();
-    setCity(description);
+    setCity(suggestion.description);
     setLocationMode('manual');
     setCurrentCoords(null);
     setSuggestions([]);
 
-    try {
-      const geocodeResponse = await axios.get(`${Config.BACKEND_BASE_URL}/geocode`, {
-        params: { address: description },
-      });
-      if (version !== launchVersion.current) return;
-      const resolvedLocation = {
-        latitude: Number(geocodeResponse.data.latitude),
-        longitude: Number(geocodeResponse.data.longitude),
-      };
-      if (Number.isFinite(resolvedLocation.latitude) && Number.isFinite(resolvedLocation.longitude)) {
-        setCurrentCoords(resolvedLocation);
-      }
-    } catch (error) {
-      if (version !== launchVersion.current) return;
-      setLaunchError('Destination not available. Choose another city or use GPS.');
-      console.error('Error resolving selected launch point:', describeAxiosError(error));
+    const { latitude, longitude } = suggestion;
+    if (Number.isFinite(latitude) && Math.abs(latitude) <= 90 && Number.isFinite(longitude) && Math.abs(longitude) <= 180) {
+      setCurrentCoords({ latitude, longitude });
+    } else {
+      setLaunchError('Could not locate that selection. Try another result.');
     }
   };
 
@@ -495,7 +486,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
       const details = describeAxiosError(error);
       console.error(`Error during ${step}:`, details);
       const message = step === 'geocode'
-        ? 'Destination not available. Choose a suggested city or place, or use GPS.'
+        ? 'Choose a location from the suggestions, or use GPS.'
         : 'Unable to load recommendations for that destination.';
       setEmptyMessage(message);
       if (!append) {
@@ -629,14 +620,17 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
             </TouchableOpacity>
           </View>
           {launchError ? <Text style={styles.suggestionText}>{launchError}</Text> : null}
+          <Text style={styles.suggestionText} onPress={() => Linking.openURL('https://www.openstreetmap.org/copyright')}>
+            Location search: © OpenStreetMap contributors
+          </Text>
         </View>
         {suggestions.length > 0 && (
           <View style={styles.suggestionsList}>
             {suggestions.map((item) => (
               <TouchableOpacity
-                key={item.place_id || item.description}
+                key={item.suggestion_id}
                 style={styles.suggestionItem}
-                onPress={() => handleSuggestionSelect(item.description)}
+                onPress={() => handleSuggestionSelect(item)}
               >
                 <Text style={styles.suggestionText}>{item.description}</Text>
               </TouchableOpacity>
@@ -798,7 +792,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
             <Text style={styles.emptyText}>{emptyMessage}</Text>
           )}
         </View>
-        {currentCoords && hasLoadedRecommendations ? <LocalEventsSection coordinates={currentCoords} /> : null}
+        {currentCoords ? <LocalEventsSection key={`${currentCoords.latitude}/${currentCoords.longitude}`} coordinates={currentCoords} /> : null}
       </ScrollView>
       <PlaceDetailsModal
         onClosedReport={handleClosedReport}

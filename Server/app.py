@@ -856,17 +856,24 @@ def get_place_ratings(place_id):
 def geocode():
     try:
         if request.args.get('address'):
-            result = launch_service.resolve(db, request.args['address'])
+            result = launch_service.resolve(request.args['address'])
         else:
             result = launch_service.coordinates(request.args.get('latitude'), request.args.get('longitude'))
         return jsonify(result)
     except (ValueError, TypeError) as exc:
         return jsonify({'error': str(exc)}), 400
+    except launch_service.SearchUnavailable as exc:
+        return jsonify({'error': str(exc)}), 503
 
 @app.route('/api/places/autocomplete', methods=['GET'])
 @require_auth
 def places_autocomplete():
-    return jsonify({'predictions': launch_service.suggestions(db, request.args.get('input', ''))})
+    try:
+        response = jsonify({'predictions': launch_service.suggestions(request.args.get('input', ''))})
+        response.headers['Cache-Control'] = 'no-store'
+        return response
+    except launch_service.SearchUnavailable as exc:
+        return jsonify({'error': str(exc)}), 503
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", "8080")))

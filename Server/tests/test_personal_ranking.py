@@ -29,17 +29,6 @@ def test_feedback_is_one_vote_per_entity_and_repeat_windows_expire():
     assert place['availability'] == 'unknown'
 
 
-def test_case_variants_do_not_make_a_selected_region_ambiguous():
-    from types import SimpleNamespace
-    from adventour_backend.services import launch_service
-    rows=[{'label':name,'region':'FL','lat':28.53,'lon':-81.37}
-          for name in ('orlando','Orlando','ORLANDO')]
-    result=SimpleNamespace(mappings=lambda:SimpleNamespace(all=lambda:rows))
-    db=SimpleNamespace(session=SimpleNamespace(execute=lambda *args,**kwargs:result))
-    assert len(launch_service.suggestions(db,'Orlando')) == 1
-    assert launch_service.resolve(db,'Orlando, FL')['latitude'] == 28.53
-
-
 def test_personal_api_repeats_are_private_and_snapshot_survives(monkeypatch):
     if os.getenv('ENV_FILE') != '.env.ingest-check':
         pytest.skip('Isolated ingestion database only')

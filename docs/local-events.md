@@ -4,13 +4,24 @@ The approved surface is a dated section below the swipe deck in Discover. Events
 are queried around the selected launch point (50 km, next 14 days), independently
 of the phone GPS. The regular place deck and navigation tabs remain unchanged.
 
-Launch correction after owner review: city suggestions use acquired metro names,
-not arbitrary POI address localities. A single Orlando record labelled New York,
-NY had manufactured a false New York launch at Orlando coordinates. New York is
-not currently acquired: typed New York now shows an unavailable-destination
-message and clears the preceding deck/events. Exact indexed place-name launches
-and GPS remain supported; unverified address-locality/neighborhood strings are
-not a standalone geocoder. Real New York coordinates return zero indexed events.
+Launch lookup is worldwide and independent of indexed place/event coverage.
+The owner rejected the interim acquired-metro-only restriction. Photon now
+resolves typed cities and addresses; selecting a suggestion uses its returned
+coordinates directly. Editing/selecting a launch clears previous results and
+ignores late responses. Events load for that selected point even before launching
+the place deck. No nearby indexed events means an empty regional list, never a
+fallback to Orlando. Current NYC coverage is empty; NYC remains a valid launch.
+
+Location search uses the free [Photon API](https://github.com/komoot/photon),
+which permits reasonable public-service use without an availability guarantee.
+The app debounces input; each backend process spaces upstream calls one second
+apart and keeps at most 128 query results for 60 seconds in memory. Searches have
+no Florida/country/radius restriction. No search payload enriches our place/event
+index. The app links [OpenStreetMap attribution](https://www.openstreetmap.org/copyright).
+Set `PHOTON_BASE_URL` to the base URL of a compatible hosted/self-hosted service
+for deployment; the modest-use public endpoint is a local-development dependency,
+not demonstrated production capacity. Search failures are shown separately from
+no matches, and GPS remains available.
 
 ## Source and storage boundary
 

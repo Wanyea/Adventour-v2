@@ -51,6 +51,7 @@ def test_event_expiry_failed_refresh_and_atomic_cancellation(monkeypatch):
             backend.db.session.commit()
             assert len(events.listing(backend.db,28.6027,-81.2038,now=now)['events']) == 1
             assert not events.listing(backend.db,29.5844,-81.2079,now=now)['events']
+            assert not events.listing(backend.db,40.7128,-74.006,now=now)['events']
             assert not events.listing(backend.db,28.6027,-81.2038,now=now+timedelta(hours=2))['events']
             # Longer occurrence expires at 24h even if it hasn't ended.
             extended={**record,'ends_at':now+timedelta(days=2),'expires_at':now+timedelta(hours=24)}

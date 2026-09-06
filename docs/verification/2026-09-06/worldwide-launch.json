@@ -1,0 +1,43 @@
+{
+  "attribution": "Location search data: OpenStreetMap contributors, ODbL, via Photon. https://www.openstreetmap.org/copyright",
+  "checks": [
+    {
+      "query": "New York, NY",
+      "selected": {
+        "description": "New York, United States",
+        "latitude": 40.7127281,
+        "longitude": -74.0060152,
+        "source": "photon_osm",
+        "suggestion_id": "osm:R:175905"
+      },
+      "event_count": 0,
+      "event_sources": []
+    },
+    {
+      "query": "London",
+      "selected": {
+        "description": "London, England, United Kingdom",
+        "latitude": 51.5074456,
+        "longitude": -0.1277653,
+        "source": "photon_osm",
+        "suggestion_id": "osm:R:175342"
+      },
+      "event_count": 0,
+      "event_sources": []
+    },
+    {
+      "query": "Orlando, FL",
+      "selected": {
+        "description": "Orlando, Florida, United States",
+        "latitude": 28.5421218,
+        "longitude": -81.379045,
+        "source": "photon_osm",
+        "suggestion_id": "osm:R:1128379"
+      },
+      "event_count": 7,
+      "event_sources": [
+        "ucf_main"
+      ]
+    }
+  ]
+}

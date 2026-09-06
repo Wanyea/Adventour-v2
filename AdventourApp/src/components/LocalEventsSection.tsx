@@ -32,6 +32,8 @@ const LocalEventsSection = ({ coordinates }: { coordinates: Coordinates }) => {
   const serverOffset = useRef(0);
   const focused = useIsFocused();
   const requestId = useRef(0);
+  const mounted = useRef(true);
+  useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   const load = useCallback(async () => {
     const id = ++requestId.current;
     setBusy(true);
@@ -72,8 +74,10 @@ const LocalEventsSection = ({ coordinates }: { coordinates: Coordinates }) => {
     setChecking(event.occurrence_id);
     try {
       const result = await axios.post(`${Config.BACKEND_BASE_URL}/api/local-events/${encodeURIComponent(event.source_id)}/${encodeURIComponent(event.occurrence_id)}/verify`, {}, { timeout: 45000 });
+      if (!mounted.current) return;
       const fresh: LocalEvent = result.data.event;
       const follow = (url: string) => {
+        if (!mounted.current) return;
         if (Date.now() + serverOffset.current >= Math.min(Date.parse(fresh.ends_at), Date.parse(fresh.expires_at))) {
           Alert.alert('Check this event again', 'The event check has expired.');
           load();
@@ -87,6 +91,7 @@ const LocalEventsSection = ({ coordinates }: { coordinates: Coordinates }) => {
         { text: 'Directions', onPress: () => follow(`https://www.google.com/maps/dir/?api=1&destination=${fresh.latitude},${fresh.longitude}`) },
       ]);
     } catch (err) {
+      if (!mounted.current) return;
       const message = axios.isAxiosError(err) ? err.response?.data?.error : null;
       Alert.alert('Event check', message || 'Could not check the organizer. Try again before leaving.');
       load();

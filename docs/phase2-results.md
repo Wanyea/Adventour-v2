@@ -12,18 +12,33 @@ its address says New York/NY but its coordinates are 28.5533,-81.3742 in the
 Orlando acquisition. Aggregating POI localities had made it a city suggestion.
 The event radius filter itself correctly returned no events at real NYC coordinates.
 
-City suggestions now derive only from acquired metro names, using the dominant
-nonblank region label per metro. Exact place-name suggestions remain; a lone
-partial match no longer silently resolves to a business. This does not add NYC
-coverage or a general city/neighborhood gazetteer. Editing/selecting a launch
-clears old cards/events and ignores responses belonging to the earlier launch.
+The first correction restricted suggestions to acquired metros. The owner
+rejected that restriction: destination search must work beyond Florida. It has
+been replaced with worldwide Photon/OSM location lookup, separate from our place
+and event index. Selecting a suggestion uses its exact returned coordinates;
+editing/selecting a launch clears old cards/events and ignores old responses.
+Events query the selected coordinates even when no place deck has loaded.
 
-Verified Orlando → New York in the updated emulator: the previous UCF list clears
-and New York shows a coverage message. Evidence: `new-york-launch-before.png`,
-`new-york-events-before.png`, `new-york-launch-fixed.png`, `launch-region-fix.json`.
-19 backend tests pass, including an isolated SQL regression with the bad locality;
-TypeScript passes. Home is now 814 lines. No source index rows or user history
-were changed by this correction.
+Verified in the updated emulator: Orlando shows UCF events; selecting New York
+removes those events and shows the regional empty state while retaining New York
+as a valid launch. Live backend results in `worldwide-launch.json` resolve NYC to
+40.7127281,-74.0060152 (zero events), London to 51.5074456,-0.1277653 (zero), and
+Orlando to 28.5421218,-81.379045 (seven). These are current acquisition results,
+not a claim that those cities have no real events.
+
+Current screenshots under `verification/2026-09-06/`:
+`new-york-worldwide-launch.png`, `worldwide-orlando-events.png`, and
+`new-york-worldwide-events.png`. Launching the NYC deck also returns zero picks
+without old Florida cards (`new-york-worldwide-deck.png`). Previous `new-york-launch-fixed.png` and
+`launch-region-fix.json` document the rejected intermediate restriction and are
+superseded, not evidence of the final behavior. The two `*-before.png` screenshots
+remain the original bug evidence.
+
+All 21 backend tests and TypeScript pass. Tests cover global coordinate
+preservation, search outage without metro fallback, disambiguation, and excluding
+Orlando events at NYC coordinates. No owned index records or user history were
+rewritten by the fix. See local-events.md for the geocoder's transient cache,
+attribution and public-service limits. No paid API supplies candidates.
 
 ## Personal discovery
 
@@ -55,8 +70,8 @@ Actual emulator evidence: `personal-palm.png`, `personal-breakdown.png`,
 The Orlando coffee-filter screen shows Pepito's Full Belly Cafe at fit .7604:
 .5 interest + .1604 distance + .1 local policy, with zero feedback/repeat terms.
 Its selected locality center differs from the fixed audit center. The launch
-lookup now collapses case variants of Orlando instead of returning three
-ambiguous city choices. No paid geocoding was introduced.
+lookup has since moved to worldwide Photon/OSM suggestions rather than deriving
+cities from indexed venue localities. No paid geocoding was introduced.
 
 ## Three experiment dispositions
 

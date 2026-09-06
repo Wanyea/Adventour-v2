@@ -2,12 +2,17 @@
 
 ## Current checkpoint after resuming (supersedes the pause record below)
 
-Latest owner-review correction: reproduced New York, NY mapping to Orlando via a
-bad POI address. City lookup now uses acquired metro names; exact place names/GPS
-remain available. New York is not acquired and shows a coverage message. Launch
-edits clear old decks/events and invalidate older responses. Emulator Orlando →
-New York verified; 19 tests and TypeScript pass; Home814 lines. Backend session14576
-supersedes16976 below. See phase2-results.md and new-york-launch-fixed.png.
+Latest owner-review correction: the acquired-metro-only launch restriction was
+rejected and replaced with worldwide Photon/OSM lookup. New York now selects real
+NYC coordinates and remains valid even with no indexed events/places. Orlando
+shows seven UCF dates; switching to New York clears them and shows the regional
+empty state. Both API and emulator verified; London also verified through the
+live API. 21 backend tests and TypeScript pass. See phase2-results.md and the
+new-york-worldwide-*.png / worldwide-orlando-events.png evidence. Earlier
+new-york-launch-fixed.png and launch-region-fix.json are superseded evidence of
+the rejected restriction, not the desired behavior. Backend session43880 is the
+current normal .env.local service; Metro9447 remains running. Sessions are
+transient and must be restarted after reboot.
 
 Phase 2 was resumed after reading HANDOFF and AGENTS. Current review entry point:
 [phase2-results.md](phase2-results.md). Event implementation/runbook/source limits:
@@ -33,13 +38,13 @@ Phase 2 was resumed after reading HANDOFF and AGENTS. Current review entry point
   name hint), FSQ OS (access-limited, no dataset), 60 venue sites plus ten closure
   controls and six Chrome renders. Only diagnostic counts/URLs were saved.
   No hours/closure facts were promoted. See measured outcomes in phase2-results.
-- 18 backend tests and TypeScript pass; largest authored app file is 1,021 lines.
+- 21 backend tests and TypeScript pass; largest authored app file is 1,021 lines.
   Strict evaluation remains red for no fresh held-out data and no accepted v2
   baseline; its report explicitly does not validate personal fit.
 - The six-hour event worker is running locally. It is not installed as a Windows
   startup task. Restart with `python -m data_pipeline.refresh_events --watch`
   from Server using its venv and ENV_FILE=.env.local. Logs are ignored at repo root.
-- Current backend exec session16976 (normal .env.local, port8080), Metro9447,
+- Current backend exec session43880 (normal .env.local, port8080), Metro9447,
   event worker parentPID44780. These are ephemeral, not restart configuration.
   Synthetic backend sessions are stopped. Emulator backend is 10.0.2.2:8080;
   adb reverse cannot redirect that native URL to another server port.

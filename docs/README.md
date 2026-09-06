@@ -6,7 +6,8 @@ for the working event pipeline and remaining coverage gaps. Resume details are
 in [restart-handoff.md](restart-handoff.md).
 
 Owner-review fix: New York no longer resolves to an Orlando POI's coordinates.
-Unsupported launch searches clear prior results and show a coverage message;
+Worldwide city/address lookup is independent of indexed coverage. Events follow
+the selected launch coordinates; changing regions clears prior results;
 see the launch correction in [phase2-results.md](phase2-results.md).
 
 Updated 2026-09-06. Read [HANDOFF.md](../HANDOFF.md) for the closed 23-feature

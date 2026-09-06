@@ -1,34 +1,45 @@
-"""Regression: an Orlando POI address must not manufacture a New York city launch."""
+"""Worldwide launch coordinates are independent of indexed venue/event coverage."""
 
-import os
+from types import SimpleNamespace
 import pytest
-from sqlalchemy import text
+import requests
+from adventour_backend.services import launch_service as launch
 
 
-def test_city_launch_uses_acquired_metro_not_poi_address():
-    if os.getenv('ENV_FILE') != '.env.ingest-check':
-        pytest.skip('Isolated database only')
-    import app as backend
-    from sqlalchemy.engine import make_url
-    from adventour_backend.services import launch_service as launch
-    assert make_url(backend.app.config['SQLALCHEMY_DATABASE_URI']).database.startswith('adventour_ingest_check_')
-    with backend.app.app_context():
-        try:
-            # Session-local shadow: the real places table and its rows are untouched.
-            backend.db.session.execute(text('''CREATE TEMP TABLE places (
-                metro text, locality text, region text, name text, lat double precision,
-                lon double precision, canonical_lat double precision, canonical_lon double precision,
-                index_active boolean DEFAULT true, tier text DEFAULT 'KEEP') ON COMMIT DROP'''))
-            backend.db.session.execute(text('''INSERT INTO places(metro,locality,region,name,lat,lon) VALUES
-                ('orlando','New York','NY','Address mismatch',28.55,-81.37),
-                ('orlando','Orlando','FL','New York Pizza',28.53,-81.38),
-                ('orlando','ORLANDO','FL','Local cafe',28.54,-81.39),
-                ('palm_coast','Palm Coast','FL','Local park',29.58,-81.20)'''))
-            assert [r['description'] for r in launch.suggestions(backend.db,'New York')] == ['New York Pizza, FL']
-            for query in ('New York', 'New York, NY', 'New York New York', 'New York Pizz'):
-                with pytest.raises(ValueError): launch.resolve(backend.db,query)
-            assert launch.resolve(backend.db,'New York Pizza, FL')['latitude'] == 28.53
-            assert launch.resolve(backend.db,'Orlando, FL')['latitude'] == pytest.approx(28.54)
-            assert launch.resolve(backend.db,'Palm Coast')['latitude'] == 29.58
-        finally:
-            backend.db.session.rollback()
+@pytest.mark.parametrize('query,lon,lat,state,country', [
+    ('New York, NY', -74.0060152, 40.7127281, 'New York', 'United States'),
+    ('London', -.1277653, 51.5074456, 'England', 'United Kingdom'),
+])
+def test_worldwide_lookup_preserves_selected_geography(monkeypatch, query, lon, lat, state, country):
+    launch._cache.clear()
+    monkeypatch.setattr(launch, '_next_request', 0)
+    calls = []
+    def get(url, **kwargs):
+        calls.append(kwargs)
+        assert 'bbox' not in kwargs['params'] and 'lat' not in kwargs['params']
+        return SimpleNamespace(raise_for_status=lambda: None, json=lambda: {'features': [{
+            'geometry': {'coordinates': [lon, lat]}, 'properties': {'name': query.split(',')[0],
+            'state': state, 'country': country, 'osm_type': 'R', 'osm_id': 1}}]})
+    monkeypatch.setattr(launch.requests, 'get', get)
+    result = launch.suggestions(query)[0]
+    assert (result['latitude'], result['longitude']) == (lat, lon)
+    assert result['source'] == 'photon_osm' and country in result['description']
+    assert launch.suggestions(query.upper()) == [result]
+    assert len(calls) == 1  # Bounded transient cache, no second provider lookup on selection.
+
+
+def test_search_failure_does_not_fall_back_to_an_indexed_city(monkeypatch):
+    launch._cache.clear()
+    monkeypatch.setattr(launch, '_next_request', 0)
+    def failure(*args, **kwargs): raise requests.Timeout()
+    monkeypatch.setattr(launch.requests, 'get', failure)
+    with pytest.raises(launch.SearchUnavailable): launch.suggestions('New York')
+    assert not launch._cache
+
+
+def test_text_resolution_does_not_select_a_partial_business_match(monkeypatch):
+    point = {'description': 'New York Pizza, Orlando, Florida, United States',
+             'latitude': 28.53, 'longitude': -81.37}
+    monkeypatch.setattr(launch, 'suggestions', lambda query: [point])
+    with pytest.raises(ValueError): launch.resolve('New York')
+    assert launch.resolve(point['description']) == point
