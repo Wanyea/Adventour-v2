@@ -62,8 +62,7 @@ elif DB_USER and DB_NAME:
 else:
     DATABASE_URI = "sqlite:///adventour_dev.db"
 
-# Debug
-print(f"Connecting to database: {DATABASE_URI}")
+# Connection URLs can contain credentials; never print or expose them.
 
 # Flask app setup
 app = Flask(__name__)
@@ -117,9 +116,8 @@ def dev_config():
 
     google_key = os.getenv("GOOGLE_API_KEY") or ""
     return jsonify({
-        "database_url": app.config["SQLALCHEMY_DATABASE_URI"],
+        "database_configured": bool(app.config["SQLALCHEMY_DATABASE_URI"]),
         "google_api_key_configured": bool(google_key),
-        "google_api_key_preview": f"{google_key[:4]}...{google_key[-4:]}" if google_key else None,
     })
 
 def get_request_user(allow_legacy_id=False):
