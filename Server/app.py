@@ -10,6 +10,7 @@ from adventour_backend.models import (
 )
 from adventour_backend.auth import require_auth
 from adventour_backend.social_routes import social_bp
+from adventour_backend.routes.local_events import blueprint as local_events_bp
 from adventour_backend.services.account_service import delete_user_account_data
 from adventour_backend.services import tag_group_service, local_index_service
 from adventour_backend.services import place_event_service
@@ -68,6 +69,7 @@ db.init_app(app)
 
 # Register blueprints
 app.register_blueprint(social_bp, url_prefix='/api')
+app.register_blueprint(local_events_bp)
 
 
 def ensure_local_schema():

@@ -8,6 +8,7 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import text
 
 from .local_index_service import _cells_for
+from .tag_group_service import GROUPS
 
 SOURCES = Path(__file__).resolve().parents[2] / 'data_pipeline' / 'event_sources.json'
 DDL = """
@@ -62,22 +63,26 @@ def listing(db, latitude, longitude, radius=16000, tag='all', now=None):
     if not all(math.isfinite(v) for v in (latitude, longitude, radius)) or not \
             (-90<=latitude<=90 and -180<=longitude<=180 and 100<=radius<=50000):
         raise ValueError('Invalid event region or radius (100–50000 metres)')
+    if tag != 'all' and tag not in GROUPS:
+        raise ValueError('Unknown event tag')
     rows = db.session.execute(text("""SELECT e.*,s.name AS source_name,
         6371000*acos(least(1,greatest(-1,cos(radians(:lat))*cos(radians(latitude))*
         cos(radians(longitude)-radians(:lon))+sin(radians(:lat))*sin(radians(latitude))))) AS distance_meters
         FROM local_event e JOIN event_source s ON s.id=e.source_id
         WHERE e.h3_r8=ANY(:cells) AND e.ends_at>:now AND e.expires_at>:now
+          AND e.starts_at<:until
           AND e.verified_at>:oldest AND e.verified_at<=:now
           AND (:tag='all' OR e.category=:tag)
         ORDER BY starts_at,title,source_id,occurrence_id"""),
         {'lat': latitude, 'lon': longitude, 'cells': _cells_for(latitude,longitude,radius),
-         'now': now, 'oldest': now-timedelta(hours=24), 'tag': tag}).mappings().all()
+         'now': now, 'oldest': now-timedelta(hours=24), 'until': now+timedelta(days=14), 'tag': tag}).mappings().all()
     events, seen = [], {}
     for row in rows:
         if row['distance_meters'] > radius:
             continue
         item = {k: v.isoformat() if isinstance(v,datetime) else v for k,v in row.items()}
-        key = (row['entity_id'], row['title'].casefold(), row['starts_at'])
+        venue_key = row['entity_id'] or (round(row['latitude'],5),round(row['longitude'],5),row['venue_name'].casefold())
+        key = (venue_key, row['title'].casefold(), row['starts_at'])
         if key in seen:
             seen[key]['sources'].append({'name': row['source_name'], 'url': row['source_url']})
             continue

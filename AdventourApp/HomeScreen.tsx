@@ -16,6 +16,7 @@ import RecommendationDeck from './src/components/RecommendationDeck';
 import PlaceDetailsModal from './src/components/PlaceDetailsModal';
 import AdventourJourneyPanel from './src/components/AdventourJourneyPanel';
 import AdventourLaunchHero from './src/components/AdventourLaunchHero';
+import LocalEventsSection from './src/components/LocalEventsSection';
 import GoogleAutocompleteService from './src/GoogleAutocompleteService';
 import Config from './src/Config';
 import { recordPlaceEvent } from './src/services/PlaceEventService';
@@ -756,6 +757,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
             <Text style={styles.emptyText}>{emptyMessage}</Text>
           )}
         </View>
+        {currentCoords && hasLoadedRecommendations ? <LocalEventsSection coordinates={currentCoords} /> : null}
       </ScrollView>
       <PlaceDetailsModal
         onClosedReport={handleClosedReport}

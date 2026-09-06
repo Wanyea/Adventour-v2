@@ -3,7 +3,7 @@
 from flask import Blueprint, jsonify, request
 from sqlalchemy import text
 
-from adventour_backend.extensions import db
+from adventour_backend.models import db
 from adventour_backend.services import local_event_service as events
 from adventour_backend.auth import require_auth
 

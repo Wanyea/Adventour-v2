@@ -19,10 +19,12 @@ from sqlalchemy import text
 USER_AGENT = 'Adventour/0.2 (UCF documented event-feed consumer)'
 
 
-def read_json(url, session):
+def read_json(url, session, single=False):
     response = session.get(url, timeout=20)
     response.raise_for_status()
     data = response.json()
+    if single and isinstance(data, dict):
+        data = [data]
     if not isinstance(data, list) or any(not isinstance(row, dict) for row in data):
         raise ValueError('Unexpected UCF feed shape; freshness not renewed')
     return data
@@ -123,7 +125,7 @@ def recheck(db, source, event):
     visible = re.sub(r'\s+', ' ', re.sub('<[^>]+>', ' ', html.unescape(response.text))).lower()
     if 'the gallery is free and open to the public' not in visible:
         raise ValueError('Public admission could not be reconfirmed')
-    rows = read_json(event['source_url'].rstrip('/')+'/feed.json', session)
+    rows = read_json(event['source_url'].rstrip('/')+'/feed.json', session, single=True)
     raw = next((r for r in rows if str(r.get('eventinstance_id'))==event['occurrence_id']), None)
     if raw is None:
         return None

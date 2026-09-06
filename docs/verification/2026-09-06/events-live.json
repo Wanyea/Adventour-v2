@@ -1,0 +1,217 @@
+{
+  "checked_at": "2026-09-06T16:39:59.430357+00:00",
+  "coverage_note": "Limited calendar coverage. No results does not mean no local events.",
+  "events": [
+    {
+      "access_note": "Public admission; free exhibition and reception. Check organizer details before leaving.",
+      "access_url": "https://cah.ucf.edu/events/ticketing/",
+      "category": "arts_culture",
+      "distance_meters": 18567.713599209128,
+      "ends_at": "2026-09-10T19:00:00-04:00",
+      "entity_id": "09f69bf0-1c91-4414-99bc-ce44c0144682",
+      "expires_at": "2026-09-07T12:37:35.988441-04:00",
+      "h3_r8": "8844a97253fffff",
+      "latitude": 28.602733612060547,
+      "longitude": -81.20378875732422,
+      "metro": "orlando",
+      "occurrence_id": "4151936",
+      "official_url": "https://events.ucf.edu/event/4151936/opening-reception-and-artist-talk-connective-tissue-by-hanna-washburn/",
+      "series_id": "1126601",
+      "source_id": "ucf_main",
+      "source_name": "UCF Events",
+      "source_url": "https://events.ucf.edu/event/4151936/opening-reception-and-artist-talk-connective-tissue-by-hanna-washburn/",
+      "sources": [
+        {
+          "name": "UCF Events",
+          "url": "https://events.ucf.edu/event/4151936/opening-reception-and-artist-talk-connective-tissue-by-hanna-washburn/"
+        }
+      ],
+      "starts_at": "2026-09-10T17:00:00-04:00",
+      "timezone": "America/New_York",
+      "title": "Opening Reception and Artist Talk | Connective Tissue by Hanna Washburn",
+      "venue_name": "UCF Art Gallery",
+      "verified_at": "2026-09-06T12:37:35.988441-04:00"
+    },
+    {
+      "access_note": "Public admission; free exhibition and reception. Check organizer details before leaving.",
+      "access_url": "https://cah.ucf.edu/events/ticketing/",
+      "category": "arts_culture",
+      "distance_meters": 18567.713599209128,
+      "ends_at": "2026-09-11T17:00:00-04:00",
+      "entity_id": "09f69bf0-1c91-4414-99bc-ce44c0144682",
+      "expires_at": "2026-09-07T12:37:35.988441-04:00",
+      "h3_r8": "8844a97253fffff",
+      "latitude": 28.602733612060547,
+      "longitude": -81.20378875732422,
+      "metro": "orlando",
+      "occurrence_id": "4151877",
+      "official_url": "https://events.ucf.edu/event/4151877/connective-tissue-by-hanna-washburn/",
+      "series_id": "1126587",
+      "source_id": "ucf_main",
+      "source_name": "UCF Events",
+      "source_url": "https://events.ucf.edu/event/4151877/connective-tissue-by-hanna-washburn/",
+      "sources": [
+        {
+          "name": "UCF Events",
+          "url": "https://events.ucf.edu/event/4151877/connective-tissue-by-hanna-washburn/"
+        }
+      ],
+      "starts_at": "2026-09-11T10:00:00-04:00",
+      "timezone": "America/New_York",
+      "title": "Connective Tissue by Hanna Washburn",
+      "venue_name": "UCF Art Gallery",
+      "verified_at": "2026-09-06T12:37:35.988441-04:00"
+    },
+    {
+      "access_note": "Public admission; free exhibition and reception. Check organizer details before leaving.",
+      "access_url": "https://cah.ucf.edu/events/ticketing/",
+      "category": "arts_culture",
+      "distance_meters": 18567.713599209128,
+      "ends_at": "2026-09-14T17:00:00-04:00",
+      "entity_id": "09f69bf0-1c91-4414-99bc-ce44c0144682",
+      "expires_at": "2026-09-07T12:37:35.988441-04:00",
+      "h3_r8": "8844a97253fffff",
+      "latitude": 28.602733612060547,
+      "longitude": -81.20378875732422,
+      "metro": "orlando",
+      "occurrence_id": "4151878",
+      "official_url": "https://events.ucf.edu/event/4151878/connective-tissue-by-hanna-washburn/",
+      "series_id": "1126587",
+      "source_id": "ucf_main",
+      "source_name": "UCF Events",
+      "source_url": "https://events.ucf.edu/event/4151878/connective-tissue-by-hanna-washburn/",
+      "sources": [
+        {
+          "name": "UCF Events",
+          "url": "https://events.ucf.edu/event/4151878/connective-tissue-by-hanna-washburn/"
+        }
+      ],
+      "starts_at": "2026-09-14T10:00:00-04:00",
+      "timezone": "America/New_York",
+      "title": "Connective Tissue by Hanna Washburn",
+      "venue_name": "UCF Art Gallery",
+      "verified_at": "2026-09-06T12:37:35.988441-04:00"
+    },
+    {
+      "access_note": "Public admission; free exhibition and reception. Check organizer details before leaving.",
+      "access_url": "https://cah.ucf.edu/events/ticketing/",
+      "category": "arts_culture",
+      "distance_meters": 18567.713599209128,
+      "ends_at": "2026-09-15T17:00:00-04:00",
+      "entity_id": "09f69bf0-1c91-4414-99bc-ce44c0144682",
+      "expires_at": "2026-09-07T12:37:35.988441-04:00",
+      "h3_r8": "8844a97253fffff",
+      "latitude": 28.602733612060547,
+      "longitude": -81.20378875732422,
+      "metro": "orlando",
+      "occurrence_id": "4151879",
+      "official_url": "https://events.ucf.edu/event/4151879/connective-tissue-by-hanna-washburn/",
+      "series_id": "1126587",
+      "source_id": "ucf_main",
+      "source_name": "UCF Events",
+      "source_url": "https://events.ucf.edu/event/4151879/connective-tissue-by-hanna-washburn/",
+      "sources": [
+        {
+          "name": "UCF Events",
+          "url": "https://events.ucf.edu/event/4151879/connective-tissue-by-hanna-washburn/"
+        }
+      ],
+      "starts_at": "2026-09-15T10:00:00-04:00",
+      "timezone": "America/New_York",
+      "title": "Connective Tissue by Hanna Washburn",
+      "venue_name": "UCF Art Gallery",
+      "verified_at": "2026-09-06T12:37:35.988441-04:00"
+    },
+    {
+      "access_note": "Public admission; free exhibition and reception. Check organizer details before leaving.",
+      "access_url": "https://cah.ucf.edu/events/ticketing/",
+      "category": "arts_culture",
+      "distance_meters": 18567.713599209128,
+      "ends_at": "2026-09-16T17:00:00-04:00",
+      "entity_id": "09f69bf0-1c91-4414-99bc-ce44c0144682",
+      "expires_at": "2026-09-07T12:37:35.988441-04:00",
+      "h3_r8": "8844a97253fffff",
+      "latitude": 28.602733612060547,
+      "longitude": -81.20378875732422,
+      "metro": "orlando",
+      "occurrence_id": "4151880",
+      "official_url": "https://events.ucf.edu/event/4151880/connective-tissue-by-hanna-washburn/",
+      "series_id": "1126587",
+      "source_id": "ucf_main",
+      "source_name": "UCF Events",
+      "source_url": "https://events.ucf.edu/event/4151880/connective-tissue-by-hanna-washburn/",
+      "sources": [
+        {
+          "name": "UCF Events",
+          "url": "https://events.ucf.edu/event/4151880/connective-tissue-by-hanna-washburn/"
+        }
+      ],
+      "starts_at": "2026-09-16T10:00:00-04:00",
+      "timezone": "America/New_York",
+      "title": "Connective Tissue by Hanna Washburn",
+      "venue_name": "UCF Art Gallery",
+      "verified_at": "2026-09-06T12:37:35.988441-04:00"
+    },
+    {
+      "access_note": "Public admission; free exhibition and reception. Check organizer details before leaving.",
+      "access_url": "https://cah.ucf.edu/events/ticketing/",
+      "category": "arts_culture",
+      "distance_meters": 18567.713599209128,
+      "ends_at": "2026-09-17T17:00:00-04:00",
+      "entity_id": "09f69bf0-1c91-4414-99bc-ce44c0144682",
+      "expires_at": "2026-09-07T12:37:35.988441-04:00",
+      "h3_r8": "8844a97253fffff",
+      "latitude": 28.602733612060547,
+      "longitude": -81.20378875732422,
+      "metro": "orlando",
+      "occurrence_id": "4151881",
+      "official_url": "https://events.ucf.edu/event/4151881/connective-tissue-by-hanna-washburn/",
+      "series_id": "1126587",
+      "source_id": "ucf_main",
+      "source_name": "UCF Events",
+      "source_url": "https://events.ucf.edu/event/4151881/connective-tissue-by-hanna-washburn/",
+      "sources": [
+        {
+          "name": "UCF Events",
+          "url": "https://events.ucf.edu/event/4151881/connective-tissue-by-hanna-washburn/"
+        }
+      ],
+      "starts_at": "2026-09-17T10:00:00-04:00",
+      "timezone": "America/New_York",
+      "title": "Connective Tissue by Hanna Washburn",
+      "venue_name": "UCF Art Gallery",
+      "verified_at": "2026-09-06T12:37:35.988441-04:00"
+    },
+    {
+      "access_note": "Public admission; free exhibition and reception. Check organizer details before leaving.",
+      "access_url": "https://cah.ucf.edu/events/ticketing/",
+      "category": "arts_culture",
+      "distance_meters": 18567.713599209128,
+      "ends_at": "2026-09-18T17:00:00-04:00",
+      "entity_id": "09f69bf0-1c91-4414-99bc-ce44c0144682",
+      "expires_at": "2026-09-07T12:37:35.988441-04:00",
+      "h3_r8": "8844a97253fffff",
+      "latitude": 28.602733612060547,
+      "longitude": -81.20378875732422,
+      "metro": "orlando",
+      "occurrence_id": "4151882",
+      "official_url": "https://events.ucf.edu/event/4151882/connective-tissue-by-hanna-washburn/",
+      "series_id": "1126587",
+      "source_id": "ucf_main",
+      "source_name": "UCF Events",
+      "source_url": "https://events.ucf.edu/event/4151882/connective-tissue-by-hanna-washburn/",
+      "sources": [
+        {
+          "name": "UCF Events",
+          "url": "https://events.ucf.edu/event/4151882/connective-tissue-by-hanna-washburn/"
+        }
+      ],
+      "starts_at": "2026-09-18T10:00:00-04:00",
+      "timezone": "America/New_York",
+      "title": "Connective Tissue by Hanna Washburn",
+      "venue_name": "UCF Art Gallery",
+      "verified_at": "2026-09-06T12:37:35.988441-04:00"
+    }
+  ],
+  "freshness_note": "Removed after ending or 24 hours without source verification."
+}
