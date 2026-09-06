@@ -124,3 +124,37 @@ establish a usable source sample or coverage denominator. General tourism/arena
 results were not substituted. Jackie's @nycforfree, @thekatieromero, @coolstuffnyc,
 @clubraisin and @fieldnotesnyc remain named publisher leads; no paid/private post
 was collected, no publisher was contacted, and NYC was not added as a metro.
+
+## Owner-requested NYC live preview (September 6)
+
+The six-hour worker refreshes configured sources only. It currently has one UCF
+adapter; it does not discover sources for newly selected launch cities. The owner
+requested running New York to see available results. A separate read-only preview
+now runs with `python -m data_pipeline.preview_nyc_events` from Server's venv.
+It makes no DB writes and does not change the worker roster or app results.
+
+Source: [NYC Parks Public Events, Upcoming 14 Days](https://data.cityofnewyork.us/d/w3wp-dpdi),
+with a working public JSON endpoint and source metadata declaring daily updates.
+At 19:12 EDT on Sept6 it returned 1,198 occurrences. Filtering to not-ended events
+before Sept20 and within 50 km of NYC's selected coordinates left 1,080 preliminary
+candidates: 55 ended/outside-window, five invalid time orders, 12 unusable/missing
+coordinates or times, and 46 explicit cancellations/closed registrations excluded.
+342 candidates have registration links. Repeated sessions count separately.
+This is source yield, not city coverage or 1,080 verified recommendations.
+
+Examples in the feed: Sept7 yoga at Bella Abzug Park (registration link), Sept8
+poetry at Bryant Park, and Sept8 yoga at Randall's Island (registration not required
+according to the feed). Individual official event-page fetches returned 403 in
+this environment, so separate organizer verification was not completed. Sample
+links and diagnostics are in `verification/2026-09-06/nyc-events-preview.json`.
+No descriptions, images, contacts, or event row payloads were saved in that report.
+
+Remaining before NYC app population: implement source dispatch (the worker and
+organizer recheck currently assume UCF), record an approved factual-storage basis
+under AGENTS' data boundary, establish venue/coordinate provenance independently
+of Google, and demonstrate cancellation/expiry and access handling on the emulator.
+The [Open Data terms](https://opendata.cityofnewyork.us/overview/#termsofuse) and
+[NYC terms](https://www.nyc.gov/main/terms-of-use) were read; this preview does not
+claim a new blanket provider-storage approval. A six-hour fetch of this daily
+publication cannot promise six-hour knowledge of organizer changes. These are
+Phase 2 event-source tasks; no NYC ingestion ETA or running schedule is claimed.

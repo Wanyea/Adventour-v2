@@ -4,8 +4,10 @@
 
 Latest label follow-up: New York city/state now have distinct typed labels;
 new-york-city-state-labels.png shows both on the emulator. Ten focused launch
-tests pass. Owner also requested a live NYC event-source preview; the six-hour
-worker currently refreshes UCF only, not automatic new-city discovery.
+tests pass. Owner-requested NYC preview completed: 1,198 NYC Parks rows, 1,080 preliminary
+candidates after date/radius/basic validity/cancellation filters; no NYC DB
+population or schedule change. See local-events.md and nyc-events-preview.json.
+The six-hour worker refreshes UCF only, not automatic new-city discovery.
 
 Latest owner-review correction: the acquired-metro-only launch restriction was
 rejected and replaced with worldwide Photon/OSM lookup. New York now selects real

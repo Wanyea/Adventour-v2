@@ -9,6 +9,8 @@ Owner-review fix: New York no longer resolves to an Orlando POI's coordinates.
 Worldwide city/address lookup is independent of indexed coverage. Events follow
 the selected launch coordinates; changing regions clears prior results;
 see the launch correction in [phase2-results.md](phase2-results.md).
+City/state labels are now distinct. A live NYC Parks source preview is recorded
+in [local-events.md](local-events.md); NYC events are not yet in the app database.
 
 Updated 2026-09-06. Read [HANDOFF.md](../HANDOFF.md) for the closed 23-feature
 product and stopping point, then [AGENTS.md](../AGENTS.md) for the working agreement.

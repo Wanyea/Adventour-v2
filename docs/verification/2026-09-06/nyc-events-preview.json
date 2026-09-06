@@ -1,0 +1,38 @@
+{
+  "checked_at": "2026-09-06T19:12:23.912994-04:00",
+  "source": "NYC Parks Public Events - Upcoming 14 Days",
+  "source_url": "https://data.cityofnewyork.us/d/w3wp-dpdi",
+  "launch": {
+    "latitude": 40.7127281,
+    "longitude": -74.0060152
+  },
+  "radius_meters": 50000,
+  "window_end_exclusive": "2026-09-20T00:00:00-04:00",
+  "source_rows": 1198,
+  "counts": {
+    "ended_or_outside_window": 55,
+    "invalid_time_order": 5,
+    "candidate_occurrences": 1080,
+    "with_registration_link": 342,
+    "missing_or_unusable_time_coordinates": 12,
+    "explicit_closed_registration_or_cancelled": 46
+  },
+  "sample_links": [
+    "http://www.nycgovparks.org/events/2026/09/07/ongoing-outdoor-museum-exhibit-alices-terracotta-garden",
+    "http://www.nycgovparks.org/events/2026/09/07/yoga-with-bien-good-well",
+    "http://www.nycgovparks.org/events/2026/09/08/morning-yoga-at-bryant-park",
+    "http://www.nycgovparks.org/events/2026/09/08/ongoing-outdoor-museum-exhibit-alices-terracotta-garden",
+    "http://www.nycgovparks.org/events/2026/09/08/poetry-at-bryant-park-reading-room",
+    "http://www.nycgovparks.org/events/2026/09/08/planning-an-event-in-your-garden",
+    "http://www.nycgovparks.org/events/2026/09/08/yoga-in-the-park",
+    "http://www.nycgovparks.org/events/2026/09/09/chair-yoga-at-greeley-square-park",
+    "http://www.nycgovparks.org/events/2026/09/09/ongoing-outdoor-museum-exhibit-alices-terracotta-garden",
+    "http://www.nycgovparks.org/events/2026/09/09/yoga"
+  ],
+  "limitations": [
+    "Read-only preview: no DB writes or scheduler changes.",
+    "Candidates still need organizer access checks and location provenance verification.",
+    "Repeated sessions count separately; this is source-specific, not city-wide coverage.",
+    "The dataset updates daily; a six-hour fetch does not improve upstream publication frequency."
+  ]
+}
