@@ -6,6 +6,13 @@
 
 Read this file completely before writing any code or any plan.
 
+**Entry points:** this file, then `AGENTS.md` (the working agreement — repo conventions, data
+boundary, UI freeze). `CLAUDE.md` is a stub pointing at `AGENTS.md`; ignore it.
+
+Nothing in this repository depends on a particular agent harness. Commands are plain
+PowerShell, Bash, `git`, `adb`, `npm` and `python`. Where a doc says "the previous agent" it
+means exactly that — no tooling is implied.
+
 ---
 
 ## 1. What Adventour is
@@ -58,6 +65,12 @@ You are explicitly asked to:
 These exist because a previous unsupervised agent run (branch `codex`) produced **57,655
 insertions across 54 files**, grew `HomeScreen.tsx` from 1,085 lines to **~22,600**, and made
 the app unnavigable. The owner could not review it and abandoned it.
+
+**The diagnosis was process, not capability.** That run had no scope contract, no file-size
+ceiling, no closed feature list, and no checkpoint anchored to something a human could look
+at — so "goal appears satisfied" was optimised for, and ~12,000 lines of self-written tests
+made it look correct. Any capable model given those conditions lands in the same place. The
+constraints below are the guardrails that were missing, not a comment on whoever ran it.
 
 1. **No file in `AdventourApp/` may exceed 1,200 lines.** If a change would push a file over,
    stop and extract instead.
@@ -221,7 +234,7 @@ it, or it is scope creep. Say which.
    design are still good
 6. `docs/scope-e-local-events.md` — researched, unscoped. Local events / third spaces. **Not
    in the §5 list**; treat as future work unless the owner says otherwise
-7. `CLAUDE.md` — working agreement and the data boundary
+7. `AGENTS.md` — working agreement and the data boundary
 8. `Server/data_pipeline/qa/*.json` — **the 268 human labels. The only ground truth that
    exists.** Read the free-text answers, not just the labels
 
@@ -230,7 +243,9 @@ it, or it is scope creep. Say which.
 `Adventour-v1/` is the 2022 implementation. It proved the swipe model; its recommender was
 not personalised.
 
-The `codex` branch is the failed unsupervised run. Useful only as a cautionary example.
+The `codex` branch is the abandoned unsupervised run. Useful as a cautionary example of what
+happens without the §3 constraints — not as a judgement of the agent that produced it. Do not
+port code from it without asking; the owner has asked for that explicitly.
 
 ---
 

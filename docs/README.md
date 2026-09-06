@@ -15,7 +15,7 @@ The index is built, filtered, scored and deduplicated; the app reads it on an em
 paid API calls; swipe feedback persists. The legacy Phase-1 recommender has been deleted — there is
 one code path and no feature flag.
 
-**The UI has still never been touched.** The app is frozen at its `main` baseline (see `../CLAUDE.md`).
+**The UI has still never been touched.** The app is frozen at its `main` baseline (see `../AGENTS.md`).
 
 ---
 
@@ -104,7 +104,7 @@ Carried forward deliberately. Each is measured, not suspected.
 
 ## Working rules
 
-See `../CLAUDE.md`:
+See `../AGENTS.md`:
 
 - One scope at a time. UI is frozen unless the scope is a UI scope.
 - No file in `AdventourApp/` over 1,200 lines.

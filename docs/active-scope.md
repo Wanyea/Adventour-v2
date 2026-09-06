@@ -7,7 +7,7 @@
 ## In scope
 
 1. Ingest Overture Places (+ FSQ OS Places) for **Orlando, FL and Palm Coast, FL only**.
-2. Postgres with H3 indexing for radius queries. **PostGIS was not used** — see CLAUDE.md.
+2. Postgres with H3 indexing for radius queries. **PostGIS was not used** — see AGENTS.md.
 3. Offline feature batch: `chain_probability` (name-frequency clustering), category rarity per H3 cell,
    tourist-cluster density, Overture confidence floor.
 4. Opening-hours seed — Layers 0 and 1 per `sourcing-cost-decision-brief.md` §8.
@@ -19,7 +19,7 @@
 
 ## Explicitly out of scope
 
-- **All UI changes.** The freeze in `CLAUDE.md` applies.
+- **All UI changes.** The freeze in `AGENTS.md` applies.
 - Ranking weights and score tuning — that is Scope B.
 - Group/friend preference blending — Scope D.
 - Itinerary sequencing (TSPTW/OPTW) — later scope; Scope A only ensures hours data exists to make it possible.
@@ -737,7 +737,7 @@ New schema, designed against the index rather than adapted to the old one:
   snapshots `score_snapshot` at decision time. Without that snapshot a re-score silently rewrites
   history and every past event becomes untrainable.
 - **`suppressed_place`** — `google_place_id` plus our own timestamp only, per the boundary in
-  `CLAUDE.md`. A `closed_report` event type writes to it directly.
+  `AGENTS.md`. A `closed_report` event type writes to it directly.
 - **`AdventourStop.entity_id`** (text, deliberately not a foreign key) so a saved stop survives an
   index rebuild. Display coordinates come from the snapshot captured when the card was shown.
 
