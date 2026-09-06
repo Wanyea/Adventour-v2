@@ -1,0 +1,171 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Adventour — help us find the real places</title>
+<style>
+ :root{--bg:#faf9f7;--card:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--line:#e4e1dc;--accent:#1a6b5a;--bad:#a13d3d}
+ @media(prefers-color-scheme:dark){:root{--bg:#16181a;--card:#1f2224;--ink:#eceae7;--muted:#9a9a9a;--line:#33383b;--accent:#4db6a0;--bad:#e08585}}
+ *{box-sizing:border-box}
+ body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}
+ header{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);padding:12px 20px;z-index:10}
+ .hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+ h1{font-size:17px;margin:0;font-weight:650}.spacer{flex:1}
+ main{max-width:720px;margin:0 auto;padding:24px 20px 120px}
+ .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px;margin-bottom:16px}
+ h2{font-size:21px;margin:0 0 6px;line-height:1.25}
+ .meta{color:var(--muted);font-size:13px}
+ .tags{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 16px}
+ .tag{font-size:12px;padding:3px 9px;border:1px solid var(--line);border-radius:20px;color:var(--muted)}
+ .opts{display:grid;gap:7px;margin-top:14px}
+ button.opt{text-align:left;padding:11px 14px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:9px;cursor:pointer;font:inherit;font-size:14px}
+ button.opt:hover{border-color:var(--accent)} button.opt.sel{background:var(--accent);border-color:var(--accent);color:#fff}
+ button.opt kbd{float:right;opacity:.55;font-size:11px}
+ textarea,input[type=text]{width:100%;margin-top:10px;padding:10px;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--ink);font:inherit;font-size:14px}
+ nav{display:flex;gap:10px;margin-top:16px;align-items:center;flex-wrap:wrap}
+ nav button,button.mini{padding:9px 15px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;font:inherit}
+ button.mini{font-size:12px;padding:5px 11px}
+ .primary{background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important}
+ .hint{color:var(--muted);font-size:12.5px}
+ .bar{height:5px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:8px}.bar div{height:100%;background:var(--accent);width:0;transition:width .2s}
+ .zipgrid{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+ .zip{padding:7px 12px;border:1px solid var(--line);border-radius:20px;cursor:pointer;font-size:13.5px}
+ .zip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+ .free label{display:block;font-weight:600;margin:18px 0 4px}.free p{color:var(--muted);font-size:13px;margin:0 0 6px}
+ a{color:var(--accent)}
+ .saved{font-size:12px;color:var(--accent);opacity:0;transition:opacity .25s}.saved.show{opacity:1}
+</style>
+
+<header>
+ <div class="hrow">
+  <h1>Adventour — help us find the real places</h1><span class="spacer"></span>
+  <span class="saved" id="saved">saved</span>
+  <button class="mini" onclick="document.getElementById('imp').click()">Import</button>
+  <button class="mini" onclick="goEnd()">Skip to questions</button>
+  <button class="mini primary" onclick="exportAll()">Export &amp; send</button>
+  <input type="file" id="imp" accept=".json,application/json" style="display:none" onchange="importFile(this)">
+ </div>
+ <div class="hint" id="prog"></div><div class="bar"><div id="pbar"></div></div>
+</header>
+<main id="view"></main>
+
+<script>
+const KIT = {"schema_version":2,"sampling":{"population":"all_tiers","strata":"postcode/tier/chain_class","min_zip":25,"independent_per_stratum":2},"model_revision":{"junk_filter.py":"43fbc75cfae46494e1ad94b71753e0759654b87fc0d49feeec82fa226c8b3ce2","authenticity.py":"9eecf8b439614c97e97d3733c78383af0d2ae299d6c46a52974cd8e9d34a779d","dedup.py":"933f5ad67b4694b5ddd8eef58987765f8697f9536126a4a29652e6d6e76249da"},"places":[{"id":"297a6c9d-9b9b-4284-8bc2-264cc37d2fa3","name":"AATWings","basic_category":"restaurant","chain_class":"independent","postcode":"32110","metro":"palm_coast","score":0.76,"needs_booking":false,"tier":"KEEP","lat":29.46088,"lon":-81.25291},{"id":"0055a47f-e3bd-4b58-a023-d54006f019f0","name":"Three Finger Charlies","basic_category":"bar","chain_class":"independent","postcode":"32110","metro":"palm_coast","score":0.52,"needs_booking":false,"tier":"KEEP","lat":29.46507,"lon":-81.25734},{"id":"8ff4176e-5880-424d-ba95-41bd4f54b68a","name":"Pak's \"Karate\"","basic_category":"sport_or_recreation_club","chain_class":"independent","postcode":"32110","metro":"palm_coast","score":null,"needs_booking":false,"tier":"DROP","lat":29.49165,"lon":-81.26601},{"id":"3625ccbd-970d-43f2-afa8-29f9e7c406ad","name":"Spartan Academy Palm Coast | Brazilian Jiu Jitsu & more","basic_category":"sport_or_recreation_club","chain_class":"independent","postcode":"32110","metro":"palm_coast","score":null,"needs_booking":false,"tier":"DROP","lat":29.4915,"lon":-81.26624},{"id":"f659dbf6-72eb-4f2c-8b94-083b0f0f6450","name":"Twice the Ice of Bunnell","basic_category":"casual_eatery","chain_class":"chain","postcode":"32110","metro":"palm_coast","score":0.47,"needs_booking":false,"tier":"KEEP","lat":29.45784,"lon":-81.25101},{"id":"3a9778fa-fc50-4a61-8ce4-d35cec6ff3e6","name":"Grand Reserve Golf Club","basic_category":"golf_course","chain_class":"independent","postcode":"32110","metro":"palm_coast","score":null,"needs_booking":false,"tier":"GATED","lat":29.48298,"lon":-81.25491},{"id":"0d27152b-7370-47ed-a25b-6c1245a065e2","name":"Wendy's","basic_category":"fast_food_restaurant","chain_class":"chain","postcode":"32110","metro":"palm_coast","score":0.46,"needs_booking":false,"tier":"KEEP","lat":29.47475,"lon":-81.23991},{"id":"d25c2a55-2e74-461e-9d19-ff467021d693","name":"Bella Vista Apartments","basic_category":"historic_site","chain_class":"regional","postcode":"32110","metro":"palm_coast","score":null,"needs_booking":false,"tier":"DROP","lat":29.46807,"lon":-81.24967},{"id":"582941d4-dd3f-4947-966a-791c3213e308","name":"Dex N Angie House of Flavor","basic_category":"restaurant","chain_class":"regional","postcode":"32110","metro":"palm_coast","score":0.67,"needs_booking":false,"tier":"KEEP","lat":29.47308,"lon":-81.24951},{"id":"36e7b228-55e5-4b79-92fd-55f6d5d74018","name":"Disabled American Veterans","basic_category":"bar","chain_class":"chain","postcode":"32136","metro":"palm_coast","score":null,"needs_booking":false,"tier":"DROP","lat":29.47754,"lon":-81.12746},{"id":"c3ad8be1-cb36-46b3-8fec-a2a33875b5e7","name":"Rise at the Island","basic_category":"restaurant","chain_class":"regional","postcode":"32136","metro":"palm_coast","score":0.92,"needs_booking":false,"tier":"KEEP","lat":29.47302,"lon":-81.12399},{"id":"ff19f774-a8d4-45dc-aeeb-b2d4a8b25ecc","name":"Bartolome Colom","basic_category":"restaurant","chain_class":"independent","postcode":"32136","metro":"palm_coast","score":0.53,"needs_booking":false,"tier":"KEEP","lat":29.47609,"lon":-81.1497},{"id":"c21386f9-958f-40ae-922d-72f597f38273","name":"Oceanside Beach Bar & Grill","basic_category":"restaurant","chain_class":"independent","postcode":"32136","metro":"palm_coast","score":0.91,"needs_booking":false,"tier":"KEEP","lat":29.4623,"lon":-81.11864},{"id":"c73fe185-fe47-462b-a29a-f24b0fa2ff29","name":"James A Merrill Jr Llc","basic_category":"restaurant","chain_class":"independent","postcode":"32136","metro":"palm_coast","score":null,"needs_booking":false,"tier":"DROP","lat":29.4787,"lon":-81.13509},{"id":"de9b176c-5e19-48ea-b43e-cded8606c97e","name":"Aliki Gold Coast Condos","basic_category":"historic_site","chain_class":"independent","postcode":"32136","metro":"palm_coast","score":null,"needs_booking":false,"tier":"DROP","lat":29.49594,"lon":-81.1356},{"id":"f883645f-07b0-4e3a-ad17-a686072e284f","name":"A1A Burrito Works Taco Shop","basic_category":"restaurant","chain_class":"regional","postcode":"32136","metro":"palm_coast","score":0.95,"needs_booking":false,"tier":"KEEP","lat":29.47891,"lon":-81.12678},{"id":"a296a2b1-c791-4623-9f6e-d3f8e58d9605","name":"Tony's Pizza","basic_category":"restaurant","chain_class":"chain","postcode":"32136","metro":"palm_coast","score":0.5,"needs_booking":false,"tier":"KEEP","lat":29.47852,"lon":-81.14689},{"id":"1e62cf12-007e-4bd7-9b7c-932ca06501c0","name":"Uncle Louie G","basic_category":"casual_eatery","chain_class":"regional","postcode":"32136","metro":"palm_coast","score":0.98,"needs_booking":false,"tier":"KEEP","lat":29.47971,"lon":-81.12833},{"id":"eab69e4e-cee4-40eb-b265-0adc8b0484e5","name":"Veterans Park","basic_category":"park","chain_class":"chain","postcode":"32136","metro":"palm_coast","score":null,"needs_booking":false,"tier":"DROP","lat":29.48051,"lon":-81.12762},{"id":"e01e5b21-1fbb-44ab-a0c0-7f4eec26050a","name":"Pizza Hut Express","basic_category":"fast_food_restaurant","chain_class":"chain","postcode":"32136","metro":"palm_coast","score":0.45,"needs_booking":false,"tier":"KEEP","lat":29.47642,"lon":-81.18152},{"id":"aaba1360-03e7-463e-bd51-f5c42a9500f0","name":"Ocean Palm Golf Course","basic_category":"golf_course","chain_class":"independent","postcode":"32136","metro":"palm_coast","score":null,"needs_booking":false,"tier":"GATED","lat":29.43042,"lon":-81.10538},{"id":"ed4fb44f-49ee-4ecf-b7c4-c0ba8566086b","name":"Texas Roadhouse","basic_category":"restaurant","chain_class":"chain","postcode":"32137","metro":"palm_coast","score":0.53,"needs_booking":false,"tier":"KEEP","lat":29.55266,"lon":-81.22906},{"id":"1a26045f-b63d-4304-9c02-63f4956ace87","name":"Gourmet Deli","basic_category":"casual_eatery","chain_class":"independent","postcode":"32137","metro":"palm_coast","score":0.76,"needs_booking":false,"tier":"KEEP","lat":29.55376,"lon":-81.25304},{"id":"603056bd-de39-4963-b284-c58dd09e1825","name":"Woody's Bar-b-que","basic_category":"restaurant","chain_class":"independent","postcode":"32137","metro":"palm_coast","score":0.55,"needs_booking":false,"tier":"KEEP","lat":29.47525,"lon":-81.18091},{"id":"e9d608f3-fbcc-476a-9bc1-cf6717eb87a7","name":"Ethan Networks Inc","basic_category":"restaurant","chain_class":"independent","postcode":"32137","metro":"palm_coast","score":null,"needs_booking":false,"tier":"DROP","lat":29.55376,"lon":-81.25304},{"id":"56f15f3a-8f2d-4764-abfd-a3b2fe61a2df","name":"Moes Southwest Grill","basic_category":"restaurant","chain_class":"chain","postcode":"32137","metro":"palm_coast","score":0.54,"needs_booking":false,"tier":"KEEP","lat":29.55686,"lon":-81.21136},{"id":"cb469b1f-615e-4dfd-baca-8cbde4cf7d66","name":"Palm Harbor Golf Club","basic_category":"golf_course","chain_class":"independent","postcode":"32137","metro":"palm_coast","score":null,"needs_booking":false,"tier":"GATED","lat":29.56979,"lon":-81.19883},{"id":"9ecd3366-571c-4317-9cf5-57ce8d9a0f85","name":"So Good Mochi","basic_category":"food_truck_stand","chain_class":"independent","postcode":"32137","metro":"palm_coast","score":null,"needs_booking":false,"tier":"MOBILE","lat":29.55392,"lon":-81.22876},{"id":"a0d0c982-3ff7-4fde-9c60-3e710b6b473d","name":"Pointe Grand Palm Coast","basic_category":"historic_site","chain_class":"independent","postcode":"32137","metro":"palm_coast","score":null,"needs_booking":false,"tier":"DROP","lat":29.60039,"lon":-81.22836},{"id":"f67fe1b2-bfa5-42b4-882c-aa9eecb86c92","name":"Salsas Mexican Restaurant","basic_category":"restaurant","chain_class":"regional","postcode":"32137","metro":"palm_coast","score":0.97,"needs_booking":false,"tier":"KEEP","lat":29.5576,"lon":-81.21256},{"id":"20c68d25-af36-4875-b0fe-cf6a16460f3b","name":"Waterside At Palm Coast Condominiums","basic_category":"historic_site","chain_class":"regional","postcode":"32137","metro":"palm_coast","score":null,"needs_booking":false,"tier":"DROP","lat":29.57617,"lon":-81.19527},{"id":"5595a0fe-a335-459f-a4b8-2d46f5a547ff","name":"Conservatory Golf Course at Hammock Beach Resort","basic_category":"golf_course","chain_class":"independent","postcode":"32137","metro":"palm_coast","score":null,"needs_booking":false,"tier":"GATED","lat":29.61577,"lon":-81.23837},{"id":"ea99ba74-9788-4b77-b0a9-bdb1891d5afc","name":"Sushi 99","basic_category":"restaurant","chain_class":"regional","postcode":"32137","metro":"palm_coast","score":0.97,"needs_booking":false,"tier":"KEEP","lat":29.55689,"lon":-81.2114},{"id":"9e149237-eea4-4229-8aae-21c9602e1a08","name":"Bronx House Pizza - Hammock Beach","basic_category":"restaurant","chain_class":"regional","postcode":"32137","metro":"palm_coast","score":0.91,"needs_booking":false,"tier":"KEEP","lat":29.59937,"lon":-81.19677},{"id":"6abd16ad-e6df-44e8-bc14-e54415b10c2b","name":"Calvary Christian Center","basic_category":"religious_organization","chain_class":"regional","postcode":"32137","metro":"palm_coast","score":null,"needs_booking":false,"tier":"DROP","lat":29.55312,"lon":-81.24265},{"id":"2f495e8a-0a63-4581-ba3a-ba608840c5e9","name":"Intracoastal Waterway","basic_category":null,"chain_class":"chain","postcode":"32137","metro":"palm_coast","score":null,"needs_booking":false,"tier":"DROP","lat":29.57589,"lon":-81.19871},{"id":"9cab108c-1133-4ba1-89b4-b678fdc1ec7f","name":"Temple Beth Shalom-palm Coast","basic_category":"jewish_place_of_worship","chain_class":"independent","postcode":"32164","metro":"palm_coast","score":null,"needs_booking":false,"tier":"DROP","lat":29.54556,"lon":-81.23769},{"id":"67e72520-274c-4208-8097-56830875318c","name":"Tijuana Flats","basic_category":"restaurant","chain_class":"chain","postcode":"32164","metro":"palm_coast","score":0.49,"needs_booking":false,"tier":"KEEP","lat":29.47628,"lon":-81.19469},{"id":"a6cb6011-6085-433b-9766-46aa647a0bee","name":"Goshin Ryu Karate","basic_category":"sport_or_recreation_club","chain_class":"independent","postcode":"32164","metro":"palm_coast","score":null,"needs_booking":false,"tier":"DROP","lat":29.50189,"lon":-81.21005},{"id":"4aa0792b-7a41-4995-85f3-f77a1f06e391","name":"Taco Bell","basic_category":"fast_food_restaurant","chain_class":"chain","postcode":"32164","metro":"palm_coast","score":0.51,"needs_booking":false,"tier":"KEEP","lat":29.47509,"lon":-81.22124},{"id":"0e13f607-5e81-4835-99b3-9a4fb300c21c","name":"Flagler Outdoor Rink","basic_category":"skating_rink","chain_class":"independent","postcode":"32164","metro":"palm_coast","score":null,"needs_booking":false,"tier":"GATED","lat":29.47667,"lon":-81.20732},{"id":"cb5a9d09-c22f-4ded-a92a-24ebda1355b6","name":"Ger-Rain\u2019s Tiki Shack","basic_category":"bar","chain_class":"independent","postcode":"32164","metro":"palm_coast","score":0.79,"needs_booking":false,"tier":"KEEP","lat":29.53918,"lon":-81.2624},{"id":"52963f25-a532-48c5-a465-96ba7adbafa5","name":"Fancy Sushi","basic_category":"restaurant","chain_class":"regional","postcode":"32164","metro":"palm_coast","score":0.93,"needs_booking":false,"tier":"KEEP","lat":29.47608,"lon":-81.21377},{"id":"80cea05d-e34a-4032-9ef3-539ca7bb6d60","name":"Toasties_redefined","basic_category":"restaurant","chain_class":"independent","postcode":"32164","metro":"palm_coast","score":0.63,"needs_booking":false,"tier":"KEEP","lat":29.48945,"lon":-81.22137},{"id":"207c9f07-2128-4c63-bae0-69e92bad2e56","name":"Cypress Knoll Golf & Country Club","basic_category":"golf_course","chain_class":"independent","postcode":"32164","metro":"palm_coast","score":null,"needs_booking":false,"tier":"GATED","lat":29.48774,"lon":-81.23363},{"id":"38bd7ee1-efe6-40ff-aea4-c187c53ad164","name":"The Journey Church","basic_category":"religious_organization","chain_class":"regional","postcode":"32164","metro":"palm_coast","score":null,"needs_booking":false,"tier":"DROP","lat":29.50182,"lon":-81.2523},{"id":"7b5e4a3b-c0f7-4997-97d5-05a7d9bb9441","name":"Golden Chopsticks","basic_category":"restaurant","chain_class":"regional","postcode":"32164","metro":"palm_coast","score":0.52,"needs_booking":false,"tier":"KEEP","lat":29.55208,"lon":-81.22137},{"id":"8050c268-745d-436d-a539-7fd81262dd77","name":"Great American Grill","basic_category":"restaurant","chain_class":"regional","postcode":"32164","metro":"palm_coast","score":0.83,"needs_booking":false,"tier":"KEEP","lat":29.47721,"lon":-81.1954},{"id":"6ab63122-ccb5-4973-8efa-df3725e26c86","name":"Golf USA","basic_category":"golf_course","chain_class":"regional","postcode":"32164","metro":"palm_coast","score":null,"needs_booking":false,"tier":"GATED","lat":29.55137,"lon":-81.22231},{"id":"2097323b-0d99-4a98-ac6d-ffc55dc705bd","name":"Chabad Jewish Center of Palm Coast","basic_category":"religious_organization","chain_class":"regional","postcode":"32164","metro":"palm_coast","score":null,"needs_booking":false,"tier":"DROP","lat":29.54876,"lon":-81.22865}],"kit_id":"1044c99bb3704ae94ea25614"};
+const DATA = KIT.places;
+const OPTIONS = [
+ ["gem","Local gem — authentic, I'd send a friend here"],
+ ["solid","Solid local spot — real, but not special"],
+ ["generic","Generic — fine, forgettable"],
+ ["not_worth","Real place, but I'd never recommend it"],
+ ["chain","Chain or franchise"],
+ ["trap","Tourist trap"],
+ ["junk","Not a real destination (office, campus, condo…)"],
+ ["unknown","Don't know it"]];
+const KEY="adventour_fieldkit_v2_"+KIT.kit_id;
+function restore(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback}catch(e){return fallback}}
+let state=restore(KEY,{}), picked=restore(KEY+"_zips",[]), freeform=restore(KEY+"_free",{});
+let deck=[], i=0, phase=picked.length?"deck":"pick", t0;
+
+const ZIPS=[...new Set(DATA.map(p=>p.postcode))].sort();
+function save(){let message="saved on this browser";try{localStorage.setItem(KEY,JSON.stringify(state));localStorage.setItem(KEY+"_zips",JSON.stringify(picked));localStorage.setItem(KEY+"_free",JSON.stringify(freeform))}catch(e){message="Export before closing: browser storage unavailable"}
+ const e=document.getElementById("saved");if(!e)return;e.textContent=message;e.classList.add("show");clearTimeout(t0);t0=setTimeout(()=>e.classList.remove("show"),4000);}
+function buildDeck(){deck=DATA.filter(p=>picked.includes(p.postcode));}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function goEnd(){if(!picked.length){alert("Pick at least one ZIP code first.");return;}phase="end";render();}
+
+function pickView(){
+ const byZip={};DATA.forEach(p=>byZip[p.postcode]=(byZip[p.postcode]||0)+1);
+ return `<div class="card">
+  <h2>Which areas do you actually know?</h2>
+  <p class="meta">Pick the ZIP codes you could give someone real advice about. Only pick places you
+   know well — a guess is worse than nothing here.</p>
+  <div class="zipgrid">${ZIPS.map(z=>`<div class="zip ${picked.includes(z)?"on":""}" onclick="toggleZip('${z}')">${z} <span class="hint">${byZip[z]}</span></div>`).join("")}</div>
+  <nav><button class="primary" onclick="startDeck()">Start — ${picked.length} area(s)</button></nav>
+  <p class="hint" style="margin-top:14px">Don't see your area? We only cover cities we've loaded so far.
+   Reply and tell us where you are.</p></div>`;
+}
+function toggleZip(z){picked=picked.includes(z)?picked.filter(x=>x!==z):[...picked,z];save();render();}
+function startDeck(){if(!picked.length){alert("Pick at least one ZIP code.");return;}buildDeck();phase="deck";i=0;render();}
+
+function deckView(){
+ const p=deck[i];if(!p)return endView();
+ const cur=(state[p.id]||{}).label;
+ const maps=`https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lon}`;
+ return `<div class="card">
+  <div class="meta">${i+1} of ${deck.length} &middot; ${p.postcode}</div>
+  <h2>${esc(p.name)}</h2>
+  <div class="meta">${esc(p.basic_category||"")}</div>
+  <div><a href="${maps}" target="_blank" rel="noopener">Look it up on Maps &#8599;</a></div>
+  <div class="opts">${OPTIONS.map(([v,l],n)=>`<button class="opt ${cur===v?"sel":""}" onclick="setLabel('${p.id}','${v}')">${l}<kbd>${n+1}</kbd></button>`).join("")}</div>
+  ${attributeView(p.id)}
+  <textarea rows="2" placeholder="Anything worth saying? (optional — saves on its own)"
+   oninput="setNote('${p.id}',this.value)">${esc((state[p.id]||{}).note||"")}</textarea>
+  <nav><button onclick="if(i>0){i--;render()}">← Back</button>
+   <button onclick="next()">Next — no label needed →</button>
+   <span class="hint">press 1–8</span></nav></div>`;
+}
+function setLabel(id,v){state[id]=Object.assign({},state[id],{label:v});save();render();}
+const ATTRS={operation:["Is it currently operating?",["open","closed","unknown"]],
+ public_access:["Can the public visit?",["yes","restricted","unknown"]],
+ booking:["Does it need advance booking?",["required","optional","no","unknown"]]};
+function attributeView(id){const a=(state[id]||{}).attributes||{};
+ return Object.entries(ATTRS).map(([key,[label,values]])=>`<p><label>${label}
+ <select onchange="setAttribute('${id}','${key}',this.value)"><option value="">Skip</option>
+ ${values.map(v=>`<option value="${v}" ${a[key]===v?'selected':''}>${v}</option>`).join('')}</select></label></p>`).join('');}
+function setAttribute(id,key,value){state[id]=state[id]||{};state[id].attributes=state[id].attributes||{};
+ if(value)state[id].attributes[key]=value;else delete state[id].attributes[key];save();}
+function setNote(id,v){state[id]=Object.assign({},state[id],{note:v});save();}
+function next(){if(i<deck.length-1){i++;render()}else{phase="end";render()}}
+
+const FREE=[["missing","Which places here should we absolutely recommend?","List them even if you didn't see them above — especially then. This tells us what we're missing."],
+ ["traps","What would a visitor wrongly be sent to?","Places that look good online but locals know better."],
+ ["areas","Where do locals actually go?","Streets, strips, neighbourhoods."],
+ ["auth","What makes a place feel authentic to you?","In your words."],
+ ["events","Any recurring local events worth knowing about?","Art markets, run clubs, open mics, first-Friday things."],
+ ["evsources","Where do locals find out about those events?","Instagram accounts, newsletters, flyers, word of mouth."]];
+
+function endView(){
+ const f=freeform;
+ return `<div class="card free">
+  <h2>Nearly done — the part that helps most</h2>
+  <p class="hint">These written answers are more useful than the cards. Skip any that don't apply.</p>
+  ${FREE.map(([k,q,h])=>`<label>${q}</label><p>${h}</p><textarea rows="4" id="f_${k}"
+    oninput="saveFree('${k}',this.value)">${esc(f[k]||"")}</textarea>`).join("")}
+  <nav><button onclick="phase='deck';i=Math.max(0,deck.length-1);render()">← Back to places</button>
+   <button class="primary" onclick="exportAll()">Download my answers</button></nav>
+  <p class="hint" style="margin-top:14px">This downloads one file. Email it back — it contains only
+   your answers and sampled place identifiers. Do not include private information in written answers.</p></div>`;
+}
+function saveFree(k,v){freeform[k]=v;save();}
+
+function importFile(input){const file=input.files&&input.files[0];if(!file)return;
+ const r=new FileReader();r.onload=()=>{let d;try{d=JSON.parse(r.result)}catch(e){alert("Not a valid file.");return}
+  if(d.schema_version!==2||d.kit_id!==KIT.kit_id||!Array.isArray(d.labels)||!Array.isArray(d.zips)){alert("These answers belong to a different kit or format.");return}
+  const known=new Set(DATA.map(p=>p.id));let n=0;
+  if(d.labels.some(x=>!x||!known.has(x.id)||(x.label&&!OPTIONS.some(([v])=>v===x.label)))||d.zips.some(z=>!ZIPS.includes(z))){alert("Unrecognized place, answer or ZIP.");return}
+  d.labels.forEach(x=>{state[x.id]={label:x.label||null,note:typeof x.note==='string'?x.note:'',attributes:x.attributes||{}};n++});
+  picked=[...new Set([...picked,...d.zips])];
+  if(d.freeform&&typeof d.freeform==='object')freeform=Object.assign(freeform,d.freeform);
+  save();buildDeck();input.value="";alert(n+" answers restored.");render();};r.readAsText(file);}
+
+function exportAll(){
+ const out={schema_version:2,kit_id:KIT.kit_id,exported_at:new Date().toISOString(),zips:picked,
+  labels:DATA.filter(p=>picked.includes(p.postcode)&&state[p.id])
+    .map(p=>({id:p.id,label:state[p.id].label||null,note:state[p.id].note||"",attributes:state[p.id].attributes||{}})),
+  freeform};
+ const a=document.createElement("a");
+ a.href=URL.createObjectURL(new Blob([JSON.stringify(out,null,2)],{type:"application/json"}));
+ a.download="adventour_answers_"+KIT.kit_id+".json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
+
+function render(){
+ const done=deck.filter(p=>state[p.id]&&state[p.id].label).length;
+ document.getElementById("prog").textContent = phase==="pick" ? "Step 1 of 2 — choose your areas"
+   : `${done} of ${deck.length} labelled${picked.length?" · "+picked.join(", "):""}`;
+ document.getElementById("pbar").style.width = deck.length?(100*done/deck.length)+"%":"0%";
+ document.getElementById("view").innerHTML =
+   phase==="pick"?pickView():phase==="end"?endView():deckView();
+}
+addEventListener("keydown",e=>{if(["TEXTAREA","INPUT","SELECT"].includes(e.target.tagName)||phase!=="deck")return;
+ const n=parseInt(e.key,10);if(n>=1&&n<=OPTIONS.length&&deck[i])setLabel(deck[i].id,OPTIONS[n-1][0]);
+ if(e.key==="ArrowLeft"&&i>0){i--;render()} if(e.key==="ArrowRight")next();});
+if(picked.length)buildDeck();
+render();
+</script>

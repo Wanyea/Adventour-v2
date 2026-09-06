@@ -9,8 +9,8 @@ embedded up front and the deck is assembled in the browser. That caps coverage a
 the metros already ingested -- adding a new city means ingesting it, not changing
 this file.
 
-    python make_field_kit.py                    # every ZIP with enough places
-    python make_field_kit.py --per-zip 40       # bigger decks, bigger file
+    python -m data_pipeline.make_field_kit                    # from Server/
+    python -m data_pipeline.make_field_kit --metro palm_coast  # one metro
 """
 
 import argparse
@@ -21,29 +21,30 @@ from pathlib import Path
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
+from evaluation.field_kit import KITS, make_manifest
+
 DSN = os.environ.get("ADVENTOUR_PG_DSN", "host=localhost port=5432 user=postgres dbname=adventour")
 OUT = Path(__file__).resolve().parent / "qa" / "adventour_field_kit.html"
 MIN_PER_ZIP = 25
 
-# Mirrors the labelling tool's strata so the returned data is directly comparable
-# with the Palm Coast and Orlando sets.
+# Include every tier: a KEEP-only kit cannot measure filter recall or lost gems.
 SQL = """
 WITH ranked AS (
     SELECT DISTINCT ON (COALESCE(canonical_id, id))
            COALESCE(canonical_id, id) AS id, name, basic_category, chain_class,
            postcode, metro, round(authenticity::numeric, 2) AS score,
-           needs_booking,
+           needs_booking, tier,
            COALESCE(canonical_lat, lat) AS lat, COALESCE(canonical_lon, lon) AS lon
     FROM places
-    WHERE tier = 'KEEP' AND authenticity >= 0.30
-      AND postcode IS NOT NULL AND postcode <> ''
-    ORDER BY COALESCE(canonical_id, id), cluster_size DESC NULLS LAST
+    WHERE postcode IS NOT NULL AND postcode <> ''
+      AND (%(metros)s::text[] IS NULL OR metro = ANY(%(metros)s))
+    ORDER BY COALESCE(canonical_id, id), (id = COALESCE(canonical_id, id)) DESC, id
 ), counted AS (
     SELECT *, count(*) OVER (PARTITION BY postcode) AS zip_total,
-           row_number() OVER (PARTITION BY postcode, chain_class ORDER BY md5(id)) AS rn
+           row_number() OVER (PARTITION BY postcode, tier, chain_class ORDER BY md5(id)) AS rn
     FROM ranked
 )
-SELECT id, name, basic_category, chain_class, postcode, metro, score, needs_booking, lat, lon
+SELECT id, name, basic_category, chain_class, postcode, metro, score, needs_booking, tier, lat, lon
 FROM counted
 WHERE zip_total >= %(min_zip)s
   AND rn <= CASE chain_class
@@ -103,7 +104,8 @@ HTML = """<!doctype html>
 <main id="view"></main>
 
 <script>
-const DATA = __DATA__;
+const KIT = __DATA__;
+const DATA = KIT.places;
 const OPTIONS = [
  ["gem","Local gem — authentic, I'd send a friend here"],
  ["solid","Solid local spot — real, but not special"],
@@ -113,14 +115,14 @@ const OPTIONS = [
  ["trap","Tourist trap"],
  ["junk","Not a real destination (office, campus, condo…)"],
  ["unknown","Don't know it"]];
-const KEY="adventour_fieldkit_v1";
-let state=JSON.parse(localStorage.getItem(KEY)||"{}");
-let picked=JSON.parse(localStorage.getItem(KEY+"_zips")||"[]");
+const KEY="adventour_fieldkit_v2_"+KIT.kit_id;
+function restore(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback}catch(e){return fallback}}
+let state=restore(KEY,{}), picked=restore(KEY+"_zips",[]), freeform=restore(KEY+"_free",{});
 let deck=[], i=0, phase=picked.length?"deck":"pick", t0;
 
 const ZIPS=[...new Set(DATA.map(p=>p.postcode))].sort();
-function save(){localStorage.setItem(KEY,JSON.stringify(state));localStorage.setItem(KEY+"_zips",JSON.stringify(picked));
- const e=document.getElementById("saved");if(!e)return;e.textContent="saved";e.classList.add("show");clearTimeout(t0);t0=setTimeout(()=>e.classList.remove("show"),1400);}
+function save(){let message="saved on this browser";try{localStorage.setItem(KEY,JSON.stringify(state));localStorage.setItem(KEY+"_zips",JSON.stringify(picked));localStorage.setItem(KEY+"_free",JSON.stringify(freeform))}catch(e){message="Export before closing: browser storage unavailable"}
+ const e=document.getElementById("saved");if(!e)return;e.textContent=message;e.classList.add("show");clearTimeout(t0);t0=setTimeout(()=>e.classList.remove("show"),4000);}
 function buildDeck(){deck=DATA.filter(p=>picked.includes(p.postcode));}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function goEnd(){if(!picked.length){alert("Pick at least one ZIP code first.");return;}phase="end";render();}
@@ -147,16 +149,25 @@ function deckView(){
   <div class="meta">${i+1} of ${deck.length} &middot; ${p.postcode}</div>
   <h2>${esc(p.name)}</h2>
   <div class="meta">${esc(p.basic_category||"")}</div>
-  <div class="tags"><span class="tag">${p.chain_class}</span>${p.needs_booking?'<span class="tag">ticket / booking</span>':""}</div>
   <div><a href="${maps}" target="_blank" rel="noopener">Look it up on Maps &#8599;</a></div>
   <div class="opts">${OPTIONS.map(([v,l],n)=>`<button class="opt ${cur===v?"sel":""}" onclick="setLabel('${p.id}','${v}')">${l}<kbd>${n+1}</kbd></button>`).join("")}</div>
+  ${attributeView(p.id)}
   <textarea rows="2" placeholder="Anything worth saying? (optional — saves on its own)"
    oninput="setNote('${p.id}',this.value)">${esc((state[p.id]||{}).note||"")}</textarea>
   <nav><button onclick="if(i>0){i--;render()}">← Back</button>
    <button onclick="next()">Next — no label needed →</button>
    <span class="hint">press 1–8</span></nav></div>`;
 }
-function setLabel(id,v){state[id]=Object.assign({},state[id],{label:v});save();render();setTimeout(next,120);}
+function setLabel(id,v){state[id]=Object.assign({},state[id],{label:v});save();render();}
+const ATTRS={operation:["Is it currently operating?",["open","closed","unknown"]],
+ public_access:["Can the public visit?",["yes","restricted","unknown"]],
+ booking:["Does it need advance booking?",["required","optional","no","unknown"]]};
+function attributeView(id){const a=(state[id]||{}).attributes||{};
+ return Object.entries(ATTRS).map(([key,[label,values]])=>`<p><label>${label}
+ <select onchange="setAttribute('${id}','${key}',this.value)"><option value="">Skip</option>
+ ${values.map(v=>`<option value="${v}" ${a[key]===v?'selected':''}>${v}</option>`).join('')}</select></label></p>`).join('');}
+function setAttribute(id,key,value){state[id]=state[id]||{};state[id].attributes=state[id].attributes||{};
+ if(value)state[id].attributes[key]=value;else delete state[id].attributes[key];save();}
 function setNote(id,v){state[id]=Object.assign({},state[id],{note:v});save();}
 function next(){if(i<deck.length-1){i++;render()}else{phase="end";render()}}
 
@@ -168,7 +179,7 @@ const FREE=[["missing","Which places here should we absolutely recommend?","List
  ["evsources","Where do locals find out about those events?","Instagram accounts, newsletters, flyers, word of mouth."]];
 
 function endView(){
- const f=JSON.parse(localStorage.getItem(KEY+"_free")||"{}");
+ const f=freeform;
  return `<div class="card free">
   <h2>Nearly done — the part that helps most</h2>
   <p class="hint">These written answers are more useful than the cards. Skip any that don't apply.</p>
@@ -177,29 +188,28 @@ function endView(){
   <nav><button onclick="phase='deck';i=Math.max(0,deck.length-1);render()">← Back to places</button>
    <button class="primary" onclick="exportAll()">Download my answers</button></nav>
   <p class="hint" style="margin-top:14px">This downloads one file. Email it back — it contains only
-   your answers, no personal information.</p></div>`;
+   your answers and sampled place identifiers. Do not include private information in written answers.</p></div>`;
 }
-function saveFree(k,v){const f=JSON.parse(localStorage.getItem(KEY+"_free")||"{}");f[k]=v;localStorage.setItem(KEY+"_free",JSON.stringify(f));save();}
+function saveFree(k,v){freeform[k]=v;save();}
 
 function importFile(input){const file=input.files&&input.files[0];if(!file)return;
  const r=new FileReader();r.onload=()=>{let d;try{d=JSON.parse(r.result)}catch(e){alert("Not a valid file.");return}
+  if(d.schema_version!==2||d.kit_id!==KIT.kit_id||!Array.isArray(d.labels)||!Array.isArray(d.zips)){alert("These answers belong to a different kit or format.");return}
   const known=new Set(DATA.map(p=>p.id));let n=0;
-  (d.labels||[]).forEach(x=>{if(x&&x.id&&known.has(x.id)&&(x.label||x.note)){state[x.id]=Object.assign({},state[x.id],x.label?{label:x.label}:{},x.note?{note:x.note}:{});n++}});
-  if(d.zips)picked=[...new Set([...picked,...d.zips])];
-  if(d.freeform)localStorage.setItem(KEY+"_free",JSON.stringify(Object.assign(JSON.parse(localStorage.getItem(KEY+"_free")||"{}"),d.freeform)));
+  if(d.labels.some(x=>!x||!known.has(x.id)||(x.label&&!OPTIONS.some(([v])=>v===x.label)))||d.zips.some(z=>!ZIPS.includes(z))){alert("Unrecognized place, answer or ZIP.");return}
+  d.labels.forEach(x=>{state[x.id]={label:x.label||null,note:typeof x.note==='string'?x.note:'',attributes:x.attributes||{}};n++});
+  picked=[...new Set([...picked,...d.zips])];
+  if(d.freeform&&typeof d.freeform==='object')freeform=Object.assign(freeform,d.freeform);
   save();buildDeck();input.value="";alert(n+" answers restored.");render();};r.readAsText(file);}
 
 function exportAll(){
- const f=JSON.parse(localStorage.getItem(KEY+"_free")||"{}");
- const out={kit_version:DATA.length,generated_at:new Date().toISOString(),zips:picked,
-  labels:DATA.filter(p=>state[p.id]&&(state[p.id].label||state[p.id].note))
-    .map(p=>({id:p.id,name:p.name,basic_category:p.basic_category,our_chain_class:p.chain_class,
-              postcode:p.postcode,metro:p.metro,our_score:p.score,
-              label:(state[p.id]||{}).label||null,note:(state[p.id]||{}).note||null})),
-  freeform:f};
+ const out={schema_version:2,kit_id:KIT.kit_id,exported_at:new Date().toISOString(),zips:picked,
+  labels:DATA.filter(p=>picked.includes(p.postcode)&&state[p.id])
+    .map(p=>({id:p.id,label:state[p.id].label||null,note:state[p.id].note||"",attributes:state[p.id].attributes||{}})),
+  freeform};
  const a=document.createElement("a");
  a.href=URL.createObjectURL(new Blob([JSON.stringify(out,null,2)],{type:"application/json"}));
- a.download="adventour_answers.json";a.click();}
+ a.download="adventour_answers_"+KIT.kit_id+".json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
 
 function render(){
  const done=deck.filter(p=>state[p.id]&&state[p.id].label).length;
@@ -209,7 +219,7 @@ function render(){
  document.getElementById("view").innerHTML =
    phase==="pick"?pickView():phase==="end"?endView():deckView();
 }
-addEventListener("keydown",e=>{if(e.target.tagName==="TEXTAREA"||phase!=="deck")return;
+addEventListener("keydown",e=>{if(["TEXTAREA","INPUT","SELECT"].includes(e.target.tagName)||phase!=="deck")return;
  const n=parseInt(e.key,10);if(n>=1&&n<=OPTIONS.length&&deck[i])setLabel(deck[i].id,OPTIONS[n-1][0]);
  if(e.key==="ArrowLeft"&&i>0){i--;render()} if(e.key==="ArrowRight")next();});
 if(picked.length)buildDeck();
@@ -220,11 +230,16 @@ render();
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--per-zip", type=int, default=30, help="independents sampled per ZIP")
+    ap.add_argument("--per-zip", type=int, default=30, help="independents per ZIP/tier stratum")
+    ap.add_argument("--metro", action="append", help="repeat to include multiple ingested metros")
+    ap.add_argument("--min-zip", type=int, default=MIN_PER_ZIP)
+    ap.add_argument("--output", type=Path, default=OUT)
     args = ap.parse_args()
 
     with psycopg2.connect(DSN) as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
-        cur.execute(SQL, {"min_zip": MIN_PER_ZIP, "indep": args.per_zip,
+        if args.per_zip < 1 or args.min_zip < 1:
+            ap.error("Sample sizes must be positive.")
+        cur.execute(SQL, {"min_zip": args.min_zip, "indep": args.per_zip, "metros": args.metro,
                           "reg": max(3, args.per_zip // 6), "chain": max(2, args.per_zip // 10)})
         rows = [dict(r) for r in cur.fetchall()]
 
@@ -233,12 +248,20 @@ def main():
         r["lat"], r["lon"] = round(float(r["lat"]), 5), round(float(r["lon"]), 5)
         r["needs_booking"] = bool(r["needs_booking"])
 
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(HTML.replace("__DATA__", json.dumps(rows, separators=(",", ":"))), encoding="utf-8")
+    if not rows:
+        ap.error("No places match. Check the metro name and postcode ingestion.")
+    manifest = make_manifest(rows, {"population": "all_tiers", "strata": "postcode/tier/chain_class",
+                                   "min_zip": args.min_zip, "independent_per_stratum": args.per_zip})
+    KITS.mkdir(parents=True, exist_ok=True)
+    (KITS / f"{manifest['kit_id']}.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    embedded = json.dumps(manifest, separators=(",", ":")).replace("<", "\\u003c")
+    args.output.write_text(HTML.replace("__DATA__", embedded), encoding="utf-8")
 
     zips = sorted({r["postcode"] for r in rows})
-    print(f"{len(rows):,} places across {len(zips)} ZIPs -> {OUT.name}")
-    print(f"file size: {OUT.stat().st_size/1024:.0f} KB")
+    print(f"{len(rows):,} places across {len(zips)} ZIPs -> {args.output}")
+    print(f"kit ID: {manifest['kit_id']} (keep evaluation/kits manifest for import)")
+    print(f"file size: {args.output.stat().st_size/1024:.0f} KB")
     print(f"ZIPs: {', '.join(zips[:14])}{' …' if len(zips) > 14 else ''}")
 
 

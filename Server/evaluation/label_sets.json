@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "fitted_on": {
+    "junk_filter": ["palm_coast", "orlando"],
+    "authenticity": ["palm_coast"]
+  },
+  "sets": [
+    {
+      "id": "palm_coast_owner_2026_08",
+      "file": "../data_pipeline/qa/adventour_palm_coast_labels.json",
+      "metro": "palm_coast",
+      "reviewer_id": "owner",
+      "sampling_population": "all_tiers",
+      "role": "development"
+    },
+    {
+      "id": "orlando_owner_2026_08",
+      "file": "../data_pipeline/qa/adventour_orlando_labels.json",
+      "metro": "orlando",
+      "reviewer_id": "owner",
+      "sampling_population": "keep_only",
+      "role": "development"
+    }
+  ]
+}

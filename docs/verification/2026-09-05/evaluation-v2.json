@@ -1,0 +1,861 @@
+{
+  "version": 2,
+  "generated_at": "2026-09-06T02:46:09.047318+00:00",
+  "population": "default deck eligibility before location/batch limits",
+  "metros": {
+    "orlando": {
+      "labelled": 137,
+      "judged": 107,
+      "missing_from_index": 0,
+      "provenance": {
+        "sets": [
+          "orlando_owner_2026_08"
+        ],
+        "source_hashes": {
+          "orlando_owner_2026_08": "0dc5514f0536a5dfdb8e9f313acb44642c2fe349908e902435704d89c18c203d"
+        },
+        "sampling_population": "keep_only",
+        "reviewers": [
+          "owner"
+        ],
+        "held_out": false,
+        "fitted_on": {
+          "junk_filter": true,
+          "authenticity": false
+        }
+      },
+      "junk_filter": {
+        "sample_is_keep_only": true,
+        "recall": null,
+        "recall_n": 24,
+        "precision": 1.0,
+        "false_positives": 0,
+        "false_positive_names": [],
+        "residual_bad_rate": 0.41,
+        "residual_bad_n": 41,
+        "served_n": 100,
+        "residual_bad_rate_incl_unknown": 0.3153846153846154,
+        "served_incl_unknown_n": 130
+      },
+      "chain": {
+        "human_chain_n": 11,
+        "matched": 10,
+        "agreement": 0.9090909090909091,
+        "flagged_but_liked": 1,
+        "flagged_but_liked_names": [
+          "Universal Studios"
+        ]
+      },
+      "signals": {
+        "authenticity_score": {
+          "auc": 0.6871069182389937,
+          "n_pos": 18,
+          "n_neg": 53,
+          "ci": [
+            0.536416009283537,
+            0.8377978271944504
+          ]
+        },
+        "overture_confidence": {
+          "auc": 0.7138364779874213,
+          "n_pos": 18,
+          "n_neg": 53,
+          "ci": [
+            0.566358136806826,
+            0.8613148191680167
+          ]
+        },
+        "has_website": {
+          "auc": 0.6420335429769392,
+          "n_pos": 18,
+          "n_neg": 53,
+          "ci": [
+            0.48747141138927946,
+            0.7965956745645988
+          ]
+        },
+        "has_socials": {
+          "auc": 0.54979035639413,
+          "n_pos": 18,
+          "n_neg": 53,
+          "ci": [
+            0.3928073092380854,
+            0.7067734035501746
+          ]
+        },
+        "cell_density_inverted": {
+          "auc": 0.42085953878406707,
+          "n_pos": 18,
+          "n_neg": 53,
+          "ci": [
+            0.27180243789329184,
+            0.5699166396748423
+          ]
+        }
+      },
+      "diagnostic_all_tiers": {
+        "authenticity_score": {
+          "auc": 0.6464912280701754,
+          "n_pos": 19,
+          "n_neg": 60,
+          "ci": [
+            0.4973872250970911,
+            0.7955952310432598
+          ]
+        },
+        "overture_confidence": {
+          "auc": 0.6631578947368421,
+          "n_pos": 19,
+          "n_neg": 60,
+          "ci": [
+            0.5152543066536092,
+            0.811061482820075
+          ]
+        },
+        "has_website": {
+          "auc": 0.6236842105263158,
+          "n_pos": 19,
+          "n_neg": 60,
+          "ci": [
+            0.47332588768998646,
+            0.7740425333626453
+          ]
+        },
+        "has_socials": {
+          "auc": 0.5600877192982456,
+          "n_pos": 19,
+          "n_neg": 60,
+          "ci": [
+            0.4084858898283849,
+            0.7116895487681063
+          ]
+        },
+        "cell_density_inverted": {
+          "auc": 0.3912280701754386,
+          "n_pos": 19,
+          "n_neg": 60,
+          "ci": [
+            0.25128045912491365,
+            0.5311756812259636
+          ]
+        }
+      },
+      "serving": {
+        "judged": 88,
+        "including_unknown": 118,
+        "bad": 40,
+        "bad_rate": 0.45454545454545453,
+        "liked_excluded": 1,
+        "liked_excluded_names": [
+          "Universal Studios"
+        ]
+      },
+      "coverage": {
+        "named": 23,
+        "exact": 10,
+        "matches": [
+          {
+            "requested": "Haan Coffee",
+            "exact_matches": [
+              {
+                "name": "Haan Coffee",
+                "entity_id": "77b86a16-e552-490a-8fe2-2a494d611984"
+              }
+            ],
+            "suggestions": []
+          },
+          {
+            "requested": "Mamak",
+            "exact_matches": [],
+            "suggestions": [
+              {
+                "name": "Mako",
+                "entity_id": "e9742599-c60a-444f-ac02-39ae80ed5674"
+              },
+              {
+                "name": "Masa",
+                "entity_id": "5cf1ab5b-762b-474e-a4d9-f13188e1bcd9"
+              },
+              {
+                "name": "Aramark",
+                "entity_id": "9a322df0-3351-4ccb-be55-b16c1f64ed15"
+              }
+            ]
+          },
+          {
+            "requested": "Hawkers",
+            "exact_matches": [],
+            "suggestions": [
+              {
+                "name": "Checkers",
+                "entity_id": "76b5b750-a56d-4513-945b-4d0896fd00af"
+              },
+              {
+                "name": "Checkers",
+                "entity_id": "00dafa59-3f96-44ef-b85b-7161dbaaf8b8"
+              },
+              {
+                "name": "Checkers",
+                "entity_id": "0e42253e-da02-4116-bde1-f09e622ad2e1"
+              }
+            ]
+          },
+          {
+            "requested": "East End Market",
+            "exact_matches": [],
+            "suggestions": [
+              {
+                "name": "Farm & Haus East End Market",
+                "entity_id": "22edbb04-55a2-4a3c-810d-a6a1c97698d3"
+              },
+              {
+                "name": "Boston Market",
+                "entity_id": "824b1859-8398-4955-89e6-ec78d2367bc5"
+              },
+              {
+                "name": "Boston Market",
+                "entity_id": "9c112fbb-7963-41e0-bc98-ecc98492a976"
+              }
+            ]
+          },
+          {
+            "requested": "Talay",
+            "exact_matches": [
+              {
+                "name": "Talay",
+                "entity_id": "bc52c7b7-2652-47fc-be51-158a4a1e09da"
+              }
+            ],
+            "suggestions": []
+          },
+          {
+            "requested": "Sixety Vines Sand Lake",
+            "exact_matches": [],
+            "suggestions": [
+              {
+                "name": "Seito Sushi Sand Lake",
+                "entity_id": "7b747b58-1124-42c2-8bea-25a5d4bf9100"
+              },
+              {
+                "name": "Sixty Vines",
+                "entity_id": "89669ee8-0663-4bf4-834b-c01815cad9e9"
+              },
+              {
+                "name": "Sixty Vines",
+                "entity_id": "da86f880-8149-4489-97a0-fa668bf44329"
+              }
+            ]
+          },
+          {
+            "requested": "Pho Bar Vietnamese Kitchen - Sand Lake",
+            "exact_matches": [],
+            "suggestions": [
+              {
+                "name": "An Vi Vietnamese Kitchen & Sandwich",
+                "entity_id": "05ca42a7-f2e7-4a28-9c7f-ab513ccf9f62"
+              },
+              {
+                "name": "Da Vi Vietnamese Kitchen",
+                "entity_id": "3597decb-41e7-4417-bc40-eebdd5771918"
+              },
+              {
+                "name": "Pho 88 Vietnamese Restaurant",
+                "entity_id": "4aff8721-b830-49d9-852d-5f44fb9626c5"
+              }
+            ]
+          },
+          {
+            "requested": "bartaco",
+            "exact_matches": [
+              {
+                "name": "bartaco",
+                "entity_id": "55ca4b11-b2d8-4517-9239-85d2b4cea90b"
+              }
+            ],
+            "suggestions": []
+          },
+          {
+            "requested": "Half Barrel Beer Project",
+            "exact_matches": [
+              {
+                "name": "Half Barrel Beer Project",
+                "entity_id": "333c3815-5b46-412c-80f3-5ec7b994a332"
+              }
+            ],
+            "suggestions": []
+          },
+          {
+            "requested": "DOMU",
+            "exact_matches": [
+              {
+                "name": "Domu",
+                "entity_id": "1f9f261b-3ec9-4970-98ef-acd60cb557c1"
+              }
+            ],
+            "suggestions": []
+          },
+          {
+            "requested": "Jinya",
+            "exact_matches": [],
+            "suggestions": [
+              {
+                "name": "JOHN RYAN",
+                "entity_id": "5499a3d8-9718-4141-9528-aef9478307da"
+              },
+              {
+                "name": "DIYArt",
+                "entity_id": "67d20b4f-e9a2-45af-ade4-b7676edcdd09"
+              },
+              {
+                "name": "Juicy & Crab",
+                "entity_id": "a8370e1a-90fd-4818-920c-315b81bc872a"
+              }
+            ]
+          },
+          {
+            "requested": "Solorzano's Pizzeria",
+            "exact_matches": [],
+            "suggestions": [
+              {
+                "name": "Franco's Pizzeria",
+                "entity_id": "cef1892e-22e7-4b41-be28-56037f427f54"
+              },
+              {
+                "name": "Fornaro Pizzeria",
+                "entity_id": "9fa87d0b-5132-4ea2-a851-3d7d6adbab5f"
+              },
+              {
+                "name": "Antonio's Pizzeria",
+                "entity_id": "d44fb6e1-4fe2-48c7-b36f-55a8da405117"
+              }
+            ]
+          },
+          {
+            "requested": "KURA",
+            "exact_matches": [],
+            "suggestions": [
+              {
+                "name": "Amura",
+                "entity_id": "5f07a760-b9c8-4a51-bbbd-42e97f645629"
+              },
+              {
+                "name": "Kyuramen",
+                "entity_id": "e8734a9f-93f8-4628-8e73-8b20068f5ec5"
+              },
+              {
+                "name": "Kraken",
+                "entity_id": "09090898-af97-4cb4-8d98-2885f6bcbb87"
+              }
+            ]
+          },
+          {
+            "requested": "Agave Azul",
+            "exact_matches": [],
+            "suggestions": [
+              {
+                "name": "Agave Azul Kirkman",
+                "entity_id": "7e0534c6-b569-44c5-b28d-2abeb321ea16"
+              },
+              {
+                "name": "Agave Azul Gateway",
+                "entity_id": "87e8d322-9585-4d82-bddd-6546ede2680c"
+              },
+              {
+                "name": "Agave Azul Windermere",
+                "entity_id": "d3cdb2b3-3273-4de2-a551-dc9b0c75c516"
+              }
+            ]
+          },
+          {
+            "requested": "Pio Pio Restaurant",
+            "exact_matches": [
+              {
+                "name": "Pio Pio Restaurant",
+                "entity_id": "d0fc7326-d9f4-48de-8d73-c9c638de4b49"
+              }
+            ],
+            "suggestions": []
+          },
+          {
+            "requested": "Matcha Cafe Maiko",
+            "exact_matches": [
+              {
+                "name": "Matcha Cafe Maiko",
+                "entity_id": "f4be9069-f3fa-414d-884a-ff979ae8496d"
+              }
+            ],
+            "suggestions": []
+          },
+          {
+            "requested": "Dragonfly Robata Grill & Sushi",
+            "exact_matches": [
+              {
+                "name": "Dragonfly Robata Grill & Sushi",
+                "entity_id": "00c11bbe-05ec-4f54-a11e-bce9729488e4"
+              }
+            ],
+            "suggestions": []
+          },
+          {
+            "requested": "Arcade Time Entertainment",
+            "exact_matches": [
+              {
+                "name": "Arcade Time Entertainment",
+                "entity_id": "bfffeba3-ca2a-4263-bd9c-f594ef14a3ff"
+              }
+            ],
+            "suggestions": []
+          },
+          {
+            "requested": "Arcade Monsters International Drive",
+            "exact_matches": [],
+            "suggestions": [
+              {
+                "name": "Sodiê Doces International Drive",
+                "entity_id": "8b085923-3f9b-41e1-9eab-36fc847f87ef"
+              },
+              {
+                "name": "Lava International Drive",
+                "entity_id": "ae67a227-8e8c-4ba2-83ff-4b18de0db413"
+              },
+              {
+                "name": "Orlando – International Drive",
+                "entity_id": "ceb9fdc6-7010-4896-94ca-9ba619d43041"
+              }
+            ]
+          },
+          {
+            "requested": "Level99",
+            "exact_matches": [],
+            "suggestions": [
+              {
+                "name": "Everbowl",
+                "entity_id": "4678a47c-0a65-4173-9f73-3f26fd24457b"
+              },
+              {
+                "name": "The 6 Levels",
+                "entity_id": "84971682-35c7-4bf1-b039-df37f209c4b0"
+              },
+              {
+                "name": "Lake Eola",
+                "entity_id": "b1956095-d4b5-449b-8ef7-5f1ece12b4f2"
+              }
+            ]
+          },
+          {
+            "requested": "Activate Orlando",
+            "exact_matches": [],
+            "suggestions": [
+              {
+                "name": "Native Orlando",
+                "entity_id": "de29ef6c-a181-44b7-a204-49f20b12ca2f"
+              },
+              {
+                "name": "City2Nite Orlando",
+                "entity_id": "83098ede-ca14-472c-bc74-82446f8abb6f"
+              },
+              {
+                "name": "Paint Nite Orlando",
+                "entity_id": "9784809e-904b-4f37-aa88-a931b77afdfc"
+              }
+            ]
+          },
+          {
+            "requested": "Lake Eola Park",
+            "exact_matches": [
+              {
+                "name": "Lake Eola Park",
+                "entity_id": "b1956095-d4b5-449b-8ef7-5f1ece12b4f2"
+              }
+            ],
+            "suggestions": []
+          },
+          {
+            "requested": "Leu gardens",
+            "exact_matches": [],
+            "suggestions": [
+              {
+                "name": "Olive Garden",
+                "entity_id": "2562b7c9-7f73-4dff-9d31-60dfb97f85a3"
+              },
+              {
+                "name": "Olive Garden",
+                "entity_id": "216ad44f-193c-4b17-9749-106b9e03cea1"
+              },
+              {
+                "name": "Olive Garden",
+                "entity_id": "9e4dd6ed-6b7b-4de4-96f3-46852eacf9c2"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "palm_coast": {
+      "labelled": 131,
+      "judged": 131,
+      "missing_from_index": 0,
+      "provenance": {
+        "sets": [
+          "palm_coast_owner_2026_08"
+        ],
+        "source_hashes": {
+          "palm_coast_owner_2026_08": "a9d95cdd51916db4996aed9571907f23dc4a3244794dc724343901838515293a"
+        },
+        "sampling_population": "all_tiers",
+        "reviewers": [
+          "owner"
+        ],
+        "held_out": false,
+        "fitted_on": {
+          "junk_filter": true,
+          "authenticity": true
+        }
+      },
+      "junk_filter": {
+        "sample_is_keep_only": false,
+        "recall": 0.8571428571428571,
+        "recall_n": 49,
+        "precision": 0.9629629629629629,
+        "false_positives": 0,
+        "false_positive_names": [],
+        "residual_bad_rate": 0.2077922077922078,
+        "residual_bad_n": 16,
+        "served_n": 77,
+        "residual_bad_rate_incl_unknown": 0.2077922077922078,
+        "served_incl_unknown_n": 77
+      },
+      "chain": {
+        "human_chain_n": 12,
+        "matched": 10,
+        "agreement": 0.8333333333333334,
+        "flagged_but_liked": 0,
+        "flagged_but_liked_names": []
+      },
+      "signals": {
+        "authenticity_score": {
+          "auc": 0.828030303030303,
+          "n_pos": 33,
+          "n_neg": 20,
+          "ci": [
+            0.7191550634143263,
+            0.9369055426462797
+          ]
+        },
+        "overture_confidence": {
+          "auc": 0.7666666666666667,
+          "n_pos": 33,
+          "n_neg": 20,
+          "ci": [
+            0.6404513406538271,
+            0.8928819926795063
+          ]
+        },
+        "has_website": {
+          "auc": 0.6393939393939394,
+          "n_pos": 33,
+          "n_neg": 20,
+          "ci": [
+            0.4888310448082527,
+            0.7899568339796261
+          ]
+        },
+        "has_socials": {
+          "auc": 0.7545454545454545,
+          "n_pos": 33,
+          "n_neg": 20,
+          "ci": [
+            0.6253749048282413,
+            0.8837160042626677
+          ]
+        },
+        "cell_density_inverted": {
+          "auc": 0.4022727272727273,
+          "n_pos": 33,
+          "n_neg": 20,
+          "ci": [
+            0.2417022450746549,
+            0.5628432094707997
+          ]
+        }
+      },
+      "diagnostic_all_tiers": {
+        "authenticity_score": {
+          "auc": 0.9543460925039873,
+          "n_pos": 33,
+          "n_neg": 76,
+          "ci": [
+            0.9033150819311334,
+            1.0
+          ]
+        },
+        "overture_confidence": {
+          "auc": 0.7671451355661882,
+          "n_pos": 33,
+          "n_neg": 76,
+          "ci": [
+            0.663048702736261,
+            0.8712415683961154
+          ]
+        },
+        "has_website": {
+          "auc": 0.63018341307815,
+          "n_pos": 33,
+          "n_neg": 76,
+          "ci": [
+            0.5127495828516929,
+            0.747617243304607
+          ]
+        },
+        "has_socials": {
+          "auc": 0.632177033492823,
+          "n_pos": 33,
+          "n_neg": 76,
+          "ci": [
+            0.5148414396215432,
+            0.7495126273641027
+          ]
+        },
+        "cell_density_inverted": {
+          "auc": 0.27870813397129185,
+          "n_pos": 33,
+          "n_neg": 76,
+          "ci": [
+            0.18139081184766898,
+            0.3760254560949147
+          ]
+        }
+      },
+      "serving": {
+        "judged": 65,
+        "including_unknown": 65,
+        "bad": 15,
+        "bad_rate": 0.23076923076923078,
+        "liked_excluded": 0,
+        "liked_excluded_names": []
+      },
+      "coverage": {
+        "named": 14,
+        "exact": 4,
+        "matches": [
+          {
+            "requested": "Swillerbees Craft Donuts & Coffee in Palm Coast",
+            "exact_matches": [],
+            "suggestions": [
+              {
+                "name": "Swillerbees Craft Donuts & Coffee",
+                "entity_id": "e5017e2a-b202-476b-a1da-c2114ee0ab34"
+              },
+              {
+                "name": "Villari's Martial Arts Centers - Palm Coast FL",
+                "entity_id": "fd2afba3-e6cd-425b-9b90-9c8f26ca5e3a"
+              },
+              {
+                "name": "Stoner's Pizza Joint Palm Coast",
+                "entity_id": "693cf25e-40a0-4a0e-a810-38b66c60bf50"
+              }
+            ]
+          },
+          {
+            "requested": "Swillerbees Craft Donuts & Coffee in Flagler Beach",
+            "exact_matches": [],
+            "suggestions": [
+              {
+                "name": "Swillerbees Craft Donuts & Coffee",
+                "entity_id": "e5017e2a-b202-476b-a1da-c2114ee0ab34"
+              },
+              {
+                "name": "St. Christopher Episcopal Mission in Flagler Beach",
+                "entity_id": "0afb5e6e-f60d-436d-b625-cb0ea6fafcc0"
+              },
+              {
+                "name": "Intercoastal Waterway in Flagler Beach",
+                "entity_id": "aa2f699b-de1a-475a-bfad-65edb09c91db"
+              }
+            ]
+          },
+          {
+            "requested": "Captains BBQ",
+            "exact_matches": [
+              {
+                "name": "Captain's BBQ",
+                "entity_id": "4c6ec55a-ce5b-40c9-9a0b-5f9194eb22ca"
+              }
+            ],
+            "suggestions": []
+          },
+          {
+            "requested": "european village restaurants",
+            "exact_matches": [],
+            "suggestions": [
+              {
+                "name": "Eduardo's Pizzeria & Restaurant",
+                "entity_id": "bbee2f73-2491-47b9-ba47-2a2625d0cab9"
+              },
+              {
+                "name": "Ai Japanese Restaurant",
+                "entity_id": "60f8d845-ac8a-4580-a689-4f7c56ea8044"
+              },
+              {
+                "name": "Manny's Pizzeria & Restaurant",
+                "entity_id": "a0d119c2-0b91-4dea-98ac-2f8a2e6b2e5a"
+              }
+            ]
+          },
+          {
+            "requested": "a1a burrito works",
+            "exact_matches": [],
+            "suggestions": [
+              {
+                "name": "A1A Burrito Works Taco Shop",
+                "entity_id": "263ea22c-5f52-4f0e-ad54-a27a8f55cc37"
+              },
+              {
+                "name": "A1A Burrito Works Taco Shop",
+                "entity_id": "f883645f-07b0-4e3a-ad17-a686072e284f"
+              }
+            ]
+          },
+          {
+            "requested": "oceanside",
+            "exact_matches": [],
+            "suggestions": [
+              {
+                "name": "Oceanside Boys Corp",
+                "entity_id": "301bcc03-70fc-4479-947c-339f4b4257eb"
+              },
+              {
+                "name": "Bob Evans",
+                "entity_id": "e4c44904-6bf3-44be-82e9-641c8ca3fc86"
+              },
+              {
+                "name": "Ocean Bar",
+                "entity_id": "d066d91c-227d-4feb-adda-bbd78b4f0882"
+              }
+            ]
+          },
+          {
+            "requested": "Golden Lion",
+            "exact_matches": [],
+            "suggestions": [
+              {
+                "name": "Golden Trines",
+                "entity_id": "b466b389-0cf6-490c-bf05-857b66d77f50"
+              },
+              {
+                "name": "The Golden Lion Cafe",
+                "entity_id": "b93ff823-3eaa-4bd2-856f-557a5bb9620d"
+              },
+              {
+                "name": "Green Lion Cafe",
+                "entity_id": "b3e4a193-ded4-46d1-8906-24da789ed832"
+              }
+            ]
+          },
+          {
+            "requested": "Hooligans Palm Coast",
+            "exact_matches": [],
+            "suggestions": [
+              {
+                "name": "Pointe Grand Palm Coast",
+                "entity_id": "a0d0c982-3ff7-4fde-9c60-3e710b6b473d"
+              },
+              {
+                "name": "Evolve Palm Coast",
+                "entity_id": "87ec34fd-cec2-4839-9ca5-b5e80813e8c4"
+              },
+              {
+                "name": "Wilton Palm Coast",
+                "entity_id": "71a26252-87ac-4216-9058-6b30aed65637"
+              }
+            ]
+          },
+          {
+            "requested": "Funky Pelican",
+            "exact_matches": [
+              {
+                "name": "Funky Pelican",
+                "entity_id": "09ad8891-81c9-4c39-8d69-188a472aa7d5"
+              }
+            ],
+            "suggestions": []
+          },
+          {
+            "requested": "Next Door Bistro",
+            "exact_matches": [],
+            "suggestions": [
+              {
+                "name": "Next Door Beach Bistro",
+                "entity_id": "df5ec953-107d-4559-b7d6-c2088beaa74d"
+              },
+              {
+                "name": "New Found Favor Ministries",
+                "entity_id": "207c1fbe-7ef6-40d2-b5cb-4b31d6aa9696"
+              },
+              {
+                "name": "Red Lobster",
+                "entity_id": "31c1838e-3280-4ad1-81d9-df097c32a91f"
+              }
+            ]
+          },
+          {
+            "requested": "Tortugas Florida Kitchen & Bar",
+            "exact_matches": [],
+            "suggestions": [
+              {
+                "name": "Tortugas Florida Kitchen and Bar",
+                "entity_id": "ded3b0b1-6677-479d-b018-ca601ed40cc0"
+              },
+              {
+                "name": "Margarita Island Mexican Kitchen & Bar",
+                "entity_id": "0f2f36a8-28ce-49bc-b53d-b8233d506d4a"
+              },
+              {
+                "name": "Popeyes Louisiana Kitchen",
+                "entity_id": "edf9fc7e-04fb-45b1-b868-314330a432bc"
+              }
+            ]
+          },
+          {
+            "requested": "Break Awayz",
+            "exact_matches": [
+              {
+                "name": "Break Awayz",
+                "entity_id": "bb89bace-b663-48f9-b55e-2fc3f328ec8b"
+              }
+            ],
+            "suggestions": []
+          },
+          {
+            "requested": "Whaam Burger",
+            "exact_matches": [
+              {
+                "name": "Whaam Burger",
+                "entity_id": "7c24c6f1-cb30-4e4d-84d1-09c1cb45f4ee"
+              }
+            ],
+            "suggestions": []
+          },
+          {
+            "requested": "Cantina Louie (Palm Coast)",
+            "exact_matches": [],
+            "suggestions": [
+              {
+                "name": "Chabad Of Palm Coast",
+                "entity_id": "ff1ebff6-f13f-44ad-ad1e-c76bbe8e3ce6"
+              },
+              {
+                "name": "Cantina Louie",
+                "entity_id": "7a062f6e-e5bb-4ba1-8f4e-f582f2f8235b"
+              },
+              {
+                "name": "Kava Kula Palm Coast",
+                "entity_id": "8c463bb7-d9c4-4c42-91cb-9cba53f82f01"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

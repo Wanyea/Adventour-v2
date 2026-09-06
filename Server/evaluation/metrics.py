@@ -41,7 +41,14 @@ def judged(rows):
     return [r for r in rows if r.get("label") in JUDGED and not r.get("_missing_from_index")]
 
 
-def junk_filter_scores(all_rows):
+def eligible(row):
+    """Default deck policy, before location and batch limits; no quality claim."""
+    return (not row.get("_missing_from_index") and row.get("tier") == "KEEP"
+            and float(row.get("authenticity") or 0) >= 0.30
+            and row.get("chain_class") != "chain" and not row.get("suppressed", False))
+
+
+def junk_filter_scores(all_rows, sampling_population="unknown"):
     """Recall, precision and — the number that must stay zero — false positives.
 
     Only meaningful over a sample drawn from ALL tiers. A sample drawn from KEEP
@@ -49,8 +56,7 @@ def junk_filter_scores(all_rows):
     already passed. `residual_bad_rate` is the honest metric in that case.
     """
     rows = judged(all_rows)
-    tiers = {r.get("tier") for r in rows}
-    keep_only = tiers <= {"KEEP"}
+    keep_only = sampling_population == "keep_only"
 
     truth_junk = [r for r in rows if r["label"] == "junk"]
     dropped = [r for r in rows if r.get("tier") and r["tier"] != "KEEP"]
@@ -66,7 +72,8 @@ def junk_filter_scores(all_rows):
 
     return {
         "sample_is_keep_only": keep_only,
-        "recall": None if keep_only or not truth_junk else len(caught) / len(truth_junk),
+        "recall": (len(caught) / len(truth_junk)
+                   if sampling_population == "all_tiers" and truth_junk else None),
         "recall_n": len(truth_junk),
         "precision": None if not dropped else sum(1 for r in dropped if r["label"] in BAD) / len(dropped),
         "false_positives": len(false_pos),
@@ -95,11 +102,12 @@ def chain_scores(rows):
     }
 
 
-def signal_aucs(rows):
+def signal_aucs(rows, served_only=False):
     """AUC of each signal on gem vs generic/not_worth/junk, among judged rows."""
     contrast = [r for r in judged(rows)
                 if r["label"] in ("gem", "generic", "not_worth", "junk")
-                and r.get("tier") is not None]
+                and r.get("tier") is not None
+                and (not served_only or eligible(r))]
     for r in contrast:
         r["_y"] = 1 if r["label"] == "gem" else 0
 
@@ -117,10 +125,13 @@ def signal_aucs(rows):
     return out
 
 
-def coverage(rows, freeform):
-    """Are the places the labeller named as must-haves actually in the index?
-
-    Recall against a wish list, which precision metrics cannot see.
-    """
-    wanted = [w.strip() for w in (freeform.get("missing") or "").split(",") if w.strip()]
-    return {"named": len(wanted), "names": wanted}
+def serving_scores(rows):
+    served = [r for r in rows if eligible(r)]
+    known = judged(served)
+    bad = [r for r in known if r["label"] in BAD]
+    lost = [r for r in judged(rows) if r["label"] in GOOD and not eligible(r)]
+    return {
+        "judged": len(known), "including_unknown": len(served), "bad": len(bad),
+        "bad_rate": len(bad) / len(known) if known else None,
+        "liked_excluded": len(lost), "liked_excluded_names": [r["name"] for r in lost],
+    }

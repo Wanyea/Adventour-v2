@@ -1,86 +1,75 @@
-# Scope C — Evaluation Harness
+﻿# Evaluation harness — Phase 1 repair
 
-**Status:** built and verified 2026-08-19. `Server/evaluation/`.
+Updated 2026-09-05. `Server/evaluation/`; original human labels and
+`baseline.json` are preserved. The previous harness's green verdict was too weak:
+Orlando labels influenced the filter, KEEP-only sampling was inferred from current
+rather than original tiers, and AUC did not describe serving eligibility.
 
-```
-python -m evaluation.harness            # report against the stored baseline
-python -m evaluation.harness --save     # accept current numbers as baseline
-python -m evaluation.harness --strict   # exit 1 on a held-out regression
-```
+From `Server/`:
 
-## Why it exists
-
-Gate 12. The authenticity score was fitted on Palm Coast, reported at AUC 0.954 against those same
-labels, and turned out to be 0.639 out of sample. That gate only happened because a second metro was
-hand-labelled on a hunch. The harness makes that check automatic and makes the mistake structurally
-hard to repeat.
-
-## The two rules it enforces
-
-**1. In-sample results are labelled and excluded from the verdict.** `datasets.FITTED_ON` records
-which metro each component was tuned on. Palm Coast is marked IN SAMPLE for the junk filter and the
-authenticity score, and its numbers never reach the verdict line. If every label set has been used
-for fitting, the harness says so rather than printing a reassuring number:
-
-> NO HELD-OUT METRO. Every label set was used to fit something — these numbers cannot tell you
-> whether anything generalises.
-
-**2. Every metric carries its n and a confidence interval.** A point estimate on ~80 places is not a
-fact. Where the 95% interval includes 0.5 the harness says, in words, that the signal is not
-distinguishable from noise.
-
-## What it measures
-
-- **junk filter** — recall, precision, and false positives (the number that must stay 0). Recall is
-  reported `n/a` when the sample was drawn from KEEP only, because everything in such a sample
-  already passed; `residual bad rate` is the honest metric there, given **both** with and without
-  unknowns in the denominator, since unknowns still get dealt to a user.
-- **chain classifier** — agreement with human "chain" calls, plus any liked place wrongly flagged.
-- **signals** — AUC for the authenticity score and each input, with intervals.
-- **coverage** — the must-have places the labeller named, which precision metrics cannot see.
-- **index drift** — labelled places that no longer exist in the index after a re-ingest.
-
-## Verified, not assumed
-
-The harness was tested by deliberately breaking the score — `W_CONFIDENCE` set to 0 and the weight
-moved to socials — then re-scoring:
-
-```
-DN authenticity_score  0.639 -> 0.586  (-0.053)   <- REGRESSION
-REGRESSIONS:
-  - orlando.authenticity_score 0.639 -> 0.586
---strict exit 1
+```powershell
+.venv\Scripts\python.exe -m evaluation.harness
+.venv\Scripts\python.exe -m evaluation.harness --strict
+.venv\Scripts\python.exe -m evaluation.harness --output report.json
 ```
 
-Reverted and re-scored, `--strict` returns 0. So it detects a real regression on the held-out metro
-and passes when the code is sound.
+## What the report means
 
-## What it says about the current state
+`label_sets.json` declares reviewer, original sampling population, source file,
+metro, development/holdout role and which metros informed each component. Both
+Palm Coast and Orlando are development sets. A metro is held out only if all its
+registered sets say holdout and no component declares it fitted. This is an
+explicit provenance contract, not proof that an engineer never looked at labels.
+Prospective models must be frozen before new answers are inspected.
 
-| | Palm Coast (in sample) | Orlando (held out) |
-|---|---:|---:|
-| authenticity AUC | 0.954 | **0.639**  [0.49–0.79] |
-| overture confidence | 0.777 | 0.637  [0.49–0.79] |
-| junk false positives | 0 | 0 |
-| residual bad in served deck | 20.8% | **43.9%** (34.3% incl. unknowns) |
-| chain agreement | 83.3% | 90.9% |
+- **Default deck eligibility:** canonical entity, KEEP, authenticity >=0.30 and
+  chains excluded, before location/radius/batch limits. It describes the labelled
+  eligible sample, not exposure-weighted live user experience. Suppression and
+  deterministic representative selection still need alignment in the serving slice.
+- **Quality:** bad is junk, not-worth or tourist-trap. Report judged denominators
+  and counts including unknowns; unknown does not mean good. Quality and closure
+  are separate fields in new returns; an admired but closed place can be both.
+- **AUC:** gem versus generic/not-worth/junk, with positive/negative observation
+  counts and approximate 95% intervals. Solid, chain, trap and unknown are outside
+  this historical contrast; traps still count in residual bad. All-tier signals
+  are separate diagnostics. Neither metric estimates an independently sampled
+  metro population; kits are stratified, ZIP-selected and judgement-dependent.
+- **Filter:** recall only for originally all-tier samples. Reclassifying Orlando
+  records cannot turn its KEEP-only sample into a filter-recall experiment.
+- **Lost liked places:** count gems/solid places excluded by serving policy,
+  including chains and score-floor exclusions. Universal Studios is currently
+  exposed by this check; Phase 1 does not silently change chain/ranking policy.
+- **Coverage:** normalize names, return exact-name matches and unresolved fuzzy
+  suggestions separately. A suggestion is not a confirmed match. Exact name
+  presence is not proof of an open, accessible, correct destination; multiple
+  entities may share a name. Review aliases manually before claiming coverage.
+- **Drift:** missing labelled index records, missing metros and changed answer
+  hashes/sets are failures or make comparisons unavailable.
 
-**All five signals on Orlando straddle 0.5.** The honest reading is not "the score is weak" but
-"at n=19/60 we cannot tell whether it works at all."
+Multiple reviewers are retained as observations; the current confidence intervals
+are not clustered by reviewer or entity and must not be presented as independent
+user evidence. Named written answers and source provenance remain available.
 
-## What this means for Scope B
+## Strict and baselines
 
-Scope B cannot proceed as ranking-weight tuning. There is nothing measurable to tune against: the
-only held-out evidence has intervals wide enough to contain "no signal". Tuning weights now would
-fit noise and the harness would correctly refuse to confirm any improvement.
+Strict exits 1 if no held-out metro has both positive and negative eligible
+examples, a comparable v2 baseline is absent, labelled records disappear, label
+sources change, the AUC contrast changes, or specified metrics regress. Known
+liked exclusions and junk false positives cannot increase; residual bad and AUC
+use a 0.03 tolerance. Development sets still catch known regressions but never
+prove generalization. A green strict run alone will not certify a good deck.
 
-Two things unblock it, in order of cost:
+`--save` explicitly records a comparison baseline at `baseline-v2.json`; it does
+not waive failures or overwrite the immutable historical baseline. No v2 baseline
+has been accepted yet. Compare eligibility changes and review their examples
+before accepting one; never reset it to hide a regression.
 
-1. **More labels.** Intervals shrink with n. Another metro, or deeper coverage of Orlando, moves
-   0.49–0.79 toward something decidable. Cheap, and it is the labeller's time rather than build time.
-2. **Behavioural data.** `place_event` already snapshots the score at decision time; accepts and
-   rejects are the signal that does not depend on anyone's afternoon. This needs real usage.
+Current [verification report](verification/2026-09-05/evaluation-v2.json): strict
+exits **1**, no held-out metro and no comparable v2 baseline. Canonical serving
+sample: Orlando bad **40/88** judged (118 including unknown); Palm Coast **15/65**.
+These are development observations, not a ranking improvement. Earlier historical
+AUC figures are not directly comparable after changing population/representative.
 
-Until one of those lands, the useful work is reducing the 43.9% residual junk — a problem the
-Orlando labels describe concretely (university-only, ticket-required, inside-a-venue, hotel, closed)
-and which needs no statistical power to act on.
+Eight focused tests cover the exposed evaluator and importer failure modes. The
+next independent evidence requires fresh human labels, with the
+[field-kit runbook](data-tooling.md). The emulator remains the product checkpoint.

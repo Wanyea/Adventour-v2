@@ -1,0 +1,21 @@
+{
+  "schema_version": 2,
+  "kit_id": "1044c99bb3704ae94ea25614",
+  "exported_at": "2026-09-06T02:47:15.940Z",
+  "zips": [
+    "32110"
+  ],
+  "labels": [
+    {
+      "id": "297a6c9d-9b9b-4284-8bc2-264cc37d2fa3",
+      "label": "unknown",
+      "note": "SYNTHETIC TOOLING CHECK - not a human judgment",
+      "attributes": {
+        "operation": "unknown"
+      }
+    }
+  ],
+  "freeform": {
+    "auth": "SYNTHETIC TOOLING CHECK - exclude from evaluation"
+  }
+}
