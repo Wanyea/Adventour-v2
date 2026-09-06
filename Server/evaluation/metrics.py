@@ -43,6 +43,8 @@ def judged(rows):
 
 def eligible(row):
     """Default deck policy, before location and batch limits; no quality claim."""
+    if "_serving_eligible" in row:
+        return bool(row["_serving_eligible"]) and not row.get("_missing_from_index")
     return (not row.get("_missing_from_index") and row.get("tier") == "KEEP"
             and float(row.get("authenticity") or 0) >= 0.30
             and row.get("chain_class") != "chain" and not row.get("suppressed", False))

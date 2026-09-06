@@ -39,14 +39,32 @@ def metadata(metro):
 def _index_rows(ids):
     with psycopg2.connect(DSN) as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
         cur.execute("""
-            SELECT original.id, p.name, p.basic_category, p.taxonomy_bucket, p.chain_class,
-                   p.tier, p.tier_reason, p.confidence, p.authenticity, p.websites,
-                   p.socials, p.postcode, p.metro,
-                   COALESCE(p.canonical_id, p.id) AS entity_id, p.cluster_size,
+            SELECT original.id, original.name, original.basic_category, original.taxonomy_bucket,
+                   original.chain_class, original.tier, original.tier_reason,
+                   COALESCE(p.confidence,original.confidence) AS confidence,
+                   COALESCE(p.authenticity,original.authenticity) AS authenticity,
+                   original.websites, COALESCE(p.socials,original.socials) AS socials,
+                   original.postcode, original.metro,
+                   COALESCE(original.canonical_id, original.id) AS entity_id, p.cluster_size,
+                   p.id IS NOT NULL AS _serving_eligible,
                    (SELECT count(*) FROM places q
-                    WHERE q.h3_r8 = p.h3_r8 AND q.tier='KEEP') AS cell_density
+                    WHERE q.h3_r8 = COALESCE(p.h3_r8,original.h3_r8)
+                      AND q.tier='KEEP' AND q.index_active) AS cell_density
             FROM places original
-            JOIN places p ON p.id = COALESCE(original.canonical_id, original.id)
+            LEFT JOIN LATERAL (
+                SELECT * FROM places candidate
+                WHERE COALESCE(candidate.canonical_id,candidate.id)=COALESCE(original.canonical_id,original.id)
+                  AND candidate.index_active AND candidate.tier='KEEP'
+                  AND candidate.authenticity >= 0.30 AND candidate.chain_class <> 'chain'
+                  AND NOT EXISTS (SELECT 1 FROM place_provider_ref r JOIN suppressed_place s
+                      ON s.google_place_id=r.google_place_id
+                      WHERE r.entity_id=COALESCE(candidate.canonical_id,candidate.id))
+                  AND NOT EXISTS (SELECT 1 FROM place_event e
+                      WHERE e.entity_id=COALESCE(candidate.canonical_id,candidate.id)
+                        AND e.event_type='closed_report' AND e.user_id=0)
+                ORDER BY candidate.cluster_size DESC NULLS LAST,
+                         candidate.authenticity DESC NULLS LAST, candidate.id LIMIT 1
+            ) p ON true
             WHERE original.id = ANY(%s)
         """, (list(ids),))
         return {r["id"]: dict(r) for r in cur.fetchall()}
