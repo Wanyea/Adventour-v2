@@ -8,12 +8,10 @@ and generic tourist defaults. Swipe left to reject, right to accept and get dire
 Work happens in **one scope at a time**. The active scope is named in `docs/active-scope.md`.
 If a change doesn't belong to the active scope, don't make it — note it and move on.
 
-Current scope sequence:
-
-- **A — Candidate sourcing & cost control** (open data ingestion, H3 index, offline features) — **done**
-- **B — Ranking & authenticity scoring** — next
-- **C — Evaluation harness**
-- **D — Multi-user preference blending**
+Current roadmap: `docs/takeover-plan.md` (five phases, ending at HANDOFF §6).
+**Phase 1 — Trustworthy core and owner-operated evidence loop** was approved on
+2026-09-05 and is active. The earlier A/B/C/D sequence is superseded; its measured
+results remain in `docs/scope-a-evidence.md`. Later phases are not open.
 
 Do not begin a scope without an approved plan. Do not start the next scope until the current one merges.
 
@@ -37,9 +35,11 @@ Baseline as of 2026-08-17 (`main`) — these are the only screens, and their siz
 
 Hard rules:
 
-- **No file in `AdventourApp/` may exceed 1,200 lines.** If a change would push it over, stop and propose
+- **No authored application source file in `AdventourApp/` may exceed 1,200 lines.** If a change would push it over, stop and propose
   an extraction instead. (For context: an unsupervised agent run grew `HomeScreen.tsx` to ~22,600 lines and
   made the app unnavigable. That is the failure this rule exists to prevent.)
+  **Exception approved 2026-09-05:** generated dependency lockfiles and third-party dependencies are
+  exempt. All Adventour source code, including agent-written code, remains subject to the ceiling.
 - No new top-level screens or navigation entries without explicit approval.
 - No restyling, no palette changes, no layout rewrites as a side effect of other work.
 - No new UI dependency without asking.
