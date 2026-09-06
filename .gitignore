@@ -59,3 +59,5 @@ firebase-service-account*.json
 AdventourApp/qa_*.png
 Server/data_pipeline/qa/*.html
 Server/**/__pycache__/
+/emulator-verification.stdout.log
+/emulator-verification.stderr.log
