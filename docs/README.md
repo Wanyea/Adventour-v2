@@ -1,7 +1,9 @@
 # Adventour v2 — current state
 
-**Paused for PC restart (2026-09-06).** Continue from
-[restart-handoff.md](restart-handoff.md); Phase 2 event work is unfinished.
+**Resumed after PC restart (2026-09-06).** Current checkpoint:
+[phase2-results.md](phase2-results.md), with [local-events.md](local-events.md)
+for the working event pipeline and remaining coverage gaps. Resume details are
+in [restart-handoff.md](restart-handoff.md).
 
 Updated 2026-09-06. Read [HANDOFF.md](../HANDOFF.md) for the closed 23-feature
 product and stopping point, then [AGENTS.md](../AGENTS.md) for the working agreement.
@@ -16,7 +18,7 @@ It is not the same as the current Phase 1. The complete approved direction is in
 | Phase | Work | Status |
 |---|---|---|
 | 1 | Trustworthy core, evaluation, field kit and safe metro ingestion | Core/tooling implemented; emulator review and owner acceptance checkpoint |
-| 2 | Discovery quality, hours/closure experiments and local events | Active; personal ranking first |
+| 2 | Discovery quality, hours/closure experiments and local events | Active; personal decks and UCF events demonstrated; quality/coverage gaps remain |
 | 3 | Friends, Beacon, taking Adventours and group recommendations | Planned; not open |
 | 4 | Full-trip planning and ticket/reservation links | Planned; not open |
 | 5 | Travel map, achievements and all-23-feature acceptance | Planned; not open |

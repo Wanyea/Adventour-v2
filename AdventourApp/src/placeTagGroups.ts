@@ -55,7 +55,7 @@ export const TAG_GROUPS: TagGroup[] = [
     color: '#854d0e',
     backgroundColor: '#fef3c7',
     types: ['cafe', 'coffee_shop', 'dessert_restaurant', 'ice_cream_shop', 'tea_house'],
-    nameHints: ['cafe', 'coffee', 'donut', 'ice cream', 'tea'],
+    nameHints: ['coffee', 'donut', 'ice cream', 'tea'],
   },
   {
     id: 'arts_culture',

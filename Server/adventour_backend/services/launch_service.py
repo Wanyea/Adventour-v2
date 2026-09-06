@@ -11,8 +11,10 @@ def suggestions(db, query):
         return []
     rows = db.session.execute(text("""
         WITH locations AS (
-            SELECT locality AS label,region,avg(lat) AS lat,avg(lon) AS lon,0 AS priority
-            FROM places WHERE index_active AND locality IS NOT NULL GROUP BY locality,region
+            SELECT initcap(lower(trim(locality))) AS label,upper(trim(region)) AS region,
+                   avg(lat) AS lat,avg(lon) AS lon,0 AS priority
+            FROM places WHERE index_active AND locality IS NOT NULL
+            GROUP BY lower(trim(locality)),upper(trim(region))
             UNION ALL
             SELECT initcap(replace(metro,'_',' ')),region,avg(lat),avg(lon),1
             FROM places WHERE index_active GROUP BY metro,region
@@ -31,9 +33,9 @@ def suggestions(db, query):
         if not row['region'] and row['label'].casefold() in qualified:
             continue
         description = f"{row['label']}, {row['region']}" if row['region'] else row['label']
-        if description in seen:
+        if description.casefold() in seen:
             continue
-        seen.add(description)
+        seen.add(description.casefold())
         result.append({"description": description, "latitude": row['lat'], "longitude": row['lon'],
                        "source": "adventour_index", "place_id": None})
     return result

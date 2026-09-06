@@ -17,6 +17,8 @@ REPORT_VERSION = 2
 def collect():
     report = {"version": REPORT_VERSION, "generated_at": datetime.now(timezone.utc).isoformat(),
               "population": "default deck eligibility before location/batch limits", "metros": {}}
+    report['ranking_limit'] = ('These place labels evaluate structural eligibility and authenticity diagnostics. '
+                               'They do not validate personal_v1 preference fit, repeat handling or session order.')
     for metro in datasets.available_metros():
         rows, freeform = datasets.load(metro)
         provenance = datasets.metadata(metro)

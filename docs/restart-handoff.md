@@ -1,5 +1,55 @@
 # Restart handoff — 2026-09-06
 
+## Current checkpoint after resuming (supersedes the pause record below)
+
+Phase 2 was resumed after reading HANDOFF and AGENTS. Current review entry point:
+[phase2-results.md](phase2-results.md). Event implementation/runbook/source limits:
+[local-events.md](local-events.md). Phase 2 remains active; Phase 3 is not authorized.
+
+- The UCF adapter now handles the single-event dictionary feed, its route is
+  registered, and Windows timezone data (`tzdata`) is installed/pinned. Seven
+  public gallery occurrences are in the working index. The owned gallery match
+  avoids the feed's Google Maps payload. No Google content was retained.
+- Discover has a 142-line LocalEventsSection below the deck: selected-region
+  lookup, dated cards, source/access details, free organizer recheck, foreground/
+  minute refresh and client expiry. Existing navigation and palette are retained.
+- Screens: events-orlando.png, event-recheck.png, expiry-visible-before.png,
+  expiry-visible-after.png, event-test-cancelled.png in verification/2026-09-06/.
+  The expiry/cancellation screens use labelled synthetic rows in the isolated DB.
+  Fixtures were cleaned; normal backend was restored. Maps opened but System UI
+  hung at its permission prompt; directions destination is still unverified.
+- Case variants of Orlando no longer produce ambiguous city launch results.
+  Both personal deck/score screens exist. The fixed two-metro/two-profile audit
+  shows intended tag behavior, but also suspect destination/location records.
+  It does not establish recommendation quality. Original labels are unchanged.
+- Three experiments are reported: name/category hints (removed generic Cafe
+  name hint), FSQ OS (access-limited, no dataset), 60 venue sites plus ten closure
+  controls and six Chrome renders. Only diagnostic counts/URLs were saved.
+  No hours/closure facts were promoted. See measured outcomes in phase2-results.
+- 18 backend tests and TypeScript pass; largest authored app file is 1,021 lines.
+  Strict evaluation remains red for no fresh held-out data and no accepted v2
+  baseline; its report explicitly does not validate personal fit.
+- The six-hour event worker is running locally. It is not installed as a Windows
+  startup task. Restart with `python -m data_pipeline.refresh_events --watch`
+  from Server using its venv and ENV_FILE=.env.local. Logs are ignored at repo root.
+- Current backend exec session16976 (normal .env.local, port8080), Metro9447,
+  event worker parentPID44780. These are ephemeral, not restart configuration.
+  Synthetic backend sessions are stopped. Emulator backend is 10.0.2.2:8080;
+  adb reverse cannot redirect that native URL to another server port.
+- Use tests/event_screen_fixture.py only with its isolated DB guard. Its `expire`
+  action creates a 90-second occurrence for a screen capture after automatic
+  refresh; `cancel` applies a successful empty snapshot; `clean` removes fixtures.
+
+Next Phase 2 slice: investigate the suspect ranked Orlando destination/location
+records; establish a permitted municipal/library or organizer source for breadth,
+and usable hours/access windows. FSQ access is pending owner credentials; the
+earlier async question has no answer. Social/newsletter collection needs the
+applicable publisher/platform authorization; no outreach is authorized or sent.
+All Phase 1 acceptance gaps below remain open. Do not call the joint review,
+Phase 2, or HANDOFF §6 complete merely because implementation tests pass.
+
+## Historical pause record (pre-resume; not current status)
+
 The owner requested an immediate pause to restart the PC. Resume Phase 2 from
 this checkpoint; do not restart the takeover or request Phase 2 approval again.
 Read HANDOFF.md completely, then AGENTS.md and this file before implementation.

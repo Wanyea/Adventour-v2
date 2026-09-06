@@ -1,0 +1,2419 @@
+{
+  "generated_at": "2026-09-06T16:54:44.556287+00:00",
+  "model": "personal_v1",
+  "evidence": "Development behavior comparison, not held-out human quality evaluation",
+  "ranking": {
+    "palm_coast": {
+      "eligible_pool": 182,
+      "profiles": [
+        {
+          "interests": [
+            "coffee_sweets",
+            "outdoors"
+          ],
+          "baseline": {
+            "count": 10,
+            "interest_matches": 1,
+            "mean_distance_m": 3155,
+            "duplicate_entities": 0,
+            "cards": [
+              {
+                "place_id": "7567ac68-2a18-424c-85f9-d7998d9c12e3",
+                "name": "Thai By Thai Restaurant",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 3022,
+                "structural_score": 0.9823,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "f7827854-907b-461a-a77a-30670702ebfc",
+                "name": "La Pizza Nostra",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 3249,
+                "structural_score": 0.977,
+                "chain_class": "regional"
+              },
+              {
+                "place_id": "b5bda95c-da6e-4f11-a90b-72fccd3a05d6",
+                "name": "Palm Harbor Grill",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 2950,
+                "structural_score": 0.9768,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "c7c71090-3a8f-4a4e-8763-659743f55d11",
+                "name": "Portugal Wine Bar & Grill",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 2974,
+                "structural_score": 0.9768,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "1d73f9c4-55ff-4b76-8ffb-092dfa8e7f6e",
+                "name": "Smiles Nite Club",
+                "tag_groups": [
+                  "nightlife"
+                ],
+                "distance_meters": 2979,
+                "structural_score": 0.9768,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "c4b8c63b-b82c-418f-b481-a3de42d53955",
+                "name": "Lotus Gallery and Fine Framing",
+                "tag_groups": [
+                  "arts_culture"
+                ],
+                "distance_meters": 2950,
+                "structural_score": 0.9729,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "ea99ba74-9788-4b77-b0a9-bdb1891d5afc",
+                "name": "Sushi 99",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 3078,
+                "structural_score": 0.9698,
+                "chain_class": "regional"
+              },
+              {
+                "place_id": "b4405264-15d6-4d27-a12b-6eafb52f6555",
+                "name": "Mamaling Asian Street Food",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 4374,
+                "structural_score": 0.9691,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "91a1924f-6f4f-47c8-8602-7ab8d9f30bfc",
+                "name": "Twisters Ice Cream Cafe",
+                "tag_groups": [
+                  "food_drink",
+                  "coffee_sweets"
+                ],
+                "distance_meters": 2956,
+                "structural_score": 0.968,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "f67fe1b2-bfa5-42b4-882c-aa9eecb86c92",
+                "name": "Salsas Mexican Restaurant",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 3014,
+                "structural_score": 0.9673,
+                "chain_class": "regional"
+              }
+            ]
+          },
+          "personal": {
+            "count": 10,
+            "interest_matches": 10,
+            "mean_distance_m": 2187,
+            "duplicate_entities": 0,
+            "cards": [
+              {
+                "place_id": "26e04b2d-6143-4ba2-b39b-e9450753ace9",
+                "name": "Rodie's Place",
+                "tag_groups": [
+                  "coffee_sweets"
+                ],
+                "distance_meters": 1639,
+                "structural_score": 0.8528,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.759025,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.159025,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "coffee_sweets"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your coffee sweets interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "c5eb87d3-4ffb-400e-9f3f-f1a42c912d82",
+                "name": "Tropical Kayaks Palm Coast",
+                "tag_groups": [
+                  "outdoors"
+                ],
+                "distance_meters": 1689,
+                "structural_score": 0.9239,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.757775,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.157775,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "outdoors"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your outdoors interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "914478ac-6838-4dd7-b26f-b2e8e37dc997",
+                "name": "Mystic Knot",
+                "tag_groups": [
+                  "outdoors"
+                ],
+                "distance_meters": 1972,
+                "structural_score": 0.9119,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.7507,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.1507,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "outdoors"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your outdoors interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "6a49a8b3-3a4a-42f4-afc8-0ec2129c5b27",
+                "name": "Hammock Trail",
+                "tag_groups": [
+                  "outdoors"
+                ],
+                "distance_meters": 2048,
+                "structural_score": 0.5562,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.7488,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.1488,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "outdoors"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your outdoors interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "1a69acbf-161c-4f3c-bbb5-d62e4e4b4be4",
+                "name": "Hammock Organics Cafe and Boutique",
+                "tag_groups": [
+                  "coffee_sweets",
+                  "shopping"
+                ],
+                "distance_meters": 2121,
+                "structural_score": 0.8226,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.746975,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.146975,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "coffee_sweets"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your coffee sweets interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "52c13991-d625-4de5-9d52-d26d3a8485d0",
+                "name": "Dream Wake Journey",
+                "tag_groups": [
+                  "coffee_sweets"
+                ],
+                "distance_meters": 2234,
+                "structural_score": 0.9119,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.74415,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.14415,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "coffee_sweets"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your coffee sweets interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "12e7a4d3-6143-48a4-8909-085e5a9fbf0c",
+                "name": "Atlantic intracoastal waterway",
+                "tag_groups": [
+                  "outdoors"
+                ],
+                "distance_meters": 2276,
+                "structural_score": 0.9459,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.7431,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.1431,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "outdoors"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your outdoors interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "0aafbd9c-7f44-4a31-b7be-b9b99ef63b2c",
+                "name": "Florida Park",
+                "tag_groups": [
+                  "outdoors"
+                ],
+                "distance_meters": 2483,
+                "structural_score": 0.75,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.737925,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.137925,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "outdoors"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your outdoors interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "7c9dc212-844a-4ccc-8f87-a01f4d793e58",
+                "name": "James F. Holland Memorial Park",
+                "tag_groups": [
+                  "outdoors"
+                ],
+                "distance_meters": 2544,
+                "structural_score": 0.8537,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.7364,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.1364,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "outdoors"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your outdoors interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "82135f41-ac49-426b-a588-69b93b727f60",
+                "name": "PC Nutrition",
+                "tag_groups": [
+                  "coffee_sweets"
+                ],
+                "distance_meters": 2866,
+                "structural_score": 0.7473,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.72835,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.12835,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "coffee_sweets"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your coffee sweets interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              }
+            ]
+          }
+        },
+        {
+          "interests": [
+            "arts_culture",
+            "food_drink"
+          ],
+          "baseline": {
+            "count": 10,
+            "interest_matches": 9,
+            "mean_distance_m": 3155,
+            "duplicate_entities": 0,
+            "cards": [
+              {
+                "place_id": "7567ac68-2a18-424c-85f9-d7998d9c12e3",
+                "name": "Thai By Thai Restaurant",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 3022,
+                "structural_score": 0.9823,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "f7827854-907b-461a-a77a-30670702ebfc",
+                "name": "La Pizza Nostra",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 3249,
+                "structural_score": 0.977,
+                "chain_class": "regional"
+              },
+              {
+                "place_id": "b5bda95c-da6e-4f11-a90b-72fccd3a05d6",
+                "name": "Palm Harbor Grill",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 2950,
+                "structural_score": 0.9768,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "c7c71090-3a8f-4a4e-8763-659743f55d11",
+                "name": "Portugal Wine Bar & Grill",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 2974,
+                "structural_score": 0.9768,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "1d73f9c4-55ff-4b76-8ffb-092dfa8e7f6e",
+                "name": "Smiles Nite Club",
+                "tag_groups": [
+                  "nightlife"
+                ],
+                "distance_meters": 2979,
+                "structural_score": 0.9768,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "c4b8c63b-b82c-418f-b481-a3de42d53955",
+                "name": "Lotus Gallery and Fine Framing",
+                "tag_groups": [
+                  "arts_culture"
+                ],
+                "distance_meters": 2950,
+                "structural_score": 0.9729,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "ea99ba74-9788-4b77-b0a9-bdb1891d5afc",
+                "name": "Sushi 99",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 3078,
+                "structural_score": 0.9698,
+                "chain_class": "regional"
+              },
+              {
+                "place_id": "b4405264-15d6-4d27-a12b-6eafb52f6555",
+                "name": "Mamaling Asian Street Food",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 4374,
+                "structural_score": 0.9691,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "91a1924f-6f4f-47c8-8602-7ab8d9f30bfc",
+                "name": "Twisters Ice Cream Cafe",
+                "tag_groups": [
+                  "food_drink",
+                  "coffee_sweets"
+                ],
+                "distance_meters": 2956,
+                "structural_score": 0.968,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "f67fe1b2-bfa5-42b4-882c-aa9eecb86c92",
+                "name": "Salsas Mexican Restaurant",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 3014,
+                "structural_score": 0.9673,
+                "chain_class": "regional"
+              }
+            ]
+          },
+          "personal": {
+            "count": 10,
+            "interest_matches": 10,
+            "mean_distance_m": 1608,
+            "duplicate_entities": 0,
+            "cards": [
+              {
+                "place_id": "26e10874-d6db-4a59-b5d5-31234f86a8fa",
+                "name": "Emilio's Pizza",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 1456,
+                "structural_score": 0.4322,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.7636,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.1636,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "food_drink"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your food drink interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "a48efb81-2213-4d5b-ba0f-fad922dcc756",
+                "name": "Mom & Pops Palm Coast Pizza",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 1456,
+                "structural_score": 0.7542,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.7636,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.1636,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "food_drink"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your food drink interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "2fd3ef37-1ce6-4214-a471-4352d59da615",
+                "name": "Schnitzel-Time",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 1472,
+                "structural_score": 0.6886,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.7632,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.1632,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "food_drink"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your food drink interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "65486ec7-4eed-4657-bce7-362b4d815fbe",
+                "name": "McSwiggin\u2019s Pub",
+                "tag_groups": [
+                  "food_drink",
+                  "nightlife"
+                ],
+                "distance_meters": 1512,
+                "structural_score": 0.6875,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.7622,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.1622,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "food_drink"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your food drink interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "e6278c36-b2df-40fe-941f-d472efea653b",
+                "name": "Jt's Seafood Shack",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 1652,
+                "structural_score": 0.328,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.7587,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.1587,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "food_drink"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your food drink interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "b3e4a193-ded4-46d1-8906-24da789ed832",
+                "name": "Green Lion Cafe",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 1663,
+                "structural_score": 0.6799,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.758425,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.158425,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "food_drink"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your food drink interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "1d38838b-b95c-46eb-9973-b941f255e68b",
+                "name": "Hammock Grill by Jt\u2019s",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 1669,
+                "structural_score": 0.9056,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.758275,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.158275,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "food_drink"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your food drink interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "ad3f43de-94ee-4c58-9595-a8c673a94eb6",
+                "name": "La Piazza Cafe",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 1676,
+                "structural_score": 0.9345,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.7581,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.1581,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "food_drink"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your food drink interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "1733000d-7061-48e9-9a8c-5cc9a9cfc2d0",
+                "name": "The Shape of Water Weddings & Events",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 1680,
+                "structural_score": 0.8131,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.758,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.158,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "food_drink"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your food drink interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "9dd1f9f4-7eb8-4baf-ae18-a70e0a91628f",
+                "name": "Loopers Par & Grille",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 1841,
+                "structural_score": 0.8293,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.753975,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.153975,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "food_drink"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your food drink interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "orlando": {
+      "eligible_pool": 2691,
+      "profiles": [
+        {
+          "interests": [
+            "coffee_sweets",
+            "outdoors"
+          ],
+          "baseline": {
+            "count": 10,
+            "interest_matches": 1,
+            "mean_distance_m": 1933,
+            "duplicate_entities": 0,
+            "cards": [
+              {
+                "place_id": "eb78826e-5f51-44f8-9caa-19a2d2d07f75",
+                "name": "Firebirds Wood Fired Grill",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 3334,
+                "structural_score": 1.0,
+                "chain_class": "regional"
+              },
+              {
+                "place_id": "f2bf15a2-fe18-4fe6-8ecf-471e697b66e1",
+                "name": "Mennello Museum of American Art",
+                "tag_groups": [
+                  "arts_culture"
+                ],
+                "distance_meters": 3715,
+                "structural_score": 1.0,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "f2f3acc2-d01d-4ff2-9441-0c53ba74e382",
+                "name": "New Moon Market",
+                "tag_groups": [
+                  "coffee_sweets",
+                  "shopping"
+                ],
+                "distance_meters": 125,
+                "structural_score": 0.9999,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "eb9e6e18-7cd3-4ed2-91a4-0b4ae1b5d027",
+                "name": "SideBar Orlando",
+                "tag_groups": [
+                  "food_drink",
+                  "nightlife"
+                ],
+                "distance_meters": 290,
+                "structural_score": 0.9999,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "2a96e0ea-c8a3-4370-abe2-5831f79870a4",
+                "name": "Attic Orlando",
+                "tag_groups": [
+                  "nightlife"
+                ],
+                "distance_meters": 353,
+                "structural_score": 0.9999,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "1da36f99-1cff-4a2a-b3f3-8b4c06f06adb",
+                "name": "Meza",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 6128,
+                "structural_score": 0.9999,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "4aa687ba-eb1c-4651-923a-60ba13fcb9d8",
+                "name": "Allure Restaurant and Lounge",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 356,
+                "structural_score": 0.9995,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "9cd85b1f-82d3-4676-ad67-83ec6280ebc3",
+                "name": "Local Draught House",
+                "tag_groups": [
+                  "food_drink",
+                  "nightlife"
+                ],
+                "distance_meters": 692,
+                "structural_score": 0.9993,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "9a3bfb3f-e7d2-4cc3-b48e-b62317dcf305",
+                "name": "Tous les Jours Bakery Caf\u00e9 - Orlando",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 3965,
+                "structural_score": 0.9993,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "1f95e563-b99d-46ee-9f7b-605afca80f13",
+                "name": "The Office Orlando Bar",
+                "tag_groups": [
+                  "food_drink",
+                  "nightlife"
+                ],
+                "distance_meters": 374,
+                "structural_score": 0.9992,
+                "chain_class": "independent"
+              }
+            ]
+          },
+          "personal": {
+            "count": 10,
+            "interest_matches": 10,
+            "mean_distance_m": 120,
+            "duplicate_entities": 0,
+            "cards": [
+              {
+                "place_id": "747cae9b-e394-4fb2-829e-c2d845c6b308",
+                "name": "Orlando fair grounds",
+                "tag_groups": [
+                  "outdoors"
+                ],
+                "distance_meters": 28,
+                "structural_score": 0.617,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.7993,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.1993,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "outdoors"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your outdoors interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "cbdb3bed-fa39-4f1f-ae48-c692f798677c",
+                "name": "Toastissimo",
+                "tag_groups": [
+                  "coffee_sweets"
+                ],
+                "distance_meters": 68,
+                "structural_score": 0.7979,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.7983,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.1983,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "coffee_sweets"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your coffee sweets interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "9d44fc67-d866-4754-a477-be43bf8878ef",
+                "name": "City Beautiful Cafe",
+                "tag_groups": [
+                  "coffee_sweets"
+                ],
+                "distance_meters": 78,
+                "structural_score": 0.9936,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.79805,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.19805,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "coffee_sweets"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your coffee sweets interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "adfcb169-5239-4ac0-8ea9-03289da29735",
+                "name": "Orlando Parks & Recreation",
+                "tag_groups": [
+                  "outdoors"
+                ],
+                "distance_meters": 84,
+                "structural_score": 0.6228,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.7979,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.1979,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "outdoors"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your outdoors interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "23509dde-514f-4213-98ac-89f2724f30ed",
+                "name": "Seneff Arts Plaza",
+                "tag_groups": [
+                  "outdoors"
+                ],
+                "distance_meters": 103,
+                "structural_score": 0.9819,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.797425,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.197425,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "outdoors"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your outdoors interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "20c8d07e-c8eb-413a-b926-9a6001cf3220",
+                "name": "Dt Cafe",
+                "tag_groups": [
+                  "coffee_sweets"
+                ],
+                "distance_meters": 123,
+                "structural_score": 0.8135,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.796925,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.196925,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "coffee_sweets"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your coffee sweets interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "f2f3acc2-d01d-4ff2-9441-0c53ba74e382",
+                "name": "New Moon Market",
+                "tag_groups": [
+                  "coffee_sweets",
+                  "shopping"
+                ],
+                "distance_meters": 125,
+                "structural_score": 0.9999,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.796875,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.196875,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "coffee_sweets"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your coffee sweets interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "ce3c3186-d96e-48da-9db2-ebe84816b44d",
+                "name": "Patagonia Underground",
+                "tag_groups": [
+                  "coffee_sweets"
+                ],
+                "distance_meters": 193,
+                "structural_score": 0.9794,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.795175,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.195175,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "coffee_sweets"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your coffee sweets interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "8a18ef6f-6a66-46e9-89b9-b5cc5b7207fc",
+                "name": "Diablicos Coffee",
+                "tag_groups": [
+                  "coffee_sweets"
+                ],
+                "distance_meters": 196,
+                "structural_score": 0.863,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.7951,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.1951,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "coffee_sweets"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your coffee sweets interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "17abf17b-083d-4890-9934-18de47ef576c",
+                "name": "Simply Puur",
+                "tag_groups": [
+                  "coffee_sweets"
+                ],
+                "distance_meters": 202,
+                "structural_score": 0.7979,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.79495,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.19495,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "coffee_sweets"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your coffee sweets interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              }
+            ]
+          }
+        },
+        {
+          "interests": [
+            "arts_culture",
+            "food_drink"
+          ],
+          "baseline": {
+            "count": 10,
+            "interest_matches": 8,
+            "mean_distance_m": 1933,
+            "duplicate_entities": 0,
+            "cards": [
+              {
+                "place_id": "eb78826e-5f51-44f8-9caa-19a2d2d07f75",
+                "name": "Firebirds Wood Fired Grill",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 3334,
+                "structural_score": 1.0,
+                "chain_class": "regional"
+              },
+              {
+                "place_id": "f2bf15a2-fe18-4fe6-8ecf-471e697b66e1",
+                "name": "Mennello Museum of American Art",
+                "tag_groups": [
+                  "arts_culture"
+                ],
+                "distance_meters": 3715,
+                "structural_score": 1.0,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "f2f3acc2-d01d-4ff2-9441-0c53ba74e382",
+                "name": "New Moon Market",
+                "tag_groups": [
+                  "coffee_sweets",
+                  "shopping"
+                ],
+                "distance_meters": 125,
+                "structural_score": 0.9999,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "eb9e6e18-7cd3-4ed2-91a4-0b4ae1b5d027",
+                "name": "SideBar Orlando",
+                "tag_groups": [
+                  "food_drink",
+                  "nightlife"
+                ],
+                "distance_meters": 290,
+                "structural_score": 0.9999,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "2a96e0ea-c8a3-4370-abe2-5831f79870a4",
+                "name": "Attic Orlando",
+                "tag_groups": [
+                  "nightlife"
+                ],
+                "distance_meters": 353,
+                "structural_score": 0.9999,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "1da36f99-1cff-4a2a-b3f3-8b4c06f06adb",
+                "name": "Meza",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 6128,
+                "structural_score": 0.9999,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "4aa687ba-eb1c-4651-923a-60ba13fcb9d8",
+                "name": "Allure Restaurant and Lounge",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 356,
+                "structural_score": 0.9995,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "9cd85b1f-82d3-4676-ad67-83ec6280ebc3",
+                "name": "Local Draught House",
+                "tag_groups": [
+                  "food_drink",
+                  "nightlife"
+                ],
+                "distance_meters": 692,
+                "structural_score": 0.9993,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "9a3bfb3f-e7d2-4cc3-b48e-b62317dcf305",
+                "name": "Tous les Jours Bakery Caf\u00e9 - Orlando",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 3965,
+                "structural_score": 0.9993,
+                "chain_class": "independent"
+              },
+              {
+                "place_id": "1f95e563-b99d-46ee-9f7b-605afca80f13",
+                "name": "The Office Orlando Bar",
+                "tag_groups": [
+                  "food_drink",
+                  "nightlife"
+                ],
+                "distance_meters": 374,
+                "structural_score": 0.9992,
+                "chain_class": "independent"
+              }
+            ]
+          },
+          "personal": {
+            "count": 10,
+            "interest_matches": 10,
+            "mean_distance_m": 62,
+            "duplicate_entities": 0,
+            "cards": [
+              {
+                "place_id": "f07a34ab-1e97-4af4-b095-90987908ede7",
+                "name": "The Pub",
+                "tag_groups": [
+                  "food_drink",
+                  "nightlife"
+                ],
+                "distance_meters": 28,
+                "structural_score": 0.4751,
+                "chain_class": "regional",
+                "model": "personal_v1",
+                "score": 0.7993,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.1993,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "food_drink"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your food drink interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "fb832c37-40c6-4a73-a5ab-b2c381c05e1d",
+                "name": "Morimoto Street Food",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 36,
+                "structural_score": 0.6771,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.7991,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.1991,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "food_drink"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your food drink interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "45c4716e-1427-4f17-96d9-421ac681e25e",
+                "name": "Foodfirst Global Restaurants",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 56,
+                "structural_score": 0.8175,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.7986,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.1986,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "food_drink"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your food drink interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "92379fa2-292d-4e86-8590-1135acfdba32",
+                "name": "Black Velvet Confections",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 57,
+                "structural_score": 0.5213,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.798575,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.198575,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "food_drink"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your food drink interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "14378961-efca-4778-a857-2afef42e774a",
+                "name": "Bosendorfer Lounge",
+                "tag_groups": [
+                  "food_drink",
+                  "nightlife"
+                ],
+                "distance_meters": 64,
+                "structural_score": 0.9936,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.7984,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.1984,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "food_drink"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your food drink interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "4b905d1b-9f51-4c2a-90ed-a6d8c39ed7c4",
+                "name": "Terrace Gallery",
+                "tag_groups": [
+                  "arts_culture"
+                ],
+                "distance_meters": 66,
+                "structural_score": 0.9479,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.79835,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.19835,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "arts_culture"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your arts culture interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "b780ec28-b329-47e8-a88d-4207dce1e659",
+                "name": "The Boheme",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 66,
+                "structural_score": 0.9936,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.79835,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.19835,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "food_drink"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your food drink interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "9ff80443-f0be-4742-98c3-dfb8ba68e1d4",
+                "name": "Altira Pool + Lounge",
+                "tag_groups": [
+                  "food_drink",
+                  "nightlife"
+                ],
+                "distance_meters": 79,
+                "structural_score": 0.9936,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.798025,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.198025,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "food_drink"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your food drink interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "40e6300b-301c-47c6-ba82-ad7b4596a55d",
+                "name": "The Westin Grand Bohemian",
+                "tag_groups": [
+                  "food_drink"
+                ],
+                "distance_meters": 86,
+                "structural_score": 0.8175,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.79785,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.19785,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "food_drink"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your food drink interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              },
+              {
+                "place_id": "a8048b6c-9704-464d-b06c-3c6974c8b9a6",
+                "name": "Grand Bohemian Gallery",
+                "tag_groups": [
+                  "arts_culture"
+                ],
+                "distance_meters": 86,
+                "structural_score": 0.8343,
+                "chain_class": "independent",
+                "model": "personal_v1",
+                "score": 0.79785,
+                "ranking_components": {
+                  "interests": 0.5,
+                  "feedback": 0.0,
+                  "distance": 0.19785,
+                  "local_policy": 0.1,
+                  "repeat": 0.0
+                },
+                "matched_interests": [
+                  "arts_culture"
+                ],
+                "feedback_count": 0,
+                "availability": "unknown",
+                "explanation": "Matches your arts culture interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified."
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "text": {
+    "palm_coast": {
+      "sample_count": 131,
+      "disagreement_count": 3,
+      "inspected_disagreements": [
+        {
+          "id": "26512b29-08e2-49d1-aa06-55f69cb2e89d",
+          "name": "Frosti Ice Cream",
+          "category": "casual_eatery",
+          "category_tags": [
+            "food_drink"
+          ],
+          "name_and_category_tags": [
+            "food_drink",
+            "coffee_sweets"
+          ],
+          "original_quality_label": "solid"
+        },
+        {
+          "id": "609f2b4a-43f9-4c7b-b033-e3695ce0532e",
+          "name": "Copper Lotus Cafe and Bistro",
+          "category": "cafe",
+          "category_tags": [
+            "coffee_sweets"
+          ],
+          "name_and_category_tags": [
+            "food_drink",
+            "coffee_sweets"
+          ],
+          "original_quality_label": "solid"
+        },
+        {
+          "id": "e5017e2a-b202-476b-a1da-c2114ee0ab34",
+          "name": "Swillerbees Craft Donuts & Coffee",
+          "category": "casual_eatery",
+          "category_tags": [
+            "food_drink"
+          ],
+          "name_and_category_tags": [
+            "food_drink",
+            "coffee_sweets"
+          ],
+          "original_quality_label": "gem"
+        }
+      ]
+    },
+    "orlando": {
+      "sample_count": 137,
+      "disagreement_count": 3,
+      "inspected_disagreements": [
+        {
+          "id": "20a30756-0b91-402c-a8d2-4f9020f02b20",
+          "name": "Kelly's Homemade Ice Cream",
+          "category": "casual_eatery",
+          "category_tags": [
+            "food_drink"
+          ],
+          "name_and_category_tags": [
+            "food_drink",
+            "coffee_sweets"
+          ],
+          "original_quality_label": "gem"
+        },
+        {
+          "id": "22edbb04-55a2-4a3c-810d-a6a1c97698d3",
+          "name": "Farm & Haus East End Market",
+          "category": "restaurant",
+          "category_tags": [
+            "food_drink"
+          ],
+          "name_and_category_tags": [
+            "food_drink",
+            "shopping"
+          ],
+          "original_quality_label": "unknown"
+        },
+        {
+          "id": "91a3c738-99d9-4720-97b8-12e2efe42903",
+          "name": "Kelly's Homemade Ice Cream",
+          "category": "casual_eatery",
+          "category_tags": [
+            "food_drink"
+          ],
+          "name_and_category_tags": [
+            "food_drink",
+            "coffee_sweets"
+          ],
+          "original_quality_label": "solid"
+        }
+      ]
+    }
+  },
+  "website_sample": [
+    {
+      "entity_id": "3aa9da6a-724f-42a1-87d4-79f2bd28a951",
+      "id": "3aa9da6a-724f-42a1-87d4-79f2bd28a951",
+      "name": "The Village Pub & Deli",
+      "websites": [
+        "http://www.thevillagepubEV.com/"
+      ],
+      "basic_category": "bar",
+      "metro": "palm_coast",
+      "lat": 29.571393966674805,
+      "lon": -81.19110870361328
+    },
+    {
+      "entity_id": "2106fa26-aebe-45ae-bd59-37905100bd89",
+      "id": "2106fa26-aebe-45ae-bd59-37905100bd89",
+      "name": "Caribbean Treats",
+      "websites": [
+        "http://www.flaglerrestaurants.com/"
+      ],
+      "basic_category": "restaurant",
+      "metro": "palm_coast",
+      "lat": 29.553537368774414,
+      "lon": -81.2539291381836
+    },
+    {
+      "entity_id": "38b0617d-d28a-458d-bc65-880af217d052",
+      "id": "38b0617d-d28a-458d-bc65-880af217d052",
+      "name": "Rednick Rick's Cooking",
+      "websites": [
+        "http://rednickrickscooking.square.site/"
+      ],
+      "basic_category": "restaurant",
+      "metro": "palm_coast",
+      "lat": 29.46882438659668,
+      "lon": -81.25527954101562
+    },
+    {
+      "entity_id": "7567ac68-2a18-424c-85f9-d7998d9c12e3",
+      "id": "7567ac68-2a18-424c-85f9-d7998d9c12e3",
+      "name": "Thai By Thai Restaurant",
+      "websites": [
+        "http://www.thaibythai.com"
+      ],
+      "basic_category": "restaurant",
+      "metro": "palm_coast",
+      "lat": 29.557592391967773,
+      "lon": -81.2130355834961
+    },
+    {
+      "entity_id": "dd26961e-0879-497d-b196-cb0f2d9fcf61",
+      "id": "dd26961e-0879-497d-b196-cb0f2d9fcf61",
+      "name": "Creative Academy of the Performing Arts",
+      "websites": [
+        "http://www.CapaAcademy.com/"
+      ],
+      "basic_category": "performing_arts_venue",
+      "metro": "palm_coast",
+      "lat": 29.47382164001465,
+      "lon": -81.2500228881836
+    },
+    {
+      "entity_id": "2fd3ef37-1ce6-4214-a471-4352d59da615",
+      "id": "2fd3ef37-1ce6-4214-a471-4352d59da615",
+      "name": "Schnitzel-Time",
+      "websites": [
+        "https://schnitzel-time.com"
+      ],
+      "basic_category": "restaurant",
+      "metro": "palm_coast",
+      "lat": 29.59054183959961,
+      "lon": -81.22138214111328
+    },
+    {
+      "entity_id": "df5ec953-107d-4559-b7d6-c2088beaa74d",
+      "id": "df5ec953-107d-4559-b7d6-c2088beaa74d",
+      "name": "Next Door Beach Bistro",
+      "websites": [
+        "http://NextDoorBeachBistro.com/"
+      ],
+      "basic_category": "restaurant",
+      "metro": "palm_coast",
+      "lat": 29.48379135131836,
+      "lon": -81.12914276123047
+    },
+    {
+      "entity_id": "7c8f7da0-3904-4f0f-86ed-29530de83021",
+      "id": "7c8f7da0-3904-4f0f-86ed-29530de83021",
+      "name": "Barnhill's Cafe, Bar & Grill",
+      "websites": [
+        "http://barnhills.com/"
+      ],
+      "basic_category": "restaurant",
+      "metro": "palm_coast",
+      "lat": 29.47982406616211,
+      "lon": -81.12809753417969
+    },
+    {
+      "entity_id": "946e2281-aa8e-4183-ad15-9536adc4d5f4",
+      "id": "946e2281-aa8e-4183-ad15-9536adc4d5f4",
+      "name": "Delfinos Italian Chophouse",
+      "websites": [
+        "http://www.hammockbeach.com/dining/delfinos"
+      ],
+      "basic_category": "restaurant",
+      "metro": "palm_coast",
+      "lat": 29.605688095092773,
+      "lon": -81.18788146972656
+    },
+    {
+      "entity_id": "1dc79100-d76c-4414-8da6-eab53c857cb2",
+      "id": "1dc79100-d76c-4414-8da6-eab53c857cb2",
+      "name": "Knuckle Sandwich Sub Shop",
+      "websites": [
+        "http://www.knucklesandwichbunnell.com"
+      ],
+      "basic_category": "casual_eatery",
+      "metro": "palm_coast",
+      "lat": 29.52706527709961,
+      "lon": -81.2625503540039
+    },
+    {
+      "entity_id": "9d41ba2a-3c6e-4001-86f1-d7b7dfb21857",
+      "id": "9d41ba2a-3c6e-4001-86f1-d7b7dfb21857",
+      "name": "The Anchor",
+      "websites": [
+        "http://theanchorflaglerbeach.com"
+      ],
+      "basic_category": "restaurant",
+      "metro": "palm_coast",
+      "lat": 29.478300094604492,
+      "lon": -81.126220703125
+    },
+    {
+      "entity_id": "7c26480d-83af-46d7-bfbd-edd1d4c42ad4",
+      "id": "7c26480d-83af-46d7-bfbd-edd1d4c42ad4",
+      "name": "La Creperie Kafe",
+      "websites": [
+        "http://www.lacreperiekafe.com/"
+      ],
+      "basic_category": "restaurant",
+      "metro": "palm_coast",
+      "lat": 29.558460235595703,
+      "lon": -81.21319580078125
+    },
+    {
+      "entity_id": "4173db99-7e30-478e-9b3c-d17cf6ce45f4",
+      "id": "4173db99-7e30-478e-9b3c-d17cf6ce45f4",
+      "name": "Ash & Ale Lounge (formerly The Humidor)",
+      "websites": [
+        "https://ashandale.com/"
+      ],
+      "basic_category": "lounge",
+      "metro": "palm_coast",
+      "lat": 29.570859909057617,
+      "lon": -81.1906509399414
+    },
+    {
+      "entity_id": "e953cce5-f953-4f3a-80b8-e92f3532de9c",
+      "id": "e953cce5-f953-4f3a-80b8-e92f3532de9c",
+      "name": "The Wandering Hoagie",
+      "websites": [
+        "http://thewanderinghoagie.godaddysites.com"
+      ],
+      "basic_category": "restaurant",
+      "metro": "palm_coast",
+      "lat": 29.471202850341797,
+      "lon": -81.26481628417969
+    },
+    {
+      "entity_id": "55893fec-d1c7-4d52-ba41-c6ae0e608ca6",
+      "id": "55893fec-d1c7-4d52-ba41-c6ae0e608ca6",
+      "name": "Seminole Woods Neighborhood Park",
+      "websites": [
+        "http://www.palmcoastgov.com/parks/seminole-woods-park"
+      ],
+      "basic_category": "park",
+      "metro": "palm_coast",
+      "lat": 29.421419143676758,
+      "lon": -81.18494415283203
+    },
+    {
+      "entity_id": "7e19a76f-8096-4335-bd6e-940a42ad35b7",
+      "id": "7e19a76f-8096-4335-bd6e-940a42ad35b7",
+      "name": "Hidden Lakes Playground",
+      "websites": [
+        "www.paytashomes.com/property-location/hidden-lakes-palm-coast"
+      ],
+      "basic_category": "playground",
+      "metro": "palm_coast",
+      "lat": 29.49945068359375,
+      "lon": -81.18656921386719
+    },
+    {
+      "entity_id": "0fe70124-8b1d-49be-9982-750ed1fac02b",
+      "id": "0fe70124-8b1d-49be-9982-750ed1fac02b",
+      "name": "Flagler County Historical Society",
+      "websites": [
+        "https://www.flaglercountyhistoricalsociety.com/"
+      ],
+      "basic_category": "museum",
+      "metro": "palm_coast",
+      "lat": 29.4666748046875,
+      "lon": -81.25698852539062
+    },
+    {
+      "entity_id": "1a26045f-b63d-4304-9c02-63f4956ace87",
+      "id": "1a26045f-b63d-4304-9c02-63f4956ace87",
+      "name": "Gourmet Deli",
+      "websites": [
+        "http://gourmetdeli.us"
+      ],
+      "basic_category": "casual_eatery",
+      "metro": "palm_coast",
+      "lat": 29.553760528564453,
+      "lon": -81.25304412841797
+    },
+    {
+      "entity_id": "2384bc29-4e11-49fa-81c7-f2d899153032",
+      "id": "2384bc29-4e11-49fa-81c7-f2d899153032",
+      "name": "River To Sea Preserve Park",
+      "websites": [
+        "www.flaglercounty.org/facilities.aspx?page=detail&RID=19"
+      ],
+      "basic_category": "park",
+      "metro": "palm_coast",
+      "lat": 29.671167373657227,
+      "lon": -81.21449279785156
+    },
+    {
+      "entity_id": "c7c71090-3a8f-4a4e-8763-659743f55d11",
+      "id": "c7c71090-3a8f-4a4e-8763-659743f55d11",
+      "name": "Portugal Wine Bar & Grill",
+      "websites": [
+        "http://www.portugalwinebarandgrill.com/"
+      ],
+      "basic_category": "restaurant",
+      "metro": "palm_coast",
+      "lat": 29.55834197998047,
+      "lon": -81.21482849121094
+    },
+    {
+      "entity_id": "78cc6879-1ce3-4d21-8305-f76b1037e0e2",
+      "id": "78cc6879-1ce3-4d21-8305-f76b1037e0e2",
+      "name": "Richie's Taqueria",
+      "websites": [
+        "http://richiescebon.com"
+      ],
+      "basic_category": "restaurant",
+      "metro": "palm_coast",
+      "lat": 29.48136329650879,
+      "lon": -81.12799072265625
+    },
+    {
+      "entity_id": "dfe00fd8-a9ec-4242-a278-03162e42a609",
+      "id": "dfe00fd8-a9ec-4242-a278-03162e42a609",
+      "name": "PDiddy &KK'S Paradise lounge",
+      "websites": [
+        "https://www.jupitersgoldcoast.com.au"
+      ],
+      "basic_category": "lounge",
+      "metro": "palm_coast",
+      "lat": 29.425617218017578,
+      "lon": -81.1693115234375
+    },
+    {
+      "entity_id": "d1a63371-57c7-4c2a-a1d5-e5cc302b784a",
+      "id": "d1a63371-57c7-4c2a-a1d5-e5cc302b784a",
+      "name": "Flagler Breez",
+      "websites": [
+        "http://www.flagleronline.com/restaurant-ID-381-flagler-breeze"
+      ],
+      "basic_category": "restaurant",
+      "metro": "palm_coast",
+      "lat": 29.451128005981445,
+      "lon": -81.11376953125
+    },
+    {
+      "entity_id": "1f567751-231f-47b3-92ae-510ca9693630",
+      "id": "1f567751-231f-47b3-92ae-510ca9693630",
+      "name": "D & H Groves",
+      "websites": [
+        "https://www.pecanoutlet.com"
+      ],
+      "basic_category": "casual_eatery",
+      "metro": "palm_coast",
+      "lat": 29.665939331054688,
+      "lon": -81.28775024414062
+    },
+    {
+      "entity_id": "82135f41-ac49-426b-a588-69b93b727f60",
+      "id": "82135f41-ac49-426b-a588-69b93b727f60",
+      "name": "PC Nutrition",
+      "websites": [
+        "http://www.goherbalife.com/cbeissel"
+      ],
+      "basic_category": "non_alcoholic_beverage_venue",
+      "metro": "palm_coast",
+      "lat": 29.558635711669922,
+      "lon": -81.20716857910156
+    },
+    {
+      "entity_id": "2d75f2c2-1ea4-4a1c-ab3a-27f87be9ff34",
+      "id": "2d75f2c2-1ea4-4a1c-ab3a-27f87be9ff34",
+      "name": "Blue Springs State Park, Orange City",
+      "websites": [
+        "https://www.floridastateparks.org/park/Blue-Spring"
+      ],
+      "basic_category": "skate_park",
+      "metro": "palm_coast",
+      "lat": 29.578285217285156,
+      "lon": -81.2010726928711
+    },
+    {
+      "entity_id": "d0017d87-3421-42dd-8a10-555705098608",
+      "id": "d0017d87-3421-42dd-8a10-555705098608",
+      "name": "Martin's Restaurant & Lounge",
+      "websites": [
+        "http://martinsrestaurantfl.com"
+      ],
+      "basic_category": "restaurant",
+      "metro": "palm_coast",
+      "lat": 29.459753036499023,
+      "lon": -81.11747741699219
+    },
+    {
+      "entity_id": "0ad02e00-67ce-4efe-8b8c-964b8ba4b7fd",
+      "id": "0ad02e00-67ce-4efe-8b8c-964b8ba4b7fd",
+      "name": "Dahlia Mexican Kitchen",
+      "websites": [
+        "http://www.dahliamexicankitchen.com/"
+      ],
+      "basic_category": "restaurant",
+      "metro": "palm_coast",
+      "lat": 29.478609085083008,
+      "lon": -81.14714050292969
+    },
+    {
+      "entity_id": "ecb67840-b300-4ccf-8315-e409401db375",
+      "id": "ecb67840-b300-4ccf-8315-e409401db375",
+      "name": "B.A. Sports Bar and Grill",
+      "websites": [
+        "http://www.coquinalanes.com/"
+      ],
+      "basic_category": "dance_club",
+      "metro": "palm_coast",
+      "lat": 29.556840896606445,
+      "lon": -81.21684265136719
+    },
+    {
+      "entity_id": "c8710691-f4f5-466b-9bea-58c58388ad7d",
+      "id": "c8710691-f4f5-466b-9bea-58c58388ad7d",
+      "name": "Russian Food",
+      "websites": [
+        "http://russian-food.edan.io"
+      ],
+      "basic_category": "restaurant",
+      "metro": "palm_coast",
+      "lat": 29.479183197021484,
+      "lon": -81.12777709960938
+    },
+    {
+      "entity_id": "9db17796-bdc3-495e-b0d5-9071f1306076",
+      "id": "9db17796-bdc3-495e-b0d5-9071f1306076",
+      "name": "Hot Diggity Dogz",
+      "websites": [
+        "https://www.orderhotdiggitydogz.com/?utm_source=bing&utm_medium=websiteurl&utm_campaign=search"
+      ],
+      "basic_category": "restaurant",
+      "metro": "orlando",
+      "lat": 28.65467071533203,
+      "lon": -81.33153533935547
+    },
+    {
+      "entity_id": "43bb94d6-1fd8-4a95-9e38-13190ae92fcd",
+      "id": "43bb94d6-1fd8-4a95-9e38-13190ae92fcd",
+      "name": "Project: Vetrelief",
+      "websites": [
+        "https://projectvetrelief.org"
+      ],
+      "basic_category": "social_club",
+      "metro": "orlando",
+      "lat": 28.600845336914062,
+      "lon": -81.40966033935547
+    },
+    {
+      "entity_id": "f4cef549-2dc0-4dad-b384-f7a5ee33b425",
+      "id": "f4cef549-2dc0-4dad-b384-f7a5ee33b425",
+      "name": "Khasiyat",
+      "websites": [
+        "http://www.khasiyatrestaurant.com/"
+      ],
+      "basic_category": "restaurant",
+      "metro": "orlando",
+      "lat": 28.465009689331055,
+      "lon": -81.38963317871094
+    },
+    {
+      "entity_id": "d93f0837-07d7-4514-8b65-98cc0ec5e272",
+      "id": "d93f0837-07d7-4514-8b65-98cc0ec5e272",
+      "name": "Gabriel's Sub Shop",
+      "websites": [
+        "http://www.gabrielssubs.com"
+      ],
+      "basic_category": "casual_eatery",
+      "metro": "orlando",
+      "lat": 28.52334213256836,
+      "lon": -81.34638977050781
+    },
+    {
+      "entity_id": "f85d1e4b-74f9-44d1-b219-2abc83a93464",
+      "id": "f85d1e4b-74f9-44d1-b219-2abc83a93464",
+      "name": "Connections Eatery",
+      "websites": [
+        "https://disneyworld.disney.go.com/dining/epcot/connections-eatery/"
+      ],
+      "basic_category": "restaurant",
+      "metro": "orlando",
+      "lat": 28.37433433532715,
+      "lon": -81.54881286621094
+    },
+    {
+      "entity_id": "486703ea-f418-4776-9484-e07be76dc5a2",
+      "id": "486703ea-f418-4776-9484-e07be76dc5a2",
+      "name": "Frame Masters Gallery",
+      "websites": [
+        "http://FMGOrlando.com/"
+      ],
+      "basic_category": "art_gallery",
+      "metro": "orlando",
+      "lat": 28.5676326751709,
+      "lon": -81.3480453491211
+    },
+    {
+      "entity_id": "16ba0f28-6ec5-4661-a395-f650def87a25",
+      "id": "16ba0f28-6ec5-4661-a395-f650def87a25",
+      "name": "AJ's Pizza Joint",
+      "websites": [
+        "http://www.ajspizzajoint.com/"
+      ],
+      "basic_category": "restaurant",
+      "metro": "orlando",
+      "lat": 28.565397262573242,
+      "lon": -81.58637237548828
+    },
+    {
+      "entity_id": "e7623f93-a9eb-4eb6-8161-ba3049ac91a1",
+      "id": "e7623f93-a9eb-4eb6-8161-ba3049ac91a1",
+      "name": "Ticket Word Express",
+      "websites": [
+        "http://Www.TickerWhater.com/"
+      ],
+      "basic_category": "amusement_park",
+      "metro": "orlando",
+      "lat": 28.538227081298828,
+      "lon": -81.37740325927734
+    },
+    {
+      "entity_id": "94d3ec70-6ea7-4feb-80d3-f04b29660c23",
+      "id": "94d3ec70-6ea7-4feb-80d3-f04b29660c23",
+      "name": "Mikey's Pizza-Ria",
+      "websites": [
+        "https://www.mikeyspizzaria.getsauce.com/order-online"
+      ],
+      "basic_category": "restaurant",
+      "metro": "orlando",
+      "lat": 28.30521011352539,
+      "lon": -81.4080810546875
+    },
+    {
+      "entity_id": "d7935eae-5dae-4735-b2e9-45bbb939abb4",
+      "id": "d7935eae-5dae-4735-b2e9-45bbb939abb4",
+      "name": "Real Bean Coffee Co",
+      "websites": [
+        "http://www.realbeancoffeeco.com/"
+      ],
+      "basic_category": "coffee_shop",
+      "metro": "orlando",
+      "lat": 28.60854148864746,
+      "lon": -81.41309356689453
+    },
+    {
+      "entity_id": "36a78e1e-5d1e-42b6-a31c-8def5d48d189",
+      "id": "36a78e1e-5d1e-42b6-a31c-8def5d48d189",
+      "name": "Egg Roll 99",
+      "websites": [
+        "http://orlando.florida-locksmith.com"
+      ],
+      "basic_category": "restaurant",
+      "metro": "orlando",
+      "lat": 28.48357582092285,
+      "lon": -81.45693969726562
+    },
+    {
+      "entity_id": "ede3a87a-9644-4b25-be9f-022b9a5e2218",
+      "id": "ede3a87a-9644-4b25-be9f-022b9a5e2218",
+      "name": "Todo Arepa",
+      "websites": [
+        "https://www.todoarepa.com/"
+      ],
+      "basic_category": "restaurant",
+      "metro": "orlando",
+      "lat": 28.35995101928711,
+      "lon": -81.36832427978516
+    },
+    {
+      "entity_id": "ae6c3cfa-6513-4e77-afec-3259da1fc6d5",
+      "id": "ae6c3cfa-6513-4e77-afec-3259da1fc6d5",
+      "name": "I Ce Ny Rolled Ice Cream",
+      "websites": [
+        "http://icenybaldwinpark.com/"
+      ],
+      "basic_category": "casual_eatery",
+      "metro": "orlando",
+      "lat": 28.56829071044922,
+      "lon": -81.32615661621094
+    },
+    {
+      "entity_id": "843be3ad-56f2-421a-b77b-6926103e9f4b",
+      "id": "843be3ad-56f2-421a-b77b-6926103e9f4b",
+      "name": "Iconn Restaurants of Georgia",
+      "websites": [
+        "http://bearcom.com"
+      ],
+      "basic_category": "restaurant",
+      "metro": "orlando",
+      "lat": 28.499094009399414,
+      "lon": -81.43171691894531
+    },
+    {
+      "entity_id": "cf43c30f-d88a-42b1-b984-f57cdc857919",
+      "id": "cf43c30f-d88a-42b1-b984-f57cdc857919",
+      "name": "C2 Catered Events",
+      "websites": [
+        "https://www.c2cateredevents.com/"
+      ],
+      "basic_category": "casual_eatery",
+      "metro": "orlando",
+      "lat": 28.541927337646484,
+      "lon": -81.37643432617188
+    },
+    {
+      "entity_id": "2da587e1-3510-4b3a-9d0a-2fff14649294",
+      "id": "2da587e1-3510-4b3a-9d0a-2fff14649294",
+      "name": "Servando's",
+      "websites": [
+        "http://www.servandos.com/"
+      ],
+      "basic_category": "restaurant",
+      "metro": "orlando",
+      "lat": 28.552467346191406,
+      "lon": -81.59355163574219
+    },
+    {
+      "entity_id": "23ba7631-a808-4b52-b604-aefa05125b8f",
+      "id": "23ba7631-a808-4b52-b604-aefa05125b8f",
+      "name": "The Dave Matthews Tribute Band @ The Social",
+      "websites": [
+        "http://thesocial.org"
+      ],
+      "basic_category": "music_venue",
+      "metro": "orlando",
+      "lat": 28.54304313659668,
+      "lon": -81.37982940673828
+    },
+    {
+      "entity_id": "701afa29-68ff-4fec-ac79-188b5bd3f22f",
+      "id": "701afa29-68ff-4fec-ac79-188b5bd3f22f",
+      "name": "Flavors Nigerian Restaurant",
+      "websites": [
+        "http://Flavorsnigeriarestaurant.com/"
+      ],
+      "basic_category": "restaurant",
+      "metro": "orlando",
+      "lat": 28.503936767578125,
+      "lon": -81.37657165527344
+    },
+    {
+      "entity_id": "cfdc4e09-0679-4db1-b8ba-2adc1d417661",
+      "id": "cfdc4e09-0679-4db1-b8ba-2adc1d417661",
+      "name": "Pio Pio Latin Cuisine",
+      "websites": [
+        "http://piopiosemoran.com/"
+      ],
+      "basic_category": "restaurant",
+      "metro": "orlando",
+      "lat": 28.518512725830078,
+      "lon": -81.30973815917969
+    },
+    {
+      "entity_id": "9689eade-1785-40ee-bb79-3e619695fe7a",
+      "id": "9689eade-1785-40ee-bb79-3e619695fe7a",
+      "name": "Gator's Dockside Oviedo",
+      "websites": [
+        "https://www.gatorsdockside.com"
+      ],
+      "basic_category": "restaurant",
+      "metro": "orlando",
+      "lat": 28.656173706054688,
+      "lon": -81.20557403564453
+    },
+    {
+      "entity_id": "95d94043-9692-4427-841d-070f64c828f7",
+      "id": "95d94043-9692-4427-841d-070f64c828f7",
+      "name": "The Hollywood Brown Derby",
+      "websites": [
+        "http://www.disneyworld.com"
+      ],
+      "basic_category": "restaurant",
+      "metro": "orlando",
+      "lat": 28.357633590698242,
+      "lon": -81.56027221679688
+    },
+    {
+      "entity_id": "9f7d1ed6-ad4e-4ad3-9a8b-3fd239483b11",
+      "id": "12f7cb6e-9c65-4c2d-95b6-ac3909f5c1ec",
+      "name": "Disney World Orlando Florida",
+      "websites": [
+        "https://disneyworld.disney.go.com/"
+      ],
+      "basic_category": "amusement_park",
+      "metro": "orlando",
+      "lat": 28.46384620666504,
+      "lon": -81.31130981445312
+    },
+    {
+      "entity_id": "afc94f02-5f69-4770-871f-6a5460ae9b12",
+      "id": "afc94f02-5f69-4770-871f-6a5460ae9b12",
+      "name": "Mathers Social Gathering",
+      "websites": [
+        "http://www.mathersorlando.com/"
+      ],
+      "basic_category": "bar",
+      "metro": "orlando",
+      "lat": 28.541519165039062,
+      "lon": -81.37762451171875
+    },
+    {
+      "entity_id": "f7f6b3e8-a5aa-4426-99d3-ad502d7a12bc",
+      "id": "f7f6b3e8-a5aa-4426-99d3-ad502d7a12bc",
+      "name": "Ox Grill Restaurant",
+      "websites": [
+        "https://www.oxgrillrestaurant.com"
+      ],
+      "basic_category": "restaurant",
+      "metro": "orlando",
+      "lat": 28.442737579345703,
+      "lon": -81.46925354003906
+    },
+    {
+      "entity_id": "daef1709-0c79-4874-8461-e01a421a2ad9",
+      "id": "daef1709-0c79-4874-8461-e01a421a2ad9",
+      "name": "Turtle Bay",
+      "websites": [
+        "https://turtle-bay-bar.hub.biz"
+      ],
+      "basic_category": "bar",
+      "metro": "orlando",
+      "lat": 28.569194793701172,
+      "lon": -81.23473358154297
+    },
+    {
+      "entity_id": "3788c855-c650-4804-8f34-4d5c579ad8e9",
+      "id": "3788c855-c650-4804-8f34-4d5c579ad8e9",
+      "name": "Mirizan",
+      "websites": [
+        "http://www.mirizan.com/"
+      ],
+      "basic_category": "casual_eatery",
+      "metro": "orlando",
+      "lat": 28.654619216918945,
+      "lon": -81.20989227294922
+    },
+    {
+      "entity_id": "a0622887-7e9f-4fa3-bc86-9e0a2866f969",
+      "id": "a0622887-7e9f-4fa3-bc86-9e0a2866f969",
+      "name": "Sunroom",
+      "websites": [
+        "https://www.sunroomcocktails.com"
+      ],
+      "basic_category": "bar",
+      "metro": "orlando",
+      "lat": 28.562795639038086,
+      "lon": -81.36422729492188
+    },
+    {
+      "entity_id": "cea81284-fbcd-428a-b542-2902aeb82a1c",
+      "id": "cea81284-fbcd-428a-b542-2902aeb82a1c",
+      "name": "The Land",
+      "websites": [
+        "https://disneyworld.disney.go.com/attractions/epcot/living-with-the-land/?CMP=OKC-80007848_BP_WDW_land_theland_NA"
+      ],
+      "basic_category": "event_venue",
+      "metro": "orlando",
+      "lat": 28.374006271362305,
+      "lon": -81.55197143554688
+    },
+    {
+      "entity_id": "1c329205-587d-45a7-be19-6c690d0ccfab",
+      "id": "1c329205-587d-45a7-be19-6c690d0ccfab",
+      "name": "Christinis Ristorante Italiano",
+      "websites": [
+        "https://www.christinis.com/reservations/"
+      ],
+      "basic_category": "restaurant",
+      "metro": "orlando",
+      "lat": 28.452024459838867,
+      "lon": -81.48979187011719
+    },
+    {
+      "entity_id": "4c529438-7c8f-46cd-a098-40126a7f7ba1",
+      "id": "4c529438-7c8f-46cd-a098-40126a7f7ba1",
+      "name": "El Cilantrillo Restaurant - Semoran",
+      "websites": [
+        "https://www.elcilantrillo.com/"
+      ],
+      "basic_category": "restaurant",
+      "metro": "orlando",
+      "lat": 28.51565170288086,
+      "lon": -81.31124114990234
+    }
+  ],
+  "closed_sample": [
+    {
+      "id": "10576795-4ab4-46aa-9cba-e199fe140a59",
+      "name": "Enterprise Sewing",
+      "websites": null,
+      "metro": "orlando",
+      "human_note": "Sewing shop and its permanently closed and not a true destination"
+    },
+    {
+      "id": "1062077c-f290-4a29-a9af-7b501c67b459",
+      "name": "Sevyn Inc.",
+      "websites": null,
+      "metro": "palm_coast",
+      "human_note": "Also its closed for good."
+    },
+    {
+      "id": "134e9a0d-36c0-47f7-97c1-35865105eece",
+      "name": "Duffy's Delight Llc",
+      "websites": null,
+      "metro": "palm_coast",
+      "human_note": "I might have recommended it but its closed for good."
+    },
+    {
+      "id": "1849f502-dbe8-4565-8251-e9bf1d702156",
+      "name": "Houlihan's",
+      "websites": [
+        "http://www.houlihans.com/my-houlihans/orlando-%28point-orlando%29"
+      ],
+      "metro": "orlando",
+      "human_note": "Couldnt find it, seems permanently closed"
+    },
+    {
+      "id": "22edbb04-55a2-4a3c-810d-a6a1c97698d3",
+      "name": "Farm & Haus East End Market",
+      "websites": [
+        "http://farmandhaus.com"
+      ],
+      "metro": "orlando",
+      "human_note": "Permanently closed"
+    },
+    {
+      "id": "2fd3ef37-1ce6-4214-a471-4352d59da615",
+      "name": "Schnitzel-Time",
+      "websites": [
+        "https://schnitzel-time.com"
+      ],
+      "metro": "palm_coast",
+      "human_note": "Seems permanently closed however."
+    },
+    {
+      "id": "3f114b8c-3fb3-4370-af61-16ddf3439e5c",
+      "name": "Adventel Restaurant And Bakery",
+      "websites": [
+        "https://adventel-restaurant-and-bakery.business.site"
+      ],
+      "metro": "orlando",
+      "human_note": "Permanently closed"
+    },
+    {
+      "id": "6061ac16-ab3a-453f-a812-90acc27cf852",
+      "name": "Michoacana Bacana",
+      "websites": null,
+      "metro": "palm_coast",
+      "human_note": "Permanently closed. Didnt look good"
+    },
+    {
+      "id": "64a2fb00-28ee-4984-af4e-298719af1bf8",
+      "name": "Hidden Treasure Raw Bar & Grill",
+      "websites": [
+        "http://www.hiddentreasurerestaurants.com/"
+      ],
+      "metro": "palm_coast",
+      "human_note": "Would have recommended it, permanently closed though."
+    },
+    {
+      "id": "74224f47-9d43-416f-8be8-dae8cbe4bb03",
+      "name": "Bird of Paradise",
+      "websites": [
+        "http://www.localrootsdistribution.com/"
+      ],
+      "metro": "orlando",
+      "human_note": "Used to be a restaurant but closed for good"
+    }
+  ]
+}

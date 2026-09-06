@@ -8,7 +8,7 @@ GROUPS = {
                     "restaurant", "sandwich_shop", "seafood_restaurant", "steak_house"},
                    ["bbq", "bistro", "burger", "deli", "diner", "grill", "kitchen", "pizza", "restaurant", "taco"]),
     "coffee_sweets": ({"cafe", "coffee_shop", "dessert_restaurant", "ice_cream_shop", "tea_house"},
-                      ["cafe", "coffee", "donut", "ice cream", "tea"]),
+                      ["coffee", "donut", "ice cream", "tea"]),
     "arts_culture": ({"art_gallery", "historical_landmark", "library", "museum", "performing_arts_theater", "tourist_attraction"}, []),
     "outdoors": ({"aquarium", "campground", "hiking_area", "park", "tourist_attraction", "zoo"}, ["garden", "trail"]),
     "nightlife": ({"bar", "comedy_club", "concert_hall", "night_club"}, []),

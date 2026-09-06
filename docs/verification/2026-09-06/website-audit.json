@@ -1,0 +1,1244 @@
+{
+  "generated_at": "2026-09-06T16:51:20.811767+00:00",
+  "sample_file": "..\\docs\\verification\\2026-09-06\\discovery-audit.json",
+  "limitation": "Counts are acquisition diagnostics, not verified hours, event coverage or closure predictions.",
+  "website_sample": [
+    {
+      "id": "3aa9da6a-724f-42a1-87d4-79f2bd28a951",
+      "name": "The Village Pub & Deli",
+      "metro": "palm_coast",
+      "requested_url": "http://www.thevillagepubEV.com/",
+      "pages": [],
+      "outcome": "http_404"
+    },
+    {
+      "id": "2106fa26-aebe-45ae-bd59-37905100bd89",
+      "name": "Caribbean Treats",
+      "metro": "palm_coast",
+      "requested_url": "http://www.flaglerrestaurants.com/",
+      "pages": [],
+      "outcome": "ConnectionError"
+    },
+    {
+      "id": "38b0617d-d28a-458d-bc65-880af217d052",
+      "name": "Rednick Rick's Cooking",
+      "metro": "palm_coast",
+      "requested_url": "http://rednickrickscooking.square.site/",
+      "pages": [
+        {
+          "url": "https://rednickrickscooking.square.site/",
+          "hours_class": "js_rendered",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 36
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment",
+      "render": {
+        "outcome": "rendered",
+        "url": "https://rednickrickscooking.square.site/",
+        "requests_seen": 155,
+        "hours_class": "tier2_text",
+        "structured_hours_nodes": 0,
+        "event_nodes": 0,
+        "dated_event_nodes": 0,
+        "public_access_phrase": false,
+        "explicit_closure_phrase": false,
+        "visible_characters": 694
+      }
+    },
+    {
+      "id": "7567ac68-2a18-424c-85f9-d7998d9c12e3",
+      "name": "Thai By Thai Restaurant",
+      "metro": "palm_coast",
+      "requested_url": "http://www.thaibythai.com",
+      "pages": [],
+      "outcome": "robots_denied_or_unavailable"
+    },
+    {
+      "id": "dd26961e-0879-497d-b196-cb0f2d9fcf61",
+      "name": "Creative Academy of the Performing Arts",
+      "metro": "palm_coast",
+      "requested_url": "http://www.CapaAcademy.com/",
+      "pages": [],
+      "outcome": "SSLError"
+    },
+    {
+      "id": "2fd3ef37-1ce6-4214-a471-4352d59da615",
+      "name": "Schnitzel-Time",
+      "metro": "palm_coast",
+      "requested_url": "https://schnitzel-time.com",
+      "pages": [],
+      "outcome": "SSLError"
+    },
+    {
+      "id": "df5ec953-107d-4559-b7d6-c2088beaa74d",
+      "name": "Next Door Beach Bistro",
+      "metro": "palm_coast",
+      "requested_url": "http://NextDoorBeachBistro.com/",
+      "pages": [
+        {
+          "url": "https://nextdoorbeachbistro.com/",
+          "hours_class": "tier2_text",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 3912
+        },
+        {
+          "url": "https://nextdoorbeachbistro.com/contact.asp",
+          "hours_class": "tier2_text",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 978
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment"
+    },
+    {
+      "id": "7c8f7da0-3904-4f0f-86ed-29530de83021",
+      "name": "Barnhill's Cafe, Bar & Grill",
+      "metro": "palm_coast",
+      "requested_url": "http://barnhills.com/",
+      "pages": [
+        {
+          "url": "https://barnhills.com/",
+          "hours_class": "tier1_jsonld",
+          "structured_hours_nodes": 1,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 2432
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment"
+    },
+    {
+      "id": "946e2281-aa8e-4183-ad15-9536adc4d5f4",
+      "name": "Delfinos Italian Chophouse",
+      "metro": "palm_coast",
+      "requested_url": "http://www.hammockbeach.com/dining/delfinos",
+      "pages": [],
+      "outcome": "http_404"
+    },
+    {
+      "id": "1dc79100-d76c-4414-8da6-eab53c857cb2",
+      "name": "Knuckle Sandwich Sub Shop",
+      "metro": "palm_coast",
+      "requested_url": "http://www.knucklesandwichbunnell.com",
+      "pages": [
+        {
+          "url": "https://www.knucklesandwichbunnell.com/",
+          "hours_class": "js_rendered",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 34
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment",
+      "render": {
+        "outcome": "rendered",
+        "url": "https://www.knucklesandwichbunnell.com/",
+        "requests_seen": 161,
+        "hours_class": "js_rendered",
+        "structured_hours_nodes": 0,
+        "event_nodes": 0,
+        "dated_event_nodes": 0,
+        "public_access_phrase": false,
+        "explicit_closure_phrase": false,
+        "visible_characters": 291
+      }
+    },
+    {
+      "id": "9d41ba2a-3c6e-4001-86f1-d7b7dfb21857",
+      "name": "The Anchor",
+      "metro": "palm_coast",
+      "requested_url": "http://theanchorflaglerbeach.com",
+      "pages": [
+        {
+          "url": "https://theanchorflaglerbeach.com/",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 391
+        },
+        {
+          "url": "https://theanchorflaglerbeach.com/contact.html",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 704
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment"
+    },
+    {
+      "id": "7c26480d-83af-46d7-bfbd-edd1d4c42ad4",
+      "name": "La Creperie Kafe",
+      "metro": "palm_coast",
+      "requested_url": "http://www.lacreperiekafe.com/",
+      "pages": [
+        {
+          "url": "https://www.lacreperiekafe.com/",
+          "hours_class": "tier2_text",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 1312
+        },
+        {
+          "url": "https://www.lacreperiekafe.com/contact.html",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 529
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment"
+    },
+    {
+      "id": "4173db99-7e30-478e-9b3c-d17cf6ce45f4",
+      "name": "Ash & Ale Lounge (formerly The Humidor)",
+      "metro": "palm_coast",
+      "requested_url": "https://ashandale.com/",
+      "pages": [
+        {
+          "url": "https://ashandale.com/",
+          "hours_class": "tier2_text",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 1657
+        },
+        {
+          "url": "https://ashandale.com/contact---map.html",
+          "hours_class": "tier2_text",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 1502
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment"
+    },
+    {
+      "id": "e953cce5-f953-4f3a-80b8-e92f3532de9c",
+      "name": "The Wandering Hoagie",
+      "metro": "palm_coast",
+      "requested_url": "http://thewanderinghoagie.godaddysites.com",
+      "pages": [
+        {
+          "url": "https://thewanderinghoagie.godaddysites.com/",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 1783
+        },
+        {
+          "url": "https://thewanderinghoagie.godaddysites.com/contact-us",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 467
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment"
+    },
+    {
+      "id": "55893fec-d1c7-4d52-ba41-c6ae0e608ca6",
+      "name": "Seminole Woods Neighborhood Park",
+      "metro": "palm_coast",
+      "requested_url": "http://www.palmcoastgov.com/parks/seminole-woods-park",
+      "pages": [],
+      "outcome": "robots_denied_or_unavailable"
+    },
+    {
+      "id": "7e19a76f-8096-4335-bd6e-940a42ad35b7",
+      "name": "Hidden Lakes Playground",
+      "metro": "palm_coast",
+      "requested_url": "www.paytashomes.com/property-location/hidden-lakes-palm-coast",
+      "pages": [],
+      "outcome": "unsupported_or_nonpublic_url"
+    },
+    {
+      "id": "0fe70124-8b1d-49be-9982-750ed1fac02b",
+      "name": "Flagler County Historical Society",
+      "metro": "palm_coast",
+      "requested_url": "https://www.flaglercountyhistoricalsociety.com/",
+      "pages": [],
+      "outcome": "robots_denied_or_unavailable"
+    },
+    {
+      "id": "1a26045f-b63d-4304-9c02-63f4956ace87",
+      "name": "Gourmet Deli",
+      "metro": "palm_coast",
+      "requested_url": "http://gourmetdeli.us",
+      "pages": [],
+      "outcome": "http_404"
+    },
+    {
+      "id": "2384bc29-4e11-49fa-81c7-f2d899153032",
+      "name": "River To Sea Preserve Park",
+      "metro": "palm_coast",
+      "requested_url": "www.flaglercounty.org/facilities.aspx?page=detail&RID=19",
+      "pages": [],
+      "outcome": "unsupported_or_nonpublic_url"
+    },
+    {
+      "id": "c7c71090-3a8f-4a4e-8763-659743f55d11",
+      "name": "Portugal Wine Bar & Grill",
+      "metro": "palm_coast",
+      "requested_url": "http://www.portugalwinebarandgrill.com/",
+      "pages": [
+        {
+          "url": "https://portugalwinebarandgrill.com/",
+          "hours_class": "tier2_text",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 2334
+        },
+        {
+          "url": "https://portugalwinebarandgrill.com/contact/",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 1231
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment"
+    },
+    {
+      "id": "78cc6879-1ce3-4d21-8305-f76b1037e0e2",
+      "name": "Richie's Taqueria",
+      "metro": "palm_coast",
+      "requested_url": "http://richiescebon.com",
+      "pages": [],
+      "outcome": "unsupported_or_nonpublic_url"
+    },
+    {
+      "id": "dfe00fd8-a9ec-4242-a278-03162e42a609",
+      "name": "PDiddy &KK'S Paradise lounge",
+      "metro": "palm_coast",
+      "requested_url": "https://www.jupitersgoldcoast.com.au",
+      "pages": [],
+      "outcome": "SSLError"
+    },
+    {
+      "id": "d1a63371-57c7-4c2a-a1d5-e5cc302b784a",
+      "name": "Flagler Breez",
+      "metro": "palm_coast",
+      "requested_url": "http://www.flagleronline.com/restaurant-ID-381-flagler-breeze",
+      "pages": [],
+      "outcome": "robots_denied_or_unavailable"
+    },
+    {
+      "id": "1f567751-231f-47b3-92ae-510ca9693630",
+      "name": "D & H Groves",
+      "metro": "palm_coast",
+      "requested_url": "https://www.pecanoutlet.com",
+      "pages": [
+        {
+          "url": "https://www.pecanoutlet.com/",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 1833
+        },
+        {
+          "url": "https://www.pecanoutlet.com/contact/",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 869
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment"
+    },
+    {
+      "id": "82135f41-ac49-426b-a588-69b93b727f60",
+      "name": "PC Nutrition",
+      "metro": "palm_coast",
+      "requested_url": "http://www.goherbalife.com/cbeissel",
+      "pages": [],
+      "outcome": "ReadTimeout"
+    },
+    {
+      "id": "2d75f2c2-1ea4-4a1c-ab3a-27f87be9ff34",
+      "name": "Blue Springs State Park, Orange City",
+      "metro": "palm_coast",
+      "requested_url": "https://www.floridastateparks.org/park/Blue-Spring",
+      "pages": [],
+      "outcome": "http_403"
+    },
+    {
+      "id": "d0017d87-3421-42dd-8a10-555705098608",
+      "name": "Martin's Restaurant & Lounge",
+      "metro": "palm_coast",
+      "requested_url": "http://martinsrestaurantfl.com",
+      "pages": [
+        {
+          "url": "https://www.cravesflagler.com/",
+          "hours_class": "tier1_jsonld",
+          "structured_hours_nodes": 1,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 57
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment"
+    },
+    {
+      "id": "0ad02e00-67ce-4efe-8b8c-964b8ba4b7fd",
+      "name": "Dahlia Mexican Kitchen",
+      "metro": "palm_coast",
+      "requested_url": "http://www.dahliamexicankitchen.com/",
+      "pages": [],
+      "outcome": "robots_denied_or_unavailable"
+    },
+    {
+      "id": "ecb67840-b300-4ccf-8315-e409401db375",
+      "name": "B.A. Sports Bar and Grill",
+      "metro": "palm_coast",
+      "requested_url": "http://www.coquinalanes.com/",
+      "pages": [
+        {
+          "url": "https://palmcoastlanes.com/",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 401
+        },
+        {
+          "url": "https://palmcoastlanes.com/Hours",
+          "hours_class": "tier2_text",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 657
+        },
+        {
+          "url": "https://palmcoastlanes.com/Events",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 342
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment"
+    },
+    {
+      "id": "c8710691-f4f5-466b-9bea-58c58388ad7d",
+      "name": "Russian Food",
+      "metro": "palm_coast",
+      "requested_url": "http://russian-food.edan.io",
+      "pages": [
+        {
+          "url": "https://russian-food.edan.io/",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 943
+        }
+      ],
+      "subpage_failures": [
+        {
+          "url": "https://russian-food.edan.io/contact-more",
+          "error": "ValueError"
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment"
+    },
+    {
+      "id": "9db17796-bdc3-495e-b0d5-9071f1306076",
+      "name": "Hot Diggity Dogz",
+      "metro": "orlando",
+      "requested_url": "https://www.orderhotdiggitydogz.com/?utm_source=bing&utm_medium=websiteurl&utm_campaign=search",
+      "pages": [],
+      "outcome": "unsupported_or_nonpublic_url"
+    },
+    {
+      "id": "43bb94d6-1fd8-4a95-9e38-13190ae92fcd",
+      "name": "Project: Vetrelief",
+      "metro": "orlando",
+      "requested_url": "https://projectvetrelief.org",
+      "pages": [
+        {
+          "url": "https://projectvetrelief.org/",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 8152
+        },
+        {
+          "url": "https://projectvetrelief.org/contact/",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 1316
+        },
+        {
+          "url": "https://projectvetrelief.org/events-calendar/",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 5,
+          "dated_event_nodes": 5,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 3858
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment"
+    },
+    {
+      "id": "f4cef549-2dc0-4dad-b384-f7a5ee33b425",
+      "name": "Khasiyat",
+      "metro": "orlando",
+      "requested_url": "http://www.khasiyatrestaurant.com/",
+      "pages": [],
+      "outcome": "robots_denied_or_unavailable"
+    },
+    {
+      "id": "d93f0837-07d7-4514-8b65-98cc0ec5e272",
+      "name": "Gabriel's Sub Shop",
+      "metro": "orlando",
+      "requested_url": "http://www.gabrielssubs.com",
+      "pages": [],
+      "outcome": "unsupported_or_nonpublic_url"
+    },
+    {
+      "id": "f85d1e4b-74f9-44d1-b219-2abc83a93464",
+      "name": "Connections Eatery",
+      "metro": "orlando",
+      "requested_url": "https://disneyworld.disney.go.com/dining/epcot/connections-eatery/",
+      "pages": [
+        {
+          "url": "https://disneyworld.disney.go.com/dining/epcot/connections-eatery/",
+          "hours_class": "tier1_jsonld",
+          "structured_hours_nodes": 1,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 1949
+        },
+        {
+          "url": "https://disneyworld.disney.go.com/dining/epcot/connections-eatery/menus/",
+          "hours_class": "js_rendered",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 11
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment",
+      "render": {
+        "outcome": "rendered",
+        "url": "https://disneyworld.disney.go.com/dining/epcot/connections-eatery/menus/lunch-and-dinner/",
+        "requests_seen": 160,
+        "hours_class": "tier3_none",
+        "structured_hours_nodes": 0,
+        "event_nodes": 0,
+        "dated_event_nodes": 0,
+        "public_access_phrase": false,
+        "explicit_closure_phrase": false,
+        "visible_characters": 15998
+      }
+    },
+    {
+      "id": "486703ea-f418-4776-9484-e07be76dc5a2",
+      "name": "Frame Masters Gallery",
+      "metro": "orlando",
+      "requested_url": "http://FMGOrlando.com/",
+      "pages": [
+        {
+          "url": "https://fmgorlando.com/",
+          "hours_class": "tier1_jsonld",
+          "structured_hours_nodes": 1,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 4345
+        },
+        {
+          "url": "https://fmgorlando.com/contact",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 861
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment"
+    },
+    {
+      "id": "16ba0f28-6ec5-4661-a395-f650def87a25",
+      "name": "AJ's Pizza Joint",
+      "metro": "orlando",
+      "requested_url": "http://www.ajspizzajoint.com/",
+      "pages": [
+        {
+          "url": "https://www.ajspizzajoint.com/",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 2239
+        },
+        {
+          "url": "https://www.ajspizzajoint.com/hours-and-locations/",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 884
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment"
+    },
+    {
+      "id": "e7623f93-a9eb-4eb6-8161-ba3049ac91a1",
+      "name": "Ticket Word Express",
+      "metro": "orlando",
+      "requested_url": "http://Www.TickerWhater.com/",
+      "pages": [],
+      "outcome": "unsupported_or_nonpublic_url"
+    },
+    {
+      "id": "94d3ec70-6ea7-4feb-80d3-f04b29660c23",
+      "name": "Mikey's Pizza-Ria",
+      "metro": "orlando",
+      "requested_url": "https://www.mikeyspizzaria.getsauce.com/order-online",
+      "pages": [],
+      "outcome": "http_404"
+    },
+    {
+      "id": "d7935eae-5dae-4735-b2e9-45bbb939abb4",
+      "name": "Real Bean Coffee Co",
+      "metro": "orlando",
+      "requested_url": "http://www.realbeancoffeeco.com/",
+      "pages": [],
+      "outcome": "robots_denied_or_unavailable"
+    },
+    {
+      "id": "36a78e1e-5d1e-42b6-a31c-8def5d48d189",
+      "name": "Egg Roll 99",
+      "metro": "orlando",
+      "requested_url": "http://orlando.florida-locksmith.com",
+      "pages": [],
+      "outcome": "unsupported_or_nonpublic_url"
+    },
+    {
+      "id": "ede3a87a-9644-4b25-be9f-022b9a5e2218",
+      "name": "Todo Arepa",
+      "metro": "orlando",
+      "requested_url": "https://www.todoarepa.com/",
+      "pages": [
+        {
+          "url": "https://www.todoarepa.com/",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 959
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment"
+    },
+    {
+      "id": "ae6c3cfa-6513-4e77-afec-3259da1fc6d5",
+      "name": "I Ce Ny Rolled Ice Cream",
+      "metro": "orlando",
+      "requested_url": "http://icenybaldwinpark.com/",
+      "pages": [],
+      "outcome": "robots_denied_or_unavailable"
+    },
+    {
+      "id": "843be3ad-56f2-421a-b77b-6926103e9f4b",
+      "name": "Iconn Restaurants of Georgia",
+      "metro": "orlando",
+      "requested_url": "http://bearcom.com",
+      "pages": [
+        {
+          "url": "https://bearcom.com/",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 10870
+        },
+        {
+          "url": "https://bearcom.com/contact-us",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 5658
+        },
+        {
+          "url": "https://bearcom.com/industries/live-events",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 12608
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment"
+    },
+    {
+      "id": "cf43c30f-d88a-42b1-b984-f57cdc857919",
+      "name": "C2 Catered Events",
+      "metro": "orlando",
+      "requested_url": "https://www.c2cateredevents.com/",
+      "pages": [
+        {
+          "url": "https://www.c2cateredevents.com/",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 2991
+        },
+        {
+          "url": "https://www.c2cateredevents.com/menu/",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 1396
+        },
+        {
+          "url": "https://www.c2cateredevents.com/",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 2991
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment"
+    },
+    {
+      "id": "2da587e1-3510-4b3a-9d0a-2fff14649294",
+      "name": "Servando's",
+      "metro": "orlando",
+      "requested_url": "http://www.servandos.com/",
+      "pages": [
+        {
+          "url": "http://www.servandos.com/",
+          "hours_class": "js_rendered",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 0
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment",
+      "render": {
+        "outcome": "rendered",
+        "url": "https://www.servandos.com/lander",
+        "requests_seen": 23,
+        "hours_class": "tier3_none",
+        "structured_hours_nodes": 0,
+        "event_nodes": 0,
+        "dated_event_nodes": 0,
+        "public_access_phrase": false,
+        "explicit_closure_phrase": false,
+        "visible_characters": 545
+      }
+    },
+    {
+      "id": "23ba7631-a808-4b52-b604-aefa05125b8f",
+      "name": "The Dave Matthews Tribute Band @ The Social",
+      "metro": "orlando",
+      "requested_url": "http://thesocial.org",
+      "pages": [],
+      "outcome": "robots_denied_or_unavailable"
+    },
+    {
+      "id": "701afa29-68ff-4fec-ac79-188b5bd3f22f",
+      "name": "Flavors Nigerian Restaurant",
+      "metro": "orlando",
+      "requested_url": "http://Flavorsnigeriarestaurant.com/",
+      "pages": [],
+      "outcome": "ConnectTimeout"
+    },
+    {
+      "id": "cfdc4e09-0679-4db1-b8ba-2adc1d417661",
+      "name": "Pio Pio Latin Cuisine",
+      "metro": "orlando",
+      "requested_url": "http://piopiosemoran.com/",
+      "pages": [],
+      "outcome": "http_404"
+    },
+    {
+      "id": "9689eade-1785-40ee-bb79-3e619695fe7a",
+      "name": "Gator's Dockside Oviedo",
+      "metro": "orlando",
+      "requested_url": "https://www.gatorsdockside.com",
+      "pages": [],
+      "outcome": "robots_denied_or_unavailable"
+    },
+    {
+      "id": "95d94043-9692-4427-841d-070f64c828f7",
+      "name": "The Hollywood Brown Derby",
+      "metro": "orlando",
+      "requested_url": "http://www.disneyworld.com",
+      "pages": [],
+      "outcome": "robots_denied_or_unavailable"
+    },
+    {
+      "id": "12f7cb6e-9c65-4c2d-95b6-ac3909f5c1ec",
+      "name": "Disney World Orlando Florida",
+      "metro": "orlando",
+      "requested_url": "https://disneyworld.disney.go.com/",
+      "pages": [
+        {
+          "url": "https://disneyworld.disney.go.com/",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 2601
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment"
+    },
+    {
+      "id": "afc94f02-5f69-4770-871f-6a5460ae9b12",
+      "name": "Mathers Social Gathering",
+      "metro": "orlando",
+      "requested_url": "http://www.mathersorlando.com/",
+      "pages": [
+        {
+          "url": "https://www.mathersorlando.com/",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 1490
+        },
+        {
+          "url": "https://www.mathersorlando.com/events",
+          "hours_class": "tier2_text_ldjson_no_hours",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 1125
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment"
+    },
+    {
+      "id": "f7f6b3e8-a5aa-4426-99d3-ad502d7a12bc",
+      "name": "Ox Grill Restaurant",
+      "metro": "orlando",
+      "requested_url": "https://www.oxgrillrestaurant.com",
+      "pages": [],
+      "outcome": "robots_denied_or_unavailable"
+    },
+    {
+      "id": "daef1709-0c79-4874-8461-e01a421a2ad9",
+      "name": "Turtle Bay",
+      "metro": "orlando",
+      "requested_url": "https://turtle-bay-bar.hub.biz",
+      "pages": [
+        {
+          "url": "https://turtle-bay-bar.hub.biz/",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 2390
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment"
+    },
+    {
+      "id": "3788c855-c650-4804-8f34-4d5c579ad8e9",
+      "name": "Mirizan",
+      "metro": "orlando",
+      "requested_url": "http://www.mirizan.com/",
+      "pages": [],
+      "outcome": "robots_denied_or_unavailable"
+    },
+    {
+      "id": "a0622887-7e9f-4fa3-bc86-9e0a2866f969",
+      "name": "Sunroom",
+      "metro": "orlando",
+      "requested_url": "https://www.sunroomcocktails.com",
+      "pages": [
+        {
+          "url": "https://www.sunroomcocktails.com/",
+          "hours_class": "tier2_text_ldjson_no_hours",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 809
+        },
+        {
+          "url": "https://www.sunroomcocktails.com/contact",
+          "hours_class": "js_rendered",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 424
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment",
+      "render": {
+        "outcome": "rendered",
+        "url": "https://www.sunroomcocktails.com/contact",
+        "requests_seen": 80,
+        "hours_class": "tier3_none",
+        "structured_hours_nodes": 0,
+        "event_nodes": 0,
+        "dated_event_nodes": 0,
+        "public_access_phrase": false,
+        "explicit_closure_phrase": false,
+        "visible_characters": 535
+      }
+    },
+    {
+      "id": "cea81284-fbcd-428a-b542-2902aeb82a1c",
+      "name": "The Land",
+      "metro": "orlando",
+      "requested_url": "https://disneyworld.disney.go.com/attractions/epcot/living-with-the-land/?CMP=OKC-80007848_BP_WDW_land_theland_NA",
+      "pages": [
+        {
+          "url": "https://disneyworld.disney.go.com/attractions/epcot/living-with-the-land/?CMP=OKC-80007848_BP_WDW_land_theland_NA",
+          "hours_class": "tier1_jsonld",
+          "structured_hours_nodes": 1,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 1209
+        },
+        {
+          "url": "https://disneyworld.disney.go.com/events-tours/epcot/behind-the-seeds/",
+          "hours_class": "tier3_none",
+          "structured_hours_nodes": 0,
+          "event_nodes": 1,
+          "dated_event_nodes": 1,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 2501
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment"
+    },
+    {
+      "id": "1c329205-587d-45a7-be19-6c690d0ccfab",
+      "name": "Christinis Ristorante Italiano",
+      "metro": "orlando",
+      "requested_url": "https://www.christinis.com/reservations/",
+      "pages": [],
+      "outcome": "robots_denied_or_unavailable"
+    },
+    {
+      "id": "4c529438-7c8f-46cd-a098-40126a7f7ba1",
+      "name": "El Cilantrillo Restaurant - Semoran",
+      "metro": "orlando",
+      "requested_url": "https://www.elcilantrillo.com/",
+      "pages": [
+        {
+          "url": "https://www.elcilantrillo.com/",
+          "hours_class": "tier2_text_ldjson_no_hours",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 3357
+        },
+        {
+          "url": "https://www.elcilantrillo.com/services-9",
+          "hours_class": "js_rendered",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 392
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment",
+      "render": {
+        "outcome": "rendered",
+        "url": "https://www.elcilantrillo.com/services-9",
+        "requests_seen": 143,
+        "hours_class": "js_rendered",
+        "structured_hours_nodes": 0,
+        "event_nodes": 0,
+        "dated_event_nodes": 0,
+        "public_access_phrase": false,
+        "explicit_closure_phrase": false,
+        "visible_characters": 386
+      }
+    }
+  ],
+  "closed_sample": [
+    {
+      "id": "10576795-4ab4-46aa-9cba-e199fe140a59",
+      "name": "Enterprise Sewing",
+      "metro": "orlando",
+      "human_note": "Sewing shop and its permanently closed and not a true destination",
+      "outcome": "no_website",
+      "pages": []
+    },
+    {
+      "id": "1062077c-f290-4a29-a9af-7b501c67b459",
+      "name": "Sevyn Inc.",
+      "metro": "palm_coast",
+      "human_note": "Also its closed for good.",
+      "outcome": "no_website",
+      "pages": []
+    },
+    {
+      "id": "134e9a0d-36c0-47f7-97c1-35865105eece",
+      "name": "Duffy's Delight Llc",
+      "metro": "palm_coast",
+      "human_note": "I might have recommended it but its closed for good.",
+      "outcome": "no_website",
+      "pages": []
+    },
+    {
+      "id": "1849f502-dbe8-4565-8251-e9bf1d702156",
+      "name": "Houlihan's",
+      "metro": "orlando",
+      "human_note": "Couldnt find it, seems permanently closed",
+      "requested_url": "http://www.houlihans.com/my-houlihans/orlando-%28point-orlando%29",
+      "pages": [],
+      "outcome": "http_404"
+    },
+    {
+      "id": "22edbb04-55a2-4a3c-810d-a6a1c97698d3",
+      "name": "Farm & Haus East End Market",
+      "metro": "orlando",
+      "human_note": "Permanently closed",
+      "requested_url": "http://farmandhaus.com",
+      "pages": [],
+      "outcome": "http_404"
+    },
+    {
+      "id": "2fd3ef37-1ce6-4214-a471-4352d59da615",
+      "name": "Schnitzel-Time",
+      "metro": "palm_coast",
+      "human_note": "Seems permanently closed however.",
+      "requested_url": "https://schnitzel-time.com",
+      "pages": [],
+      "outcome": "SSLError"
+    },
+    {
+      "id": "3f114b8c-3fb3-4370-af61-16ddf3439e5c",
+      "name": "Adventel Restaurant And Bakery",
+      "metro": "orlando",
+      "human_note": "Permanently closed",
+      "requested_url": "https://adventel-restaurant-and-bakery.business.site",
+      "pages": [],
+      "outcome": "http_404"
+    },
+    {
+      "id": "6061ac16-ab3a-453f-a812-90acc27cf852",
+      "name": "Michoacana Bacana",
+      "metro": "palm_coast",
+      "human_note": "Permanently closed. Didnt look good",
+      "outcome": "no_website",
+      "pages": []
+    },
+    {
+      "id": "64a2fb00-28ee-4984-af4e-298719af1bf8",
+      "name": "Hidden Treasure Raw Bar & Grill",
+      "metro": "palm_coast",
+      "human_note": "Would have recommended it, permanently closed though.",
+      "requested_url": "http://www.hiddentreasurerestaurants.com/",
+      "pages": [
+        {
+          "url": "https://hiddentreasurerestaurants.com/",
+          "hours_class": "tier2_text",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 3853
+        },
+        {
+          "url": "https://hiddentreasurerestaurants.com/contact/",
+          "hours_class": "tier2_text",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 3027
+        },
+        {
+          "url": "https://hiddentreasurerestaurants.com/private-events/",
+          "hours_class": "tier2_text",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 3420
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment"
+    },
+    {
+      "id": "74224f47-9d43-416f-8be8-dae8cbe4bb03",
+      "name": "Bird of Paradise",
+      "metro": "orlando",
+      "human_note": "Used to be a restaurant but closed for good",
+      "requested_url": "http://www.localrootsdistribution.com/",
+      "pages": [
+        {
+          "url": "http://www.localrootsdistribution.com/",
+          "hours_class": "js_rendered",
+          "structured_hours_nodes": 0,
+          "event_nodes": 0,
+          "dated_event_nodes": 0,
+          "public_access_phrase": false,
+          "explicit_closure_phrase": false,
+          "visible_characters": 0
+        }
+      ],
+      "outcome": "readable",
+      "production_storage": "not_authorized_by_this_experiment"
+    }
+  ],
+  "requests": 199,
+  "response_bytes": 12966727,
+  "elapsed_seconds": 267.2
+}

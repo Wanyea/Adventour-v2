@@ -1,0 +1,2 @@
+# Optional bounded website-rendering experiment; not an application UI dependency.
+playwright==1.62.0

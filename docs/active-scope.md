@@ -1,4 +1,4 @@
-# Active scope — Phase 2 (paused for PC restart)
+# Active scope — Phase 2 (resumed after restart)
 
 Phase 2 approved 2026-09-06: "Lets move onto phase 2. ill do a review of both
 phases after." This overrides the Phase 1 review/merge prerequisite for this
@@ -6,9 +6,10 @@ transition only. Phases 3–5 remain closed. Phase 1 acceptance gaps remain open
 
 **Resume entry point:** [restart-handoff.md](restart-handoff.md).
 Protocol: [phase2-discovery.md](phase2-discovery.md), following Phase 2 of the
-approved takeover plan. Personal ranking is implemented and demonstrated on the
-Palm Coast emulator. The event adapter/index/route files are unfinished scaffolding,
-not a working event feature. User requested a pause for reboot, not cancellation.
+approved takeover plan. Personal ranking is demonstrated in both seed metros;
+the UCF event pipeline, Discover cards and organizer recheck now work. Current
+evidence and unresolved quality/source gaps: [phase2-results.md](phase2-results.md).
+Runbook: [local-events.md](local-events.md). Phase 2 is not declared complete.
 
 ## Phase 1 record retained for joint review
 
