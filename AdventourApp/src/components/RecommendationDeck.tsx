@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
+  AppState,
+  Dimensions,
   Image,
   PanResponder,
   StyleSheet,
@@ -13,6 +15,7 @@ import { Place } from '../types/Place';
 import { StarRating } from './PlaceDetailsModal';
 import { tagGroupDisplayLabel, tagGroupMeta } from '../placeTagGroups';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useIsFocused } from '@react-navigation/native';
 
 type Props = {
   places: Place[];
@@ -20,7 +23,8 @@ type Props = {
   totalPlaces: number;
   loadingMore?: boolean;
   canLoadMore?: boolean;
-  onFeedback: (place: Place, verdict: 'accept' | 'reject') => void;
+  onFeedback: (place: Place, verdict: 'accept' | 'reject') => Promise<void>;
+  onImpression?: (place: Place) => Promise<void>;
   onOpenPlace: (place: Place) => void;
   onExhausted?: () => void;
 };
@@ -146,7 +150,7 @@ const CompactPlaceContent = ({
       <TravelTimes place={place} muted={muted} />
       <View style={styles.scoreRow}>
         {place.relevance !== undefined ? (
-          <Text style={styles.score}>Match {(place.relevance * 100).toFixed(0)}%</Text>
+          <Text style={styles.score}>Index {place.relevance.toFixed(3)}</Text>
         ) : <View />}
         <View style={styles.ratingRow}>
           <StarRating rating={place.rating} size={15} />
@@ -167,14 +171,39 @@ const RecommendationDeck: React.FC<Props> = ({
   loadingMore,
   canLoadMore,
   onFeedback,
+  onImpression,
   onOpenPlace,
   onExhausted,
 }) => {
   const position = useRef(new Animated.ValueXY()).current;
   const promote = useRef(new Animated.Value(1)).current;
   const currentPlace = places[0];
+  const cardRef = useRef<View>(null);
+  const focused = useIsFocused();
+  const [foreground, setForeground] = useState(AppState.currentState === 'active');
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => setForeground(state === 'active'));
+    return () => subscription.remove();
+  }, []);
+  const feedbackPending = useRef(false);
   const nextPlace = places[1];
   const allResultsExhausted = totalPlaces === 0;
+
+  useEffect(() => {
+    if (!currentPlace || !focused || !foreground || !onImpression) { return; }
+    let sent = false;
+    const timer = setInterval(() => {
+      if (sent) { return; }
+      cardRef.current?.measureInWindow((_x, y, _width, height) => {
+        const visible = Math.max(0, Math.min(y + height, Dimensions.get('window').height) - Math.max(y, 0));
+        if (height > 0 && visible >= height / 2) {
+          sent = true;
+          onImpression(currentPlace).then(() => clearInterval(timer)).catch(() => { sent = false; });
+        }
+      });
+    }, 700);
+    return () => clearInterval(timer);
+  }, [currentPlace, focused, foreground, onImpression]);
 
   useEffect(() => {
     if (!currentPlace && canLoadMore && !loadingMore) {
@@ -193,18 +222,22 @@ const RecommendationDeck: React.FC<Props> = ({
   }, [currentPlace?.place_id, position, promote]);
 
   const swipeCard = (verdict: 'accept' | 'reject') => {
-    if (!currentPlace) {
+    if (!currentPlace || feedbackPending.current) {
       return;
     }
 
+    feedbackPending.current = true;
     const x = verdict === 'accept' ? 520 : -520;
     Animated.timing(position, {
       toValue: { x, y: 0 },
       duration: 180,
       useNativeDriver: false,
-    }).start(() => {
-      onFeedback(currentPlace, verdict);
-      position.setValue({ x: 0, y: 0 });
+    }).start(async () => {
+      try { await onFeedback(currentPlace, verdict); }
+      finally {
+        position.setValue({ x: 0, y: 0 });
+        feedbackPending.current = false;
+      }
     });
   };
 
@@ -280,6 +313,7 @@ const RecommendationDeck: React.FC<Props> = ({
 
         {currentPlace ? (
           <Animated.View
+            ref={cardRef}
             style={[
               styles.card,
               styles.activeCard,

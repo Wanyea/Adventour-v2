@@ -15,6 +15,8 @@ type Props = {
   place: Place | null;
   visible: boolean;
   onClose: () => void;
+  onClosedReport?: (place: Place) => void;
+  onShare?: (place: Place) => void;
 };
 
 export const StarRating = ({ rating, size = 18 }: { rating?: number; size?: number }) => {
@@ -65,7 +67,7 @@ const TravelTimes = ({ place }: { place: Place }) => {
   );
 };
 
-const PlaceDetailsModal: React.FC<Props> = ({ place, visible, onClose }) => {
+const PlaceDetailsModal: React.FC<Props> = ({ place, visible, onClose, onClosedReport, onShare }) => {
   if (!place) {
     return null;
   }
@@ -95,12 +97,13 @@ const PlaceDetailsModal: React.FC<Props> = ({ place, visible, onClose }) => {
               </Text>
             </View>
             <TravelTimes place={place} />
+            {place.own_review ? <Text style={styles.bodyText}>Your review: {place.own_review}</Text> : null}
 
             <View style={styles.metaRow}>
               {place.category ? <Text style={styles.pill}>{place.category}</Text> : null}
               {place.price_level ? <Text style={styles.pill}>{'$'.repeat(place.price_level)}</Text> : null}
               {place.relevance !== undefined ? (
-                <Text style={styles.pill}>Match {(place.relevance * 100).toFixed(0)}%</Text>
+                <Text style={styles.pill}>Index {place.relevance.toFixed(4)}</Text>
               ) : null}
             </View>
 
@@ -111,11 +114,35 @@ const PlaceDetailsModal: React.FC<Props> = ({ place, visible, onClose }) => {
               </View>
             ) : null}
 
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Score breakdown</Text>
+              {place.score_components ? (
+                <Text style={styles.bodyText}>
+                  Source confidence: {place.score_components.confidence.toFixed(4)}{'\n'}
+                  Social-link presence: {place.score_components.socials.toFixed(4)}{'\n'}
+                  Nearby-place density: {place.score_components.density.toFixed(4)}{'\n'}
+                  Chain policy multiplier: ×{place.score_components.chain_multiplier.toFixed(2)}
+                </Text>
+              ) : <Text style={styles.bodyText}>Detailed inputs unavailable for this score.</Text>}
+              {place.needs_booking ? <Text style={styles.bodyText}>Check ticket or reservation requirements before leaving.</Text> : null}
+              {place.approximate_location ? <Text style={styles.bodyText}>Location is approximate. Confirm the entrance before leaving.</Text> : null}
+            </View>
+
             {place.types?.length ? (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Signals</Text>
                 <Text style={styles.bodyText}>{place.types.slice(0, 8).join(', ')}</Text>
               </View>
+            ) : null}
+            {onClosedReport ? (
+              <TouchableOpacity style={styles.section} onPress={() => onClosedReport(place)}>
+                <Text style={styles.sectionTitle}>Report this place closed</Text>
+              </TouchableOpacity>
+            ) : null}
+            {onShare ? (
+              <TouchableOpacity style={styles.section} onPress={() => onShare(place)}>
+                <Text style={styles.sectionTitle}>Share place</Text>
+              </TouchableOpacity>
             ) : null}
           </ScrollView>
 

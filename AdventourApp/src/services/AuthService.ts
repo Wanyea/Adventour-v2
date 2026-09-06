@@ -32,7 +32,7 @@ class AuthService {
     axios.interceptors.request.use(
       async (config) => {
         const token = await this.getIdToken();
-        if (token) {
+        if (token && !config.headers.Authorization) {
           config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
@@ -137,6 +137,9 @@ class AuthService {
         await auth().signOut();
       }
       this.currentUser = null;
+      if (this.isDevAuth) {
+        await AsyncStorage.setItem('dev_auth_email', '__signed_out__');
+      }
       await AsyncStorage.removeItem('user_id');
       await AsyncStorage.removeItem('auth_token');
     } catch (error) {
@@ -157,6 +160,9 @@ class AuthService {
           Authorization: `Bearer ${token}`,
         },
       });
+      if (this.isDevAuth) {
+        await AsyncStorage.setItem('dev_auth_email', '__signed_out__');
+      }
 
       if (!this.isDevAuth) {
         const firebaseUser = auth().currentUser;
@@ -180,7 +186,8 @@ class AuthService {
 
   async getIdToken(): Promise<string | null> {
     if (this.isDevAuth) {
-      return Config.getDevAuthHeader()?.replace('Bearer ', '') || null;
+      const email = this.currentUser?.email || await AsyncStorage.getItem('dev_auth_email') || Config.DEV_AUTH_EMAIL;
+      return email === '__signed_out__' ? null : `dev:${email}`;
     }
 
     try {
@@ -202,6 +209,9 @@ class AuthService {
 
     if (this.isDevAuth) {
       try {
+        if (await AsyncStorage.getItem('dev_auth_email') === '__signed_out__') {
+          return null;
+        }
         const user = await this.getDevUser();
         this.currentUser = user;
         return user;
@@ -271,7 +281,7 @@ class AuthService {
   onAuthStateChanged(callback: (user: User | null) => void): () => void {
     if (this.isDevAuth) {
       let active = true;
-      this.getDevUser()
+      this.getCurrentUser()
         .then((user) => {
           if (!active) {
             return;
@@ -349,12 +359,12 @@ class AuthService {
   }
 
   private async getDevUser(displayName?: string, emailOverride?: string): Promise<User> {
-    const devEmail = emailOverride || Config.DEV_AUTH_EMAIL;
+    const devEmail = emailOverride || await AsyncStorage.getItem('dev_auth_email') || Config.DEV_AUTH_EMAIL;
     const response = await axios.post(`${Config.BACKEND_BASE_URL}/user/dev`, {
       email: devEmail,
-      display_name: displayName || devEmail.split('@')[0],
+      ...(displayName ? { display_name: displayName } : {}),
     });
-
+    await AsyncStorage.setItem('dev_auth_email', devEmail);
     return response.data.user;
   }
 }

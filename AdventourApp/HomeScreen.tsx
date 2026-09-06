@@ -6,92 +6,29 @@ import {
   TextInput,
   Alert,
   TouchableOpacity,
-  StyleSheet,
   Image,
   Linking,
+  Keyboard,
   ScrollView,
 } from 'react-native';
+import { styles } from './src/styles/HomeScreenStyles';
 import RecommendationDeck from './src/components/RecommendationDeck';
 import PlaceDetailsModal from './src/components/PlaceDetailsModal';
 import AdventourJourneyPanel from './src/components/AdventourJourneyPanel';
 import AdventourLaunchHero from './src/components/AdventourLaunchHero';
 import GoogleAutocompleteService from './src/GoogleAutocompleteService';
 import Config from './src/Config';
+import { recordPlaceEvent } from './src/services/PlaceEventService';
 import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import 'react-native-get-random-values';
-import { v4 as uuidv4 } from 'uuid';
 import { PermissionsAndroid, Platform } from 'react-native';
 import { Place } from './src/types/Place';
 import { AdventourSession, AdventourStop } from './src/types/Adventour';
-import { TAG_GROUPS, tagGroupDisplayLabel, tagGroupIdsForPlace } from './src/placeTagGroups';
+import { TAG_GROUPS, tagGroupDisplayLabel } from './src/placeTagGroups';
 import AdventourService from './src/services/AdventourService';
 import { User } from './src/services/AuthService';
 
-type Coordinates = { latitude: number; longitude: number };
-type LocationMode = 'none' | 'gps' | 'manual';
-type RequestStep = 'geocode' | 'recommendations';
-type RadiusOption = {
-  id: 'walkable' | 'nearby' | 'explore' | 'wide';
-  label: string;
-  helper: string;
-  meters: number;
-};
-
-const RADIUS_OPTIONS: RadiusOption[] = [
-  { id: 'walkable', label: 'Walkable', helper: '10 min', meters: 800 },
-  { id: 'nearby', label: 'Nearby', helper: '2 mi', meters: 3200 },
-  { id: 'explore', label: 'Explore', helper: '5 mi', meters: 8000 },
-  { id: 'wide', label: 'Wide', helper: '10 mi', meters: 16000 },
-];
-
-const describeAxiosError = (error: unknown) => {
-  if (axios.isAxiosError(error)) {
-    return {
-      message: error.message,
-      code: error.code,
-      status: error.response?.status,
-      data: error.response?.data,
-      url: error.config?.url,
-      method: error.config?.method,
-    };
-  }
-  return error;
-};
-
-const placeFromRecommendation = (item: any): Place => {
-  const name = item.name || item.display?.name || 'Unknown place';
-  const types = item.display?.types || [];
-  const place = {
-    place_id: String(item.place_id || item.provider_place_id),
-    provider: item.provider,
-    provider_place_id: item.provider_place_id,
-    name,
-    vicinity: item.display?.vicinity || `${item.distance_meters ?? 'Unknown'} meters away`,
-    types,
-    category: item.category,
-    explanation: item.explanation,
-    photo_url: item.display?.photo_url
-      ? `${Config.BACKEND_BASE_URL}${item.display.photo_url}`
-      : undefined,
-    photo_attributions: item.display?.photo_attributions || [],
-    rating: item.display?.rating,
-    user_ratings_total: item.display?.user_ratings_total,
-    price_level: item.display?.price_level,
-    relevance: item.score,
-    likelihood: item.score,
-    latitude: item.latitude,
-    longitude: item.longitude,
-    distance_meters: item.distance_meters,
-    travel_times: item.travel_times,
-  };
-
-  return {
-    ...place,
-    tag_groups: tagGroupIdsForPlace(place),
-  };
-};
+import { Coordinates, LocationMode, RequestStep, RadiusOption, RADIUS_OPTIONS, describeAxiosError, placeFromRecommendation } from './src/home/homeUtils';
 
 type HomeScreenProps = {
   user?: User | null;
@@ -109,12 +46,9 @@ const greetingForNow = () => {
 };
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
-  const backendBaseURL = Config.BACKEND_BASE_URL;
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [userFeedback, setUserFeedback] = useState<{ place_id: string; feedback: string; tags: string[] }[]>([]);
-  const [userId, setUserId] = useState<string>('');
   const [city, setCity] = useState<string>(''); 
   const [currentCoords, setCurrentCoords] = useState<Coordinates | null>(null);
   const [locationMode, setLocationMode] = useState<LocationMode>('none');
@@ -141,22 +75,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
   const hasLaunchPoint = Boolean(currentCoords);
 
   useEffect(() => {
-    const getOrCreateUserId = async () => {
-      try {
-        let id = await AsyncStorage.getItem('user_id');
-        if (!id) {
-          id = uuidv4();
-          await AsyncStorage.setItem('user_id', id);
-        }
-        setUserId(id);
-      } catch (e) {
-        console.error("Failed to initialize user ID", e);
-      }
-    };
-    getOrCreateUserId();
-  }, []);
-
-  useEffect(() => {
     const loadActiveAdventour = async () => {
       try {
         const adventour = await AdventourService.getActive();
@@ -173,20 +91,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
     ? places
     : places.filter((place) => place.tag_groups?.includes(selectedTagGroup));
 
-  const tagGroupCounts = TAG_GROUPS.reduce<Record<string, number>>((counts, group) => {
-    counts[group.id] = places.filter((place) => place.tag_groups?.includes(group.id)).length;
-    return counts;
-  }, {});
+  const [tagGroupCounts, setTagGroupCounts] = useState<Record<string, number>>({});
 
   const selectedTagLabel = selectedTagGroup === 'all'
     ? 'All picks'
     : tagGroupDisplayLabel(selectedTagGroup) || 'All picks';
-
-  useEffect(() => {
-    if (selectedTagGroup !== 'all' && places.length > 0 && filteredPlaces.length === 0) {
-      setSelectedTagGroup('all');
-    }
-  }, [filteredPlaces.length, places.length, selectedTagGroup]);
 
   useEffect(() => {
     Animated.timing(filterPanelAnim, {
@@ -240,13 +149,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
       ? `${stop.display.latitude},${stop.display.longitude}`
       : stop.display?.name || '';
     const encodedDestination = encodeURIComponent(destination);
-    const providerPlaceId = stop.provider_place_id
-      ? `&destination_place_id=${encodeURIComponent(stop.provider_place_id)}`
-      : '';
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${encodedDestination}${providerPlaceId}`;
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${encodedDestination}`;
 
     try {
       await Linking.openURL(url);
+      if (activeAdventour) {
+        const result = await AdventourService.navigate(activeAdventour.id, stop.id);
+        setActiveAdventour(result.adventour);
+      }
     } catch (error) {
       console.error('Error opening directions:', error);
       Alert.alert('Directions unavailable', 'Adventour could not open your maps app.');
@@ -283,14 +193,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
     }
   };
 
-  const handleRateStop = async (stop: AdventourStop, rating: number) => {
+  const handleRateStop = async (stop: AdventourStop, rating: number, notes: string) => {
     if (!activeAdventour) {
       return;
     }
 
     setJourneyLoading(true);
     try {
-      const result = await AdventourService.completeStop(activeAdventour.id, stop.id, rating);
+      const result = await AdventourService.completeStop(activeAdventour.id, stop.id, rating, notes);
       setActiveAdventour(result.adventour);
     } catch (error) {
       console.error('Error completing stop:', describeAxiosError(error));
@@ -333,89 +243,62 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
     );
   };
 
+  const onImpression = useCallback(async (place: Place) => {
+    await recordPlaceEvent(place, 'impression');
+  }, []);
+
+  const handleClosedReport = (place: Place) => {
+    Alert.alert('Report closed?', 'This will remove the place from your recommendations.', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Report closed', onPress: async () => {
+        try {
+          await recordPlaceEvent(place, 'closed_report');
+          setSelectedPlace(null);
+          setPlaces((previous) => previous.filter((item) => item.place_id !== place.place_id));
+        } catch { Alert.alert('Report not saved', 'Please try again.'); }
+      } },
+    ]);
+  };
+
   const handleFeedback = async (place: Place, feedback: 'accept' | 'reject') => {
     if (feedback === 'accept' && activeAdventour?.active_stop) {
-      Alert.alert(
-        'Finish your current stop first',
-        'Mark yourself as arrived and rate the current place before adding another Adventour stop.'
-      );
+      Alert.alert('Finish your current stop first', 'Mark arrival and rate the current place before choosing another stop.');
       return;
     }
-
-    setUserFeedback((prev) => [
-      ...prev,
-      { place_id: place.place_id, feedback, tags: place.types },
-    ]);
-    recentlyDecidedPlaceIds.current.add(place.place_id);
-    if (place.provider_place_id) {
-      recentlyDecidedPlaceIds.current.add(String(place.provider_place_id));
-    }
-    setPlaces((prev) => prev.filter((item) => item.place_id !== place.place_id));
-
-    let eventSaved = false;
-
     try {
-      await axios.post(`${backendBaseURL}/api/events`, {
-        place_id: place.place_id,
-        provider: place.provider,
-        provider_place_id: place.provider_place_id,
-        event_type: feedback,
-        context: selectedTagGroup === 'all' ? 'solo' : selectedTagGroup,
-        metadata: {
-          source: 'recommendation_deck',
-          category: place.category,
-          active_tag_group: selectedTagGroup,
-          score: place.relevance,
-          tags: place.types,
-          display: {
-            name: place.name,
-            vicinity: place.vicinity,
-            types: place.types,
-            category: place.category,
-            tag_groups: place.tag_groups || [],
-            photo_url: place.photo_url
-              ? place.photo_url.replace(Config.BACKEND_BASE_URL, '')
-              : undefined,
-            photo_attributions: place.photo_attributions || [],
-            rating: place.rating,
-            user_ratings_total: place.user_ratings_total,
-            price_level: place.price_level,
-          },
-        },
-      });
-      eventSaved = true;
-    } catch (error) {
-      console.error('Error saving feedback event:', describeAxiosError(error));
-      Alert.alert('Feedback not saved', 'The card was removed locally, but Adventour could not save that swipe.');
-    }
-
-    if (eventSaved && feedback === 'accept' && activeAdventour) {
-      try {
+      if (feedback === 'accept' && activeAdventour) {
         const result = await AdventourService.addStop(activeAdventour.id, place);
         setActiveAdventour(result.adventour);
-      } catch (error: any) {
-        const details = describeAxiosError(error);
-        console.error('Error adding Adventour stop:', details);
-
-        if (axios.isAxiosError(error) && error.response?.status === 409) {
-          try {
-            const refreshed = await AdventourService.getActive();
-            setActiveAdventour(refreshed);
-          } catch (refreshError) {
-            console.error('Error refreshing active Adventour:', describeAxiosError(refreshError));
-          }
-
-          Alert.alert(
-            'Current stop still active',
-            error.response.data?.error || 'Finish or rate your current stop before adding another Adventour place.',
-          );
+      } else {
+        await recordPlaceEvent(place, feedback);
+      }
+    } catch (error) {
+      console.error('Could not save swipe:', describeAxiosError(error));
+      Alert.alert('Swipe not saved', 'Your card is still here. Please try again.');
+      return;
+    }
+    recentlyDecidedPlaceIds.current.add(place.place_id);
+    if (place.provider_place_id) { recentlyDecidedPlaceIds.current.add(place.provider_place_id); }
+    setPlaces((previous) => previous.filter((item) => item.place_id !== place.place_id));
+    if (feedback === 'accept') {
+      let googlePlaceId: string | undefined;
+      try {
+        const checked = await axios.get(`${Config.BACKEND_BASE_URL}/api/places/details`, { params: { place_id: place.place_id } });
+        if (checked.data.verification === 'suppressed') {
+          if (activeAdventour) { setActiveAdventour(await AdventourService.getActive()); }
+          Alert.alert('Place unavailable', 'Choose another place for this stop.');
           return;
         }
-
-        Alert.alert(
-          'Place liked',
-          'Your swipe was saved, but Adventour could not add this place as a trip stop yet.',
-        );
+        googlePlaceId = checked.data.google_place_id;
+      } catch { /* Owned coordinates still work when live verification is unavailable. */ }
+      const destination = place.approximate_location || place.latitude === undefined || place.longitude === undefined
+        ? place.name : `${place.latitude},${place.longitude}`;
+      try {
+        const providerId = googlePlaceId ? `&destination_place_id=${encodeURIComponent(googlePlaceId)}` : '';
+        await Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}${providerId}`);
+        await recordPlaceEvent(place, 'navigate', activeAdventour ? 'adventour' : 'solo');
+      } catch {
+        Alert.alert('Place saved', 'Directions could not be opened or recorded. Your accepted place is in your history.');
       }
     }
   };
@@ -448,6 +331,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
   };
 
   const handleSuggestionSelect = async (description: string) => {
+    Keyboard.dismiss();
     setCity(description);
     setLocationMode('manual');
     setCurrentCoords(null);
@@ -469,7 +353,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
     }
   };
 
-  const loadRecommendations = useCallback(async ({ append = false, quiet = false } = {}) => {
+  const loadRecommendations = useCallback(async ({ append = false, quiet = false, tagGroup = selectedTagGroup } = {}) => {
     if (append) {
       if (autoRefillInFlight.current) {
         return;
@@ -496,6 +380,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
         constraints: {
           limit: 20,
           avoid_chains: true,
+          tag_group: tagGroup,
+          exclude_entity_ids: append ? Array.from(recentlyDecidedPlaceIds.current).slice(-500) : [],
         },
       });
 
@@ -532,6 +418,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
         return;
       }
 
+      setTagGroupCounts(recommendationResponse.data.tag_group_counts || {});
       const recommendations = recommendationResponse.data.recommendations || [];
       const results = recommendations
         .map(placeFromRecommendation)
@@ -554,10 +441,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
         : results;
 
       setPlaces(append ? [...places, ...freshResults] : freshResults);
-      setHasLoadedRecommendations((current) => current || freshResults.length > 0 || append);
-      setAutoRefillAvailable(!append || freshResults.length > 0);
+      setHasLoadedRecommendations(true);
+      setAutoRefillAvailable(freshResults.length > 0);
       if (!append) {
-        setSelectedTagGroup('all');
+        setSelectedTagGroup(tagGroup);
         pendingBasketScroll.current = freshResults.length > 0;
       }
       if (freshResults.length > 0 || append) {
@@ -569,7 +456,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
           ? 'No places found because the place provider lookup failed.'
           : 'No places found for this search. Try a wider distance or a different location.';
         setEmptyMessage(message);
-        setHasLoadedRecommendations(false);
+        setHasLoadedRecommendations(true);
       }
     } catch (error: unknown) {
       const details = describeAxiosError(error);
@@ -593,7 +480,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
         setLoading(false);
       }
     }
-  }, [city, currentCoords, locationMode, places, radiusOption.meters]);
+  }, [city, currentCoords, locationMode, places, radiusOption.meters, selectedTagGroup]);
 
   const handleFindPlaces = () => {
     loadRecommendations({ append: false });
@@ -778,6 +665,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
                     onPress={() => {
                       setSelectedTagGroup('all');
                       setTagDropdownOpen(false);
+                      loadRecommendations({ tagGroup: 'all' });
                     }}
                   >
                     <Text style={[styles.dropdownItemText, selectedTagGroup === 'all' && styles.dropdownItemTextSelected]}>
@@ -806,6 +694,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
                           }
                           setSelectedTagGroup(group.id);
                           setTagDropdownOpen(false);
+                          loadRecommendations({ tagGroup: group.id });
                         }}
                       >
                         <Text
@@ -859,6 +748,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
               loadingMore={loadingMore}
               canLoadMore={autoRefillAvailable}
               onFeedback={handleFeedback}
+              onImpression={onImpression}
               onOpenPlace={setSelectedPlace}
               onExhausted={handleRecommendationDeckExhausted}
             />
@@ -868,6 +758,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
         </View>
       </ScrollView>
       <PlaceDetailsModal
+        onClosedReport={handleClosedReport}
         place={selectedPlace}
         visible={Boolean(selectedPlace)}
         onClose={() => setSelectedPlace(null)}
@@ -876,272 +767,5 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: '#bfeaf4',
-  },
-  scroll: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: 14,
-    paddingTop: 12,
-    paddingBottom: 28,
-  },
-  greetingBlock: {
-    marginBottom: 10,
-  },
-  greetingText: {
-    color: '#31506b',
-    fontSize: 20,
-    fontWeight: '800',
-  },
-  greetingPrompt: {
-    color: '#123c69',
-    fontSize: 26,
-    fontWeight: '900',
-    lineHeight: 30,
-    marginTop: 2,
-  },
-  launchControls: {
-    backgroundColor: '#dff6f2',
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#87cfe1',
-  },
-  controlLabel: {
-    color: '#123c69',
-    fontSize: 12,
-    fontWeight: '900',
-    marginBottom: 7,
-    textTransform: 'uppercase',
-  },
-  launchControlHeader: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 7,
-  },
-  launchControlsRequired: {
-    borderColor: '#87cfe1',
-    backgroundColor: '#e8f8fb',
-  },
-  controlLabelRequired: {
-    color: '#123c69',
-    marginBottom: 0,
-  },
-  input: {
-    borderColor: '#eadfce',
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 8,
-    marginBottom: 8,
-    backgroundColor: '#fff',
-    color: '#1f2937',
-  },
-  locationContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  cityInput: {
-    flex: 1,
-    borderColor: '#87cfe1',
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 8,
-    backgroundColor: '#fff',
-    color: '#123c69',
-    fontWeight: '700',
-  },
-  cityInputRequired: {
-    borderColor: '#123c69',
-    borderWidth: 2,
-  },
-  locationButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: '#123c69',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 9,
-  },
-  filterIconButton: {
-    backgroundColor: '#ff9f1c',
-    borderColor: '#123c69',
-    borderWidth: 2,
-  },
-  filterIconButtonActive: {
-    backgroundColor: '#ff4b47',
-  },
-  filterGlyph: {
-    height: 21,
-    justifyContent: 'space-between',
-    width: 22,
-  },
-  filterGlyphLine: {
-    backgroundColor: '#ffffff',
-    borderRadius: 999,
-    height: 3,
-  },
-  filterGlyphLineTop: {
-    width: 18,
-  },
-  filterGlyphLineMiddle: {
-    alignSelf: 'flex-end',
-    width: 22,
-  },
-  filterGlyphLineBottom: {
-    width: 14,
-  },
-  locationIcon: {
-    width: 24,
-    height: 24,
-  },
-  suggestionsList: {
-    borderWidth: 1,
-    borderColor: '#87cfe1',
-    borderRadius: 8,
-    backgroundColor: '#fff',
-    overflow: 'hidden',
-    marginBottom: 8,
-  },
-  suggestionItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eadfce',
-  },
-  suggestionText: {
-    color: '#1f2937',
-    fontSize: 13,
-  },
-  emptyText: {
-    color: '#6b7280',
-    textAlign: 'center',
-    marginTop: 8,
-  },
-  filterSection: {
-    marginTop: 0,
-    marginBottom: 8,
-  },
-  filterPanelHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 1,
-    borderColor: '#87cfe1',
-    borderRadius: 8,
-    backgroundColor: '#dff6f2',
-    paddingHorizontal: 10,
-    paddingVertical: 9,
-    marginBottom: 8,
-    shadowColor: '#123c69',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 5,
-    elevation: 2,
-  },
-  filterPanel: {
-    marginTop: 8,
-  },
-  filterTitle: {
-    fontSize: 13,
-    fontWeight: '900',
-    color: '#134e4a',
-  },
-  filterSummary: {
-    marginTop: 2,
-    color: '#31506b',
-    fontSize: 12,
-  },
-  dropdownButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 1,
-    borderColor: '#87cfe1',
-    borderRadius: 8,
-    backgroundColor: '#fff',
-    paddingHorizontal: 10,
-    paddingVertical: 9,
-    marginBottom: 6,
-  },
-  dropdownLabel: {
-    color: '#123c69',
-    fontSize: 12,
-    fontWeight: '800',
-  },
-  dropdownValue: {
-    color: '#123c69',
-    fontSize: 12,
-    fontWeight: '900',
-  },
-  dropdownMenu: {
-    borderWidth: 1,
-    borderColor: '#87cfe1',
-    borderRadius: 8,
-    backgroundColor: '#fff',
-    overflow: 'hidden',
-    marginBottom: 8,
-  },
-  dropdownItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 10,
-    paddingVertical: 9,
-  },
-  dropdownItemSelected: {
-    backgroundColor: '#123c69',
-  },
-  dropdownItemDisabled: {
-    backgroundColor: '#f9fafb',
-  },
-  dropdownItemText: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: '#123c69',
-  },
-  dropdownHelperText: {
-    fontSize: 12,
-    color: '#31506b',
-  },
-  dropdownItemTextDisabled: {
-    color: '#a3a3a3',
-  },
-  dropdownItemTextSelected: {
-    color: '#fff',
-  },
-  dropdownButtonDisabled: {
-    opacity: 0.6,
-  },
-  tagInfo: {
-    color: '#6b7280',
-    fontSize: 12,
-    fontWeight: '900',
-  },
-  button: {
-    backgroundColor: '#0f766e',
-    paddingVertical: 9,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 8,
-    shadowColor: '#0f766e',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.18,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '900',
-  },
-});
 
 export default HomeScreen;

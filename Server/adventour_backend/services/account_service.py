@@ -18,7 +18,7 @@ def _delete_query(query):
 
 
 def delete_user_account_data(user):
-    """Delete one user's private Adventour data while keeping shared place cache rows."""
+    """Delete one user's private Adventour data while keeping the shared owned index."""
     deleted = {}
 
     created_trip_ids = [
@@ -46,6 +46,10 @@ def delete_user_account_data(user):
     deleted["place_events"] = db.session.execute(
         text("DELETE FROM place_event WHERE user_id = :uid"), {"uid": user.id}
     ).rowcount
+    for table in ("recommendation_decision", "provider_usage"):
+        deleted[table] = db.session.execute(
+            text(f"DELETE FROM {table} WHERE user_id=:uid"), {"uid": user.id}
+        ).rowcount
     deleted["place_ratings"] = _delete_query(
         PlaceRating.query.filter(PlaceRating.user_id == user.id)
     )

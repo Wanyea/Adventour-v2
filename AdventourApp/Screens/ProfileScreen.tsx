@@ -6,6 +6,7 @@ import {
   ImageBackground,
   RefreshControl,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -20,6 +21,7 @@ import { AdventourSession, AdventourStop } from '../src/types/Adventour';
 import { tagGroupIdsForPlace, tagGroupMeta } from '../src/placeTagGroups';
 import AuthService from '../src/services/AuthService';
 import { User } from '../src/services/AuthService';
+import { recordPlaceEvent } from '../src/services/PlaceEventService';
 
 const passportCard = require('../src/assets/profile/passport-card.png');
 const ticketCard = require('../src/assets/cards/ticket-card.png');
@@ -52,7 +54,13 @@ type ProfileScreenProps = {
 
 type HistoryPlace = {
   event_id?: number;
-  place_id: number;
+  place_id: string;
+  decision_id?: string;
+  score?: number;
+  score_components?: Place['score_components'];
+  explanation?: string;
+  own_rating?: number;
+  own_review?: string;
   provider?: string;
   provider_place_id?: string;
   name: string;
@@ -320,6 +328,10 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onSignOut, onAccountDelet
 
   const toPlace = (item: HistoryPlace): Place => ({
       place_id: String(item.place_id),
+      decision_id: item.decision_id,
+      relevance: item.score ?? undefined,
+      score_components: item.score_components,
+      explanation: item.explanation,
       provider: item.provider,
       provider_place_id: item.provider_place_id,
       name: item.name,
@@ -330,41 +342,24 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onSignOut, onAccountDelet
       category: item.category,
       photo_url: backendPhotoUrl(item.photo_url),
       photo_attributions: item.photo_attributions || [],
-      rating: item.rating,
+      rating: item.own_rating ?? item.rating,
+      own_review: item.own_review,
       user_ratings_total: item.user_ratings_total,
       price_level: item.price_level,
   });
 
-  const openHistoryPlace = async (item: HistoryPlace) => {
-    const snapshot = toPlace(item);
-    setSelectedPlace(snapshot);
+  const openHistoryPlace = (item: HistoryPlace) => {
+    setSelectedPlace(toPlace(item));
+  };
 
-    if (snapshot.photo_url && snapshot.rating) {
-      return;
-    }
-
+  const sharePlace = async (place: Place) => {
     try {
-      const response = await axios.get(`${Config.BACKEND_BASE_URL}/api/places/details`, {
-        params: {
-          place_id: item.place_id,
-          provider: item.provider,
-          provider_place_id: item.provider_place_id,
-        },
-      });
-      const detail = response.data;
-      setSelectedPlace({
-        ...snapshot,
-        name: detail.name || snapshot.name,
-        vicinity: detail.vicinity || snapshot.vicinity,
-        types: detail.types || snapshot.types,
-        photo_url: backendPhotoUrl(detail.photo_url) || snapshot.photo_url,
-        photo_attributions: detail.photo_attributions || snapshot.photo_attributions,
-        rating: detail.rating ?? snapshot.rating,
-        user_ratings_total: detail.user_ratings_total ?? snapshot.user_ratings_total,
-        price_level: detail.price_level ?? snapshot.price_level,
-      });
-    } catch (detailsError) {
-      console.error('Error loading place details:', detailsError);
+      const result = await Share.share({ message: `${place.name}\nhttps://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name)}` });
+      if (result.action === Share.sharedAction) {
+        await recordPlaceEvent(place, 'share');
+      }
+    } catch {
+      Alert.alert('Share not recorded', 'Please try again.');
     }
   };
 
@@ -585,6 +580,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onSignOut, onAccountDelet
         place={selectedPlace}
         visible={Boolean(selectedPlace)}
         onClose={() => setSelectedPlace(null)}
+        onShare={selectedPlace?.decision_id ? sharePlace : undefined}
       />
     </View>
   );

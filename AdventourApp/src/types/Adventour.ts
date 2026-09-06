@@ -14,7 +14,8 @@ export type AdventourStopDisplay = {
 export type AdventourStop = {
   id: number;
   session_id: number;
-  place_id: number;
+  place_id: string;
+  decision_id?: string;
   provider?: string;
   provider_place_id?: string;
   order_index: number;

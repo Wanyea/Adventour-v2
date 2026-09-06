@@ -1,447 +1,110 @@
-"""Small Google Maps/Places wrapper used only by the backend.
+﻿"""Uncached Google ID/status verification, usable only after a recorded accept.
 
-The mobile app should talk to Adventour routes, not directly to Google. That
-keeps keys server-side and gives us one place to control cost and caching rules.
+Returned content is transient. Only the place ID and our editorial suppression
+flag may be persisted by the caller; no provider display data enters a deck.
 """
 
-import requests
+import logging
 import os
 import re
-from functools import lru_cache
-from urllib.parse import quote
+import unicodedata
+from contextlib import contextmanager
+from contextvars import ContextVar
+
+import requests
+from sqlalchemy import text
+
+from data_pipeline.dedup import haversine_m
+
+logger = logging.getLogger(__name__)
+_in_deck = ContextVar('in_deck', default=False)
 
 
-GOOGLE_PLACES_BASE_URL = "https://places.googleapis.com/v1"
-
-GOOGLE_PLACE_FIELD_MASK = ",".join([
-    "places.id",
-    "places.displayName",
-    "places.formattedAddress",
-    "places.location",
-    "places.types",
-    "places.primaryType",
-    "places.businessStatus",
-    "places.rating",
-    "places.userRatingCount",
-    "places.priceLevel",
-    "places.photos",
-])
-
-GOOGLE_PLACE_DETAILS_FIELD_MASK = ",".join([
-    "id",
-    "displayName",
-    "formattedAddress",
-    "location",
-    "types",
-    "primaryType",
-    "businessStatus",
-    "rating",
-    "userRatingCount",
-    "priceLevel",
-    "photos",
-])
-
-GOOGLE_AUTOCOMPLETE_FIELD_MASK = ",".join([
-    "suggestions.placePrediction.placeId",
-    "suggestions.placePrediction.text.text",
-    "suggestions.queryPrediction.text.text",
-])
-
-GOOGLE_PRICE_LEVELS = {
-    "PRICE_LEVEL_FREE": 0,
-    "PRICE_LEVEL_INEXPENSIVE": 1,
-    "PRICE_LEVEL_MODERATE": 2,
-    "PRICE_LEVEL_EXPENSIVE": 3,
-    "PRICE_LEVEL_VERY_EXPENSIVE": 4,
-}
-
-GOOGLE_NEARBY_TYPES = {
-    "amusement_park",
-    "aquarium",
-    "art_gallery",
-    "bakery",
-    "bar",
-    "book_store",
-    "breakfast_restaurant",
-    "brunch_restaurant",
-    "cafe",
-    "campground",
-    "clothing_store",
-    "coffee_shop",
-    "comedy_club",
-    "concert_hall",
-    "dessert_restaurant",
-    "fast_food_restaurant",
-    "fine_dining_restaurant",
-    "hiking_area",
-    "historical_landmark",
-    "ice_cream_shop",
-    "library",
-    "market",
-    "meal_takeaway",
-    "mexican_restaurant",
-    "movie_theater",
-    "museum",
-    "night_club",
-    "park",
-    "performing_arts_theater",
-    "pizza_restaurant",
-    "restaurant",
-    "shopping_mall",
-    "spa",
-    "steak_house",
-    "tea_house",
-    "tourist_attraction",
-    "visitor_center",
-    "zoo",
-}
+@contextmanager
+def deck_boundary():
+    token = _in_deck.set(True)
+    try:
+        yield
+    finally:
+        _in_deck.reset(token)
 
 
-def _is_google_type(value):
-    return bool(re.fullmatch(r"[a-z][a-z0-9_]*", value or ""))
-
-
-def _first_supported_place_type(tags):
-    for tag in tags or []:
-        if tag in GOOGLE_NEARBY_TYPES:
-            return tag
-    return None
-
-
-def _supported_place_types(tags):
-    return [
-        tag
-        for tag in tags or []
-        if tag in GOOGLE_NEARBY_TYPES and _is_google_type(tag)
-    ][:10]
-
-
-def _headers(api_key, field_mask):
-    return {
-        "Content-Type": "application/json",
-        "X-Goog-Api-Key": api_key,
-        "X-Goog-FieldMask": field_mask,
-    }
-
-
-def _display_text(value):
-    if isinstance(value, dict):
-        return value.get("text")
-    return value
-
-
-def _normalize_new_place(place):
-    location = place.get("location") or {}
-    display_name = _display_text(place.get("displayName")) or "Unknown place"
-    types = place.get("types") or []
-    primary_type = place.get("primaryType")
-    if primary_type and primary_type not in types:
-        types = [primary_type, *types]
-
-    return {
-        "provider": "google",
-        "place_id": place.get("id") or (place.get("name") or "").replace("places/", ""),
-        "name": display_name,
-        "vicinity": place.get("formattedAddress"),
-        "formatted_address": place.get("formattedAddress"),
-        "types": types,
-        "rating": place.get("rating"),
-        "user_ratings_total": place.get("userRatingCount"),
-        "price_level": GOOGLE_PRICE_LEVELS.get(place.get("priceLevel")),
-        "business_status": place.get("businessStatus"),
-        "photos": [
-            {
-                "name": photo.get("name"),
-                "width_px": photo.get("widthPx"),
-                "height_px": photo.get("heightPx"),
-                "author_attributions": photo.get("authorAttributions", []),
-            }
-            for photo in place.get("photos", [])[:3]
-            if photo.get("name")
-        ],
-        "geometry": {
-            "location": {
-                "lat": location.get("latitude"),
-                "lng": location.get("longitude"),
-            }
-        },
-    }
-
-
-def first_photo_url(photos, max_width_px=640, max_height_px=420):
-    if not photos:
-        return None
-    photo_name = photos[0].get("name")
-    if not photo_name:
-        return None
-    return (
-        "/api/places/photo?"
-        f"name={quote(photo_name, safe='')}"
-        f"&max_width_px={int(max_width_px)}"
-        f"&max_height_px={int(max_height_px)}"
-    )
-
-
-def _normalize_new_autocomplete(payload):
-    predictions = []
-    for suggestion in payload.get("suggestions", []):
-        place_prediction = suggestion.get("placePrediction")
-        query_prediction = suggestion.get("queryPrediction")
-        if place_prediction:
-            text = _display_text(place_prediction.get("text"))
-            predictions.append({
-                "place_id": place_prediction.get("placeId"),
-                "description": text,
-            })
-        elif query_prediction:
-            text = _display_text(query_prediction.get("text"))
-            predictions.append({
-                "place_id": None,
-                "description": text,
-            })
-    return [item for item in predictions if item.get("description")]
+def _name(value):
+    return re.sub(r'[^a-z0-9]', '', unicodedata.normalize('NFKD', value or '').casefold())
 
 
 class GoogleServicesAPI:
-    BASE_URL = GOOGLE_PLACES_BASE_URL
+    BASE_URL = 'https://places.googleapis.com/v1'
 
     @staticmethod
-    def api_key():
-        return os.getenv("GOOGLE_API_KEY")
-
-    @staticmethod
-    @lru_cache(maxsize=512)
-    def fetch_autocomplete(input_text, latitude=None, longitude=None, radius_meters=3200):
-        api_key = GoogleServicesAPI.api_key()
+    def _request(db, user_id, method, path, field_mask, body=None):
+        if _in_deck.get():
+            raise RuntimeError('Provider access is forbidden while building a deck')
+        api_key = os.getenv('GOOGLE_API_KEY')
         if not api_key:
-            print("[Autocomplete] GOOGLE_API_KEY is not configured.")
-            return []
-
-        if not input_text or len(input_text.strip()) < 3:
-            return []
-
-        body = {
-            "input": input_text.strip(),
-            "includeQueryPredictions": True,
-        }
-        if latitude is not None and longitude is not None:
-            body["locationBias"] = {
-                "circle": {
-                    "center": {
-                        "latitude": float(latitude),
-                        "longitude": float(longitude),
-                    },
-                    "radius": float(radius_meters),
-                }
-            }
-
-        try:
-            response = requests.post(
-                f"{GoogleServicesAPI.BASE_URL}/places:autocomplete",
-                json=body,
-                headers=_headers(api_key, GOOGLE_AUTOCOMPLETE_FIELD_MASK),
-                timeout=8,
-            )
-            response.raise_for_status()
-            return _normalize_new_autocomplete(response.json())
-        except requests.exceptions.RequestException as e:
-            print(f"Error fetching autocomplete suggestions: {e}")
-            if getattr(e, "response", None) is not None:
-                print(f"[Autocomplete] Google response: {e.response.text}")
-            return []
-
-    @staticmethod
-    def coordinate_fallback(latitude, longitude):
-        return {
-            "city": "Current Location",
-            "state": "GPS",
-            "latitude": float(latitude),
-            "longitude": float(longitude),
-            "source": "coordinate_fallback"
-        }
-
-    @staticmethod
-    def fetch_places(selected_tags, location, radius_meters=3200, max_result_count=20):
-        """
-        Fetch one low-cost page of nearby candidates for the recommender.
-
-        Places API (New) uses POST endpoints and field masks. Nearby Search is
-        used for known Google types; Text Search handles free-form taste tags.
-        """
-        api_key = GoogleServicesAPI.api_key()
-        if not api_key:
-            print("[Places] GOOGLE_API_KEY is not configured.")
-            return []
-
-        selected_tags = selected_tags or []
-        max_result_count = max(1, min(int(max_result_count or 20), 20))
-        included_types = _supported_place_types(selected_tags)
-
-        circle = {
-            "center": {
-                "latitude": float(location["latitude"]),
-                "longitude": float(location["longitude"]),
-            },
-            "radius": float(radius_meters),
-        }
-
-        if included_types:
-            url = f"{GoogleServicesAPI.BASE_URL}/places:searchNearby"
-            body = {
-                "includedTypes": included_types,
-                "maxResultCount": max_result_count,
-                "locationRestriction": {"circle": circle},
-            }
-        else:
-            url = f"{GoogleServicesAPI.BASE_URL}/places:searchText"
-            body = {
-                "textQuery": " ".join(selected_tags[:5]) or "local places",
-                "pageSize": max_result_count,
-                "locationBias": {"circle": circle},
-            }
-
-        try:
-            response = requests.post(
-                url,
-                json=body,
-                headers=_headers(api_key, GOOGLE_PLACE_FIELD_MASK),
-                timeout=8,
-            )
-            response.raise_for_status()
-            return [
-                _normalize_new_place(place)
-                for place in response.json().get("places", [])
-            ]
-        except requests.exceptions.RequestException as e:
-            print(f"Error fetching places: {e}")
-            if getattr(e, "response", None) is not None:
-                print(f"[Places] Google response: {e.response.text}")
-            raise
-
-    @staticmethod
-    @lru_cache(maxsize=512)
-    def fetch_place_details(place_id):
-        api_key = GoogleServicesAPI.api_key()
-        if not api_key or not place_id:
             return None
-
+        limit = max(0, min(20, int(os.getenv('GOOGLE_DAILY_CALL_LIMIT', '6'))))
+        # Reserve in its own transaction before network I/O. Failures still cost a
+        # request; rolling back an application transaction cannot refund the quota.
+        with db.engine.begin() as connection:
+            reserved = connection.execute(text("""INSERT INTO provider_usage(user_id,usage_day,calls)
+                SELECT :uid,(now() AT TIME ZONE 'UTC')::date,1 WHERE :limit>0
+                ON CONFLICT(user_id,usage_day) DO UPDATE SET calls=provider_usage.calls+1
+                WHERE provider_usage.calls<:limit RETURNING calls"""),
+                {'uid': user_id, 'limit': limit}).scalar()
+        if reserved is None:
+            logger.info('provider_request denied=quota user=%s', user_id)
+            return None
+        logger.info('provider_request provider=google user=%s operation=%s daily_count=%s', user_id, path.split('/')[0], reserved)
         try:
-            response = requests.get(
-                f"{GoogleServicesAPI.BASE_URL}/places/{place_id}",
-                headers=_headers(api_key, GOOGLE_PLACE_DETAILS_FIELD_MASK),
-                timeout=8,
-            )
+            response = requests.request(method, f'{GoogleServicesAPI.BASE_URL}/{path}',
+                headers={'X-Goog-Api-Key': api_key, 'X-Goog-FieldMask': field_mask}, json=body, timeout=8)
             response.raise_for_status()
-            return _normalize_new_place(response.json())
-        except requests.exceptions.RequestException as e:
-            print(f"Error fetching place details: {e}")
-            if getattr(e, "response", None) is not None:
-                print(f"[Place Details] Google response: {e.response.text}")
+            return response.json()
+        except (requests.RequestException, ValueError):
+            # URLs/bodies can expose keys or provider content. Log neither.
+            logger.warning('provider_request failed provider=google user=%s', user_id)
             return None
 
     @staticmethod
-    def fetch_city_coordinates(city):
-        """
-        Get latitude and longitude for a city/address using Places API (New).
-        """
-        api_key = GoogleServicesAPI.api_key()
-        if not api_key:
-            print("[Geocode] GOOGLE_API_KEY is not configured.")
-            return None
-
-        try:
-            response = requests.post(
-                f"{GoogleServicesAPI.BASE_URL}/places:searchText",
-                json={
-                    "textQuery": city,
-                    "pageSize": 1,
-                },
-                headers=_headers(
-                    api_key,
-                    "places.displayName,places.formattedAddress,places.location",
-                ),
-                timeout=8,
-            )
-            response.raise_for_status()
-            results = response.json().get("places", [])
-            if not results:
-                print(f"No results from Places Text Search for location: {city}")
-                return None
-            location = results[0].get("location") or {}
-            if location.get("latitude") is None or location.get("longitude") is None:
-                print(f"Places Text Search returned no coordinates for location: {city}")
-                return None
-            return {
-                "latitude": location["latitude"],
-                "longitude": location["longitude"],
-            }
-        except requests.exceptions.RequestException as e:
-            print(f"Error fetching city coordinates from Places Text Search: {e}")
-            if getattr(e, "response", None) is not None:
-                print(f"[Geocode] Google response: {e.response.text}")
-            raise
-
-    @staticmethod
-    def fetch_photo_uri(photo_name, max_width_px=640, max_height_px=420):
-        api_key = GoogleServicesAPI.api_key()
-        if not api_key or not photo_name:
-            return None
-
-        try:
-            response = requests.get(
-                f"{GoogleServicesAPI.BASE_URL}/{photo_name}/media",
-                params={
-                    "key": api_key,
-                    "maxWidthPx": max_width_px,
-                    "maxHeightPx": max_height_px,
-                    "skipHttpRedirect": "true",
-                },
-                timeout=8,
-            )
-            response.raise_for_status()
-            return response.json().get("photoUri")
-        except requests.exceptions.RequestException as e:
-            print(f"Error fetching place photo: {e}")
-            if getattr(e, "response", None) is not None:
-                print(f"[Photo] Google response: {e.response.text}")
-            return None
-
-    @staticmethod
-    def reverse_geocode(latitude, longitude):
-        api_key = GoogleServicesAPI.api_key()
-        if not api_key:
-            print(f"[Geocode] GOOGLE_API_KEY is not configured for {latitude}, {longitude}.")
-            return GoogleServicesAPI.coordinate_fallback(latitude, longitude)
-
-        url = "https://maps.googleapis.com/maps/api/geocode/json"
-        params = {
-            "latlng": f"{latitude},{longitude}",
-            "key": api_key
-        }
-
-        response = requests.get(url, params=params)
-        data = response.json()
-
-        if not data.get("results"):
-            print(f"[Geocode] No results for {latitude}, {longitude}")
-            return GoogleServicesAPI.coordinate_fallback(latitude, longitude)
-
-        city = None
-        state = None
-
-        for result in data["results"]:
-            for component in result["address_components"]:
-                types = component.get("types", [])
-                if "locality" in types and not city:
-                    city = component["long_name"]
-                elif "administrative_area_level_1" in types and not state:
-                    state = component["short_name"]
-            if city and state:
-                break
-
-        # Fallbacks
-        city = city or "Unknown"
-        state = state or "Unknown"
-
-        print(f"[Geocode] Resolved to city: {city}, state: {state}")
-        return {"city": city, "state": state}
+    def verify_accepted(db, user_id, place_id):
+        accepted = db.session.execute(text("""SELECT d.entity_id,d.payload
+            FROM recommendation_decision d WHERE d.user_id=:uid AND d.entity_id=:id AND d.verdict='accept'
+            ORDER BY d.served_at DESC LIMIT 1"""), {'uid': user_id, 'id': place_id}).mappings().first()
+        if not accepted:
+            raise ValueError('Accept the place before requesting provider verification.')
+        owned = accepted['payload']
+        suppressed_id = db.session.execute(text("""SELECT r.google_place_id FROM place_provider_ref r
+            JOIN suppressed_place s ON s.google_place_id=r.google_place_id WHERE r.entity_id=:id"""),
+            {'id': place_id}).scalar()
+        if suppressed_id:
+            return {'verification': 'suppressed', 'google_place_id': suppressed_id}
+        if not os.getenv('GOOGLE_API_KEY') or owned.get('snapshot_origin') == 'legacy_unsnapshotted':
+            return {'verification': 'unavailable'}
+        google_id = db.session.execute(text('SELECT google_place_id FROM place_provider_ref WHERE entity_id=:id'),
+                                       {'id': place_id}).scalar()
+        if not google_id:
+            search = GoogleServicesAPI._request(db, user_id, 'POST', 'places:searchText', 'places.id', {
+                'textQuery': owned['name'], 'pageSize': 1,
+                'locationBias': {'circle': {'center': {'latitude': owned['latitude'], 'longitude': owned['longitude']}, 'radius': 150.0}},
+            })
+            candidates = (search or {}).get('places') or []
+            google_id = candidates[0].get('id') if candidates else None
+        if not google_id or not re.fullmatch(r'[A-Za-z0-9_-]+', google_id):
+            return {'verification': 'unavailable'}
+        details = GoogleServicesAPI._request(db, user_id, 'GET', f'places/{google_id}',
+                                             'id,displayName,location,businessStatus')
+        if not details:
+            return {'verification': 'unavailable'}
+        location = details.get('location') or {}
+        if not (_name((details.get('displayName') or {}).get('text')) == _name(owned['name'])
+                and location.get('latitude') is not None and location.get('longitude') is not None
+                and haversine_m(owned['latitude'], owned['longitude'], location['latitude'], location['longitude']) <= 150):
+            return {'verification': 'unmatched'}
+        db.session.execute(text("""INSERT INTO place_provider_ref(entity_id,google_place_id) VALUES(:id,:gid)
+            ON CONFLICT(entity_id) DO NOTHING"""), {'id': place_id, 'gid': google_id})
+        if details.get('businessStatus') == 'CLOSED_PERMANENTLY':
+            db.session.execute(text("""INSERT INTO suppressed_place(google_place_id) VALUES(:gid)
+                ON CONFLICT(google_place_id) DO NOTHING"""), {'gid': google_id})
+            return {'verification': 'suppressed', 'google_place_id': google_id}
+        return {'verification': 'matched', 'google_place_id': google_id}

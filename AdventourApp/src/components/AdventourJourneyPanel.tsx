@@ -3,6 +3,7 @@ import {
   Image,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -15,7 +16,7 @@ type Props = {
   onStart: () => void;
   onOpenDirections: (stop: AdventourStop) => void;
   onArrive: (stop: AdventourStop) => void;
-  onRateStop: (stop: AdventourStop, rating: number) => void;
+  onRateStop: (stop: AdventourStop, rating: number, notes: string) => void;
   onEnd: () => void;
 };
 
@@ -74,6 +75,8 @@ const AdventourJourneyPanel: React.FC<Props> = ({
 }) => {
   const [tripLogOpen, setTripLogOpen] = useState(false);
   const activeStop = adventour?.active_stop || null;
+  const [review, setReview] = useState('');
+  useEffect(() => { setReview(activeStop?.notes || ''); }, [activeStop?.id]);
   const elapsedAtStop = useElapsedSeconds(activeStop?.arrived_at);
   const completedStops = adventour?.stops.filter((stop) => stop.status === 'completed') || [];
   const visitedStops = adventour?.stops.filter((stop) => (
@@ -151,7 +154,8 @@ const AdventourJourneyPanel: React.FC<Props> = ({
                     <TouchableOpacity
                       key={rating}
                       style={styles.ratingButton}
-                      onPress={() => onRateStop(activeStop, rating)}
+                      onPress={() => onRateStop(activeStop, rating, review)}
+                      disabled={loading}
                     >
                       <Text style={styles.ratingText}>{rating}</Text>
                     </TouchableOpacity>
@@ -159,6 +163,17 @@ const AdventourJourneyPanel: React.FC<Props> = ({
                 </View>
               )}
             </View>
+            {activeStop.status === 'arrived' ? (
+              <TextInput
+                value={review}
+                onChangeText={setReview}
+                placeholder="Your review (optional), then choose a rating"
+                accessibilityLabel="Place review"
+                multiline
+                maxLength={4000}
+                style={styles.stopAddress}
+              />
+            ) : null}
           </View>
         </View>
       ) : (
@@ -219,7 +234,7 @@ const AdventourJourneyPanel: React.FC<Props> = ({
                                 styles.historyRatingButton,
                                 stop.rating === rating && styles.historyRatingButtonActive,
                               ]}
-                              onPress={() => onRateStop(stop, rating)}
+                              onPress={() => onRateStop(stop, rating, stop.notes || '')}
                             >
                               <Text
                                 style={[

@@ -4,23 +4,19 @@ This replaces provider-driven candidate retrieval. No paid API call is made to
 build a deck -- the whole point of the sourcing decision in
 docs/sourcing-cost-decision-brief.md.
 
-It deliberately emits the *existing* /api/recommendations response shape so the
-mobile client needs no changes. Per CLAUDE.md the UI is frozen: a recommender
-change may alter what data a screen receives, never how the screen looks.
-
-Ordering follows the Gate 8 finding: authenticity is a floor, not a ranker (490
-places share one score), so results are filtered by score and then ordered
-nearest-first within the radius the user asked for.
+The approved Phase 1 keeps the structural baseline: filter by its score floor,
+order by score descending, then distance ascending. This is not evidence of
+authenticity or personal fit. Tag filtering applies before the batch limit.
 """
 
-import os
+import math
 
 import h3
 from sqlalchemy import text
+from data_pipeline.authenticity import authenticity_score
+from . import tag_group_service
 
-# Matches Server/data_pipeline/authenticity.py. Duplicated rather than imported
-# because the pipeline is not on the web app's import path; if it moves, these
-# must move together.
+# Keep the production floor explicit for evaluation's default serving population.
 AUTHENTICITY_FLOOR = 0.30
 H3_RESOLUTION = 8
 
@@ -102,26 +98,30 @@ def _types_for(basic_category, taxonomy_bucket):
     return types
 
 
-def is_enabled():
-    return os.getenv("ADVENTOUR_USE_LOCAL_INDEX", "").lower() in ("1", "true", "yes")
-
-
 SQL = text(
     """
     WITH candidates AS (
         SELECT DISTINCT ON (COALESCE(canonical_id, id))
                COALESCE(canonical_id, id) AS entity_id,
                id, name, basic_category, taxonomy_bucket, chain_class,
-               authenticity, authenticity_why, cluster_size, loc_spread_m,
+               authenticity, authenticity_why, cluster_size, loc_spread_m, metro,
+               confidence, socials, needs_booking, score_components, score_density,
+               (SELECT count(*) FROM places q WHERE q.h3_r8=p.h3_r8
+                AND q.tier='KEEP' AND q.index_active) AS cell_density,
                COALESCE(canonical_lat, lat) AS lat,
                COALESCE(canonical_lon, lon) AS lon
-        FROM places
-        WHERE tier = 'KEEP'
-          AND h3_r8 = ANY(:cells)
+        FROM places p
+        WHERE tier = 'KEEP' AND index_active
+          AND canonical_h3_r8 = ANY(:cells)
           AND authenticity >= :floor
           AND (:allow_chains OR chain_class <> 'chain')
+          AND NOT EXISTS (SELECT 1 FROM place_provider_ref r JOIN suppressed_place s
+                          ON s.google_place_id=r.google_place_id
+                          WHERE r.entity_id=COALESCE(p.canonical_id,p.id))
+          AND NOT EXISTS (SELECT 1 FROM place_event e WHERE e.entity_id=COALESCE(p.canonical_id,p.id)
+                          AND e.event_type='closed_report' AND e.user_id IN (0,:user_id))
         ORDER BY COALESCE(canonical_id, id), cluster_size DESC NULLS LAST,
-                 authenticity DESC NULLS LAST
+                 authenticity DESC NULLS LAST, id
     )
     SELECT *,
            (6371000 * acos(least(1, greatest(-1,
@@ -132,7 +132,6 @@ SQL = text(
                 cos(radians(:lat)) * cos(radians(lat)) * cos(radians(lon) - radians(:lon))
               + sin(radians(:lat)) * sin(radians(lat)))))) <= :radius
     ORDER BY authenticity DESC, distance_meters ASC
-    LIMIT :limit
     """
 )
 
@@ -140,17 +139,28 @@ SQL = text(
 def _cells_for(latitude, longitude, radius_meters):
     """H3 disk covering the radius. r8 cells are ~460m across, so this is the
     cheap prefilter; the haversine clause above does the exact cut."""
-    rings = max(1, min(24, int(radius_meters / 400) + 1))
+    rings = max(1, int(radius_meters / 400) + 2)
     origin = h3.latlng_to_cell(latitude, longitude, H3_RESOLUTION)
     return list(h3.grid_disk(origin, rings))
 
 
-def recommend(db, location, radius_meters=3200, constraints=None):
+def recommend(db, location, radius_meters=3200, constraints=None, user_id=0):
     constraints = constraints or {}
     lat = float(location["latitude"])
     lon = float(location["longitude"])
-    limit = int(constraints.get("limit", 20))
+    if not (math.isfinite(lat) and math.isfinite(lon) and -90 <= lat <= 90 and -180 <= lon <= 180):
+        raise ValueError("Invalid latitude or longitude.")
+    radius_meters = float(radius_meters)
+    if not math.isfinite(radius_meters) or not 100 <= radius_meters <= 16000:
+        raise ValueError("Radius must be between 100 and 16000 metres.")
+    limit = max(1, min(50, int(constraints.get("limit", 20))))
     allow_chains = not bool(constraints.get("avoid_chains", False))
+    selected_tag = constraints.get("tag_group", "all")
+    if selected_tag != "all" and selected_tag not in tag_group_service.GROUPS:
+        raise ValueError("Unknown tag group.")
+    excluded = constraints.get("exclude_entity_ids", [])
+    if not isinstance(excluded, list) or len(excluded) > 500 or any(not isinstance(s, str) for s in excluded):
+        raise ValueError("exclude_entity_ids must contain at most 500 IDs.")
 
     rows = db.session.execute(
         SQL,
@@ -162,15 +172,31 @@ def recommend(db, location, radius_meters=3200, constraints=None):
             "lon": lon,
             "radius": float(radius_meters),
             "limit": limit,
+            "user_id": user_id,
         },
     ).mappings().all()
 
     recommendations = []
+    counts = {key: 0 for key in tag_group_service.GROUPS}
     for r in rows:
+        if r["entity_id"] in excluded:
+            continue
+        types = _types_for(r["basic_category"], r["taxonomy_bucket"])
+        groups = tag_group_service.for_place(r["name"], types)
+        for group in groups:
+            counts[group] += 1
+        if (selected_tag != "all" and selected_tag not in groups) or len(recommendations) >= limit:
+            continue
         distance = int(round(r["distance_meters"]))
         # Location is unreliable when a merged cluster's members disagreed; the
         # deck can still show it, but navigation should re-resolve at accept time.
         approximate = (r["loc_spread_m"] or 0) > 5000
+        components = r["score_components"]
+        if not components:
+            reconstructed, candidate_components = authenticity_score(
+                r["confidence"], bool(r["socials"]), r["cell_density"], r["chain_class"])
+            if abs(reconstructed - float(r["authenticity"])) < .00001:
+                components = candidate_components
         recommendations.append(
             {
                 "place_id": r["entity_id"],
@@ -178,8 +204,12 @@ def recommend(db, location, radius_meters=3200, constraints=None):
                 "provider_place_id": r["id"],
                 "name": r["name"],
                 "category": "food" if r["taxonomy_bucket"] in FOOD_BUCKETS else "activity",
-                "score": round(float(r["authenticity"] or 0), 3),
-                "explanation": r["authenticity_why"] or "",
+                "score": float(r["authenticity"] or 0),
+                "score_components": components,
+                "explanation": "Structural index score from source confidence, social-link presence and nearby indexed places. It is not a probability of liking this place.",
+                "metro": r["metro"],
+                "needs_booking": bool(r["needs_booking"]),
+                "tag_groups": groups,
                 "latitude": float(r["lat"]),
                 "longitude": float(r["lon"]),
                 "distance_meters": distance,
@@ -188,8 +218,8 @@ def recommend(db, location, radius_meters=3200, constraints=None):
                     "name": r["name"],
                     "vicinity": f"{distance} m away"
                     + (" · approximate" if approximate else ""),
-                    "types": _types_for(r["basic_category"], r["taxonomy_bucket"]),
+                    "types": types,
                 },
             }
         )
-    return {"recommendations": recommendations, "provider_errors": []}
+    return {"recommendations": recommendations, "tag_group_counts": counts, "provider_errors": []}

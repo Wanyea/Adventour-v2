@@ -136,9 +136,9 @@ class AdventourStop(db.Model):
     It is deliberately *not* a foreign key: the index is rebuilt independently of
     the app, and a stop must survive a re-ingest that changes record ids.
 
-    Display fields for the card live in `metadata_json`, captured at selection
-    time. That is required rather than convenient -- provider display content may
-    not be stored, so what is kept here is the snapshot the user actually saw.
+    Only owned-index display fields live in `metadata_json`, copied from the
+    server's serving decision at selection time. Google display content is never
+    accepted from the client or persisted here.
     """
     id = db.Column(db.Integer, primary_key=True)
     session_id = db.Column(db.Integer, db.ForeignKey('adventour_session.id'), nullable=False, index=True)

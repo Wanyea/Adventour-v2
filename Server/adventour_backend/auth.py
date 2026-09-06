@@ -223,6 +223,7 @@ def require_auth(f):
         
         # Store user in Flask's g object for use in route
         g.current_user = user
+        g.test_activity = os.getenv('ADVENTOUR_DEV_AUTH') == 'true' and token.startswith('dev:')
         
         return f(*args, **kwargs)
     

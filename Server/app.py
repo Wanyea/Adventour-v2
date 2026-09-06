@@ -1,6 +1,6 @@
-from flask import Flask, request, jsonify, g, redirect
+from flask import Flask, request, jsonify, g
 from flask_cors import CORS
-from adventour_backend.services.google_services_api import GoogleServicesAPI
+from adventour_backend.services.google_services_api import GoogleServicesAPI, deck_boundary
 from adventour_backend.models import (
     db,
     User,
@@ -8,12 +8,12 @@ from adventour_backend.models import (
     AdventourSession,
     AdventourStop,
 )
-from adventour_backend.auth import require_auth, optional_auth
+from adventour_backend.auth import require_auth
 from adventour_backend.social_routes import social_bp
-from adventour_backend.services.google_services_api import first_photo_url
 from adventour_backend.services.account_service import delete_user_account_data
-from adventour_backend.services import local_index_service
+from adventour_backend.services import tag_group_service, local_index_service
 from adventour_backend.services import place_event_service
+from adventour_backend.services import decision_service, index_schema_service, launch_service
 
 from dotenv import load_dotenv
 from urllib.parse import quote_plus
@@ -29,22 +29,9 @@ if env_file:
 else:
     load_dotenv()
 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
-def place_display_payload(candidate):
-    photos = candidate.get("photos") or []
-    return {
-        "name": candidate.get("name"),
-        "vicinity": candidate.get("vicinity") or candidate.get("formatted_address") or (candidate.get("location") or {}).get("formatted_address"),
-        "rating": candidate.get("rating"),
-        "user_ratings_total": candidate.get("user_ratings_total"),
-        "price_level": candidate.get("price_level") or candidate.get("price"),
-        "business_status": candidate.get("business_status"),
-        "types": candidate.get("types") or candidate.get("categories") or [],
-        "photo_url": first_photo_url(photos),
-        "photo_attributions": photos[0].get("author_attributions", []) if photos else [],
-    }
 
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = quote_plus(os.getenv("DB_PASSWORD") or "")
@@ -99,6 +86,7 @@ def ensure_local_schema():
 with app.app_context():
     db.create_all()
     ensure_local_schema()
+    index_schema_service.ensure(db.engine)
 
 @app.route('/')
 def home():
@@ -198,6 +186,7 @@ def serialize_adventour_stop(stop):
         "id": stop.id,
         "session_id": stop.session_id,
         "place_id": stop.entity_id,
+        "decision_id": metadata.get("decision_id"),
         "provider": metadata.get("provider"),
         "provider_place_id": metadata.get("provider_place_id"),
         "order_index": stop.order_index,
@@ -246,47 +235,22 @@ def serialize_adventour_session(session, include_stops=True):
     }
     
 @app.route('/onboarding', methods=['POST'])
-@optional_auth
+@require_auth
 def onboarding():
-    data = request.json
+    data = request.json or {}
     tags = data.get('initial_tags', [])
-
-    if not tags:
-        return jsonify({"error": "Missing tags"}), 400
-
-    # Try to get authenticated user first
-    user = None
-    if hasattr(g, 'current_user'):
-        user = g.current_user
-    else:
-        # Fallback to old user_id parameter
-        user_id = data.get('user_id')
-        if user_id:
-            user = User.query.filter_by(uuid=user_id).first()
-            if not user:
-                user = User(uuid=user_id, preferences=",".join(tags))
-                db.session.add(user)
-    
-    if not user:
-        return jsonify({"error": "User authentication required"}), 401
-
-    user.preferences = ",".join(tags)
+    if not isinstance(tags, list) or not tags or any(not isinstance(t, str) or t not in tag_group_service.GROUPS for t in tags):
+        return jsonify({"error": "Choose one or more travel mood tags"}), 400
+    g.current_user.preferences = ",".join(dict.fromkeys(tags))
     db.session.commit()
     return jsonify({"message": "Onboarding preferences saved"}), 200
 
 @app.route('/user/<user_id>', methods=['GET'])
-@optional_auth
+@require_auth
 def get_user_info(user_id):
-    # Try to get authenticated user first
-    user = None
-    if hasattr(g, 'current_user'):
-        user = g.current_user
-    else:
-        # Fallback to user_id parameter
-        user = User.query.filter_by(uuid=user_id).first()
-    
-    if not user:
-        return jsonify({"onboarded": False, "profile_complete": False}), 200
+    user = g.current_user
+    if user_id not in (user.firebase_uid, str(user.id)):
+        return jsonify({"error": "Profile does not belong to this user"}), 403
     
     return jsonify({
         "onboarded": bool(user.preferences),
@@ -353,7 +317,8 @@ def create_dev_user():
         db.session.add(user)
     else:
         user.email = email
-        user.display_name = display_name
+        if data.get("display_name"):
+            user.display_name = display_name
 
     db.session.commit()
 
@@ -410,7 +375,7 @@ def delete_current_user():
 @require_auth
 def rate_place():
     """Rate a place with 1-5 stars and optional review"""
-    data = request.json
+    data = request.json or {}
     user = g.current_user
     
     place_id = data.get('place_id')
@@ -420,8 +385,17 @@ def rate_place():
     if not place_id or not rating:
         return jsonify({"error": "Place ID and rating are required"}), 400
     
-    if not isinstance(rating, int) or rating < 1 or rating > 5:
+    if type(rating) is not int or rating < 1 or rating > 5:
         return jsonify({"error": "Rating must be an integer between 1 and 5"}), 400
+    if not isinstance(review, str) or len(review) > 4000:
+        return jsonify({"error": "Review must be text of at most 4000 characters"}), 400
+    try:
+        event = place_event_service.record(db, user.id, place_id, "rate", event_value=rating,
+                                           decision_id=data.get("decision_id"))
+        place_id = event["entity_id"]
+    except ValueError as exc:
+        db.session.rollback()
+        return jsonify({"error": str(exc)}), 400
     
     # Check if user already rated this place
     existing_rating = PlaceRating.query.filter_by(
@@ -469,10 +443,15 @@ def record_place_event():
             event_type=event_type,
             event_value=data.get("event_value"),
             context=data.get("context", "solo"),
+            decision_id=data.get("decision_id"),
+            test_activity=bool(getattr(g, "test_activity", False)),
         )
+        db.session.commit()
     except ValueError as exc:
+        db.session.rollback()
         return jsonify({"error": str(exc)}), 400
     except Exception:
+        db.session.rollback()
         logger.exception("Event recording failed")
         return jsonify({"error": "Event recording failed"}), 500
 
@@ -516,13 +495,24 @@ def start_adventour():
 def add_adventour_stop(session_id):
     data = request.json or {}
     user = g.current_user
-    session = AdventourSession.query.filter_by(id=session_id, user_id=user.id, status="active").first()
+    session = AdventourSession.query.filter_by(id=session_id, user_id=user.id, status="active").with_for_update().first()
     if not session:
         return jsonify({"error": "Active Adventour not found"}), 404
 
     entity_id = data.get("place_id")
     if not entity_id:
         return jsonify({"error": "place_id is required"}), 400
+
+    try:
+        decision = decision_service.get(db, user.id, data.get("decision_id"), entity_id, lock=True)
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    for existing in session.stops.all():
+        if json.loads(existing.metadata_json or "{}").get("decision_id") == decision["id"]:
+            return jsonify({"adventour": serialize_adventour_session(session),
+                            "stop": serialize_adventour_stop(existing), "message": "Stop already added"}), 200
+    if decision["verdict"] == "reject":
+        return jsonify({"error": "This card was already rejected"}), 409
 
     active_stop = (
         AdventourStop.query
@@ -539,28 +529,31 @@ def add_adventour_stop(session_id):
             "active_stop": serialize_adventour_stop(active_stop),
         }), 409
 
+    picked = decision["payload"]
+    entity_id = decision["entity_id"]
     order_index = session.stops.count()
-    display = data.get("display") or {}
+    display = {**picked["display"], "latitude": picked["latitude"], "longitude": picked["longitude"],
+               "category": picked["category"], "approximate_location": picked["approximate_location"]}
     metadata = {
-        "source": data.get("source", "recommendation_deck"),
-        "provider": data.get("provider"),
-        "provider_place_id": data.get("provider_place_id"),
+        "source": "recommendation_deck",
+        "provider": "adventour_index",
+        "provider_place_id": decision["record_id"],
+        "decision_id": decision["id"],
         "display": display,
     }
     stop = AdventourStop(
         session_id=session.id,
         entity_id=str(entity_id),
-        record_id=str(data.get("provider_place_id")) if data.get("provider_place_id") else None,
+        record_id=decision["record_id"],
         order_index=order_index,
         status="navigating",
         navigation_started_at=datetime.utcnow(),
         metadata_json=json.dumps(metadata),
     )
     db.session.add(stop)
-    place_event_service.record(
-        db=db, user_id=user.id, place_id=entity_id,
-        event_type="navigate", context="adventour",
-    )
+    for event_type in ("accept", "save"):
+        place_event_service.record(db=db, user_id=user.id, place_id=entity_id,
+                                   event_type=event_type, context="adventour", decision_id=decision["id"])
     db.session.commit()
 
     return jsonify({
@@ -578,14 +571,30 @@ def arrive_adventour_stop(session_id, stop_id):
     if not session or not stop:
         return jsonify({"error": "Active Adventour stop not found"}), 404
 
+    if stop.status not in ("navigating", "arrived"):
+        return jsonify({"error": "Only a navigating stop can be marked arrived"}), 409
     stop.status = "arrived"
     stop.arrived_at = stop.arrived_at or datetime.utcnow()
     place_event_service.record(
         db=db, user_id=user.id, place_id=stop.entity_id,
         event_type="arrival", context="adventour",
+        decision_id=decision_service.for_stop(db, user.id, stop),
     )
     db.session.commit()
 
+    return jsonify({"adventour": serialize_adventour_session(session), "stop": serialize_adventour_stop(stop)}), 200
+
+@app.route('/api/adventours/<int:session_id>/stops/<int:stop_id>/navigate', methods=['POST'])
+@require_auth
+def navigate_adventour_stop(session_id, stop_id):
+    user = g.current_user
+    session = AdventourSession.query.filter_by(id=session_id, user_id=user.id, status="active").first()
+    stop = AdventourStop.query.filter_by(id=stop_id, session_id=session_id).first() if session else None
+    if not stop or stop.status not in ("navigating", "arrived"):
+        return jsonify({"error": "Active stop not found"}), 404
+    place_event_service.record(db, user.id, stop.entity_id, "navigate", context="adventour",
+                               decision_id=decision_service.for_stop(db, user.id, stop))
+    db.session.commit()
     return jsonify({"adventour": serialize_adventour_session(session), "stop": serialize_adventour_stop(stop)}), 200
 
 @app.route('/api/adventours/<int:session_id>/stops/<int:stop_id>/complete', methods=['POST'])
@@ -598,13 +607,12 @@ def complete_adventour_stop(session_id, stop_id):
     if not session or not stop:
         return jsonify({"error": "Active Adventour stop not found"}), 404
 
+    if stop.status not in ("arrived", "completed"):
+        return jsonify({"error": "Mark arrival before completing this stop"}), 409
+
     rating = data.get("rating")
     if rating is not None:
-        try:
-            rating = int(rating)
-        except (TypeError, ValueError):
-            return jsonify({"error": "rating must be an integer between 1 and 5"}), 400
-        if rating < 1 or rating > 5:
+        if type(rating) is not int or rating < 1 or rating > 5:
             return jsonify({"error": "rating must be an integer between 1 and 5"}), 400
 
     now = datetime.utcnow()
@@ -613,13 +621,20 @@ def complete_adventour_stop(session_id, stop_id):
     stop.departed_at = stop.departed_at or now
     stop.rating = rating
     if "notes" in data:
-        stop.notes = data.get("notes")
+        stop.notes = str(data.get("notes") or "")[:4000]
 
     if rating:
         place_event_service.record(
             db=db, user_id=user.id, place_id=stop.entity_id,
             event_type="rate", event_value=rating, context="adventour",
+            decision_id=decision_service.for_stop(db, user.id, stop),
         )
+        review = PlaceRating.query.filter_by(user_id=user.id, place_id=stop.entity_id).first()
+        if not review:
+            review = PlaceRating(user_id=user.id, place_id=stop.entity_id, rating=rating)
+            db.session.add(review)
+        review.rating = rating
+        review.review = stop.notes
     db.session.commit()
 
     return jsonify({"adventour": serialize_adventour_session(session), "stop": serialize_adventour_stop(stop)}), 200
@@ -676,10 +691,15 @@ def profile_history():
 
     rows = db.session.execute(text("""
         SELECT e.id AS event_id, e.entity_id, e.event_type, e.occurred_at, e.score_snapshot,
+               e.decision_id, e.components_snapshot, e.explanation_snapshot, d.payload,
+               review.rating AS own_rating, review.review AS own_review,
                p.name, p.basic_category, p.taxonomy_bucket,
                COALESCE(p.canonical_lat, p.lat) AS lat, COALESCE(p.canonical_lon, p.lon) AS lon
         FROM place_event e
-        LEFT JOIN places p ON p.id = e.record_id OR p.id = e.entity_id
+        LEFT JOIN LATERAL (SELECT * FROM places
+            WHERE id=e.record_id OR id=e.entity_id ORDER BY (id=e.record_id) DESC LIMIT 1) p ON true
+        LEFT JOIN recommendation_decision d ON d.id=e.decision_id
+        LEFT JOIN place_rating review ON review.user_id=e.user_id AND review.place_id=e.entity_id
         WHERE e.user_id = :uid AND e.event_type = :etype
         ORDER BY e.occurred_at DESC
         LIMIT :lim
@@ -693,10 +713,14 @@ def profile_history():
         seen.add(r["entity_id"])
         places.append({
             "event_id": r["event_id"],
+            "decision_id": r["decision_id"],
+            "score_components": r["components_snapshot"],
+            "explanation": r["explanation_snapshot"],
+            "own_rating": r["own_rating"], "own_review": r["own_review"],
             "place_id": r["entity_id"],
             "provider": "adventour_index",
             "provider_place_id": r["entity_id"],
-            "name": r["name"],
+            "name": (r["payload"] or {}).get("name") or r["name"] or "Saved place",
             "vicinity": None,
             "latitude": float(r["lat"]) if r["lat"] is not None else None,
             "longitude": float(r["lon"]) if r["lon"] is not None else None,
@@ -727,62 +751,22 @@ def profile_history():
 @app.route('/api/places/details', methods=['GET'])
 @require_auth
 def place_details():
-    provider = request.args.get("provider")
-    provider_place_id = request.args.get("provider_place_id")
-    adventour_place_id = request.args.get("place_id")
-
-    indexed = None
-    if adventour_place_id:
-        indexed = db.session.execute(text("""
-            SELECT COALESCE(canonical_id, id) AS entity_id, name, basic_category,
-                   taxonomy_bucket, authenticity, authenticity_why,
-                   COALESCE(canonical_lat, lat) AS lat, COALESCE(canonical_lon, lon) AS lon
-            FROM places WHERE id = :pid OR canonical_id = :pid LIMIT 1
-        """), {"pid": str(adventour_place_id)}).mappings().first()
-
-    candidate = None
-    if provider == "google" and provider_place_id:
-        candidate = GoogleServicesAPI.fetch_place_details(provider_place_id)
-
-    display = place_display_payload(candidate) if candidate else {}
-    types = display.get("types") or (
-        local_index_service._types_for(indexed["basic_category"], indexed["taxonomy_bucket"])
-        if indexed else []
-    )
-
-    if not indexed and not display:
-        return jsonify({"error": "Unknown place"}), 404
-
-    return jsonify({
-        "place_id": indexed["entity_id"] if indexed else None,
-        "provider": provider or "adventour_index",
-        "provider_place_id": provider_place_id,
-        "name": display.get("name") or (indexed["name"] if indexed else None),
-        "vicinity": display.get("vicinity"),
-        "latitude": float(indexed["lat"]) if indexed and indexed["lat"] is not None else None,
-        "longitude": float(indexed["lon"]) if indexed and indexed["lon"] is not None else None,
-        "types": types,
-        "rating": display.get("rating"),
-        "user_ratings_total": display.get("user_ratings_total"),
-        "price_level": display.get("price_level"),
-        "photo_url": display.get("photo_url"),
-        "photo_attributions": display.get("photo_attributions") or [],
-    }), 200
-
-@app.route('/api/places/photo', methods=['GET'])
-def place_photo():
-    photo_name = request.args.get("name")
-    max_width_px = int(request.args.get("max_width_px", 640))
-    max_height_px = int(request.args.get("max_height_px", 420))
-
-    photo_uri = GoogleServicesAPI.fetch_photo_uri(
-        photo_name,
-        max_width_px=max_width_px,
-        max_height_px=max_height_px,
-    )
-    if not photo_uri:
-        return jsonify({"error": "Unable to load place photo"}), 404
-    return redirect(photo_uri, code=302)
+    place_id = request.args.get('place_id')
+    try:
+        verification = GoogleServicesAPI.verify_accepted(db, g.current_user.id, place_id)
+        if verification.get("verification") == "suppressed":
+            active_ids = [s.id for s in AdventourSession.query.filter_by(user_id=g.current_user.id, status="active")]
+            for stop in AdventourStop.query.filter(AdventourStop.session_id.in_(active_ids),
+                    AdventourStop.entity_id == place_id, AdventourStop.status == "navigating"):
+                stop.status = "skipped"
+                stop.departed_at = datetime.utcnow()
+        db.session.commit()
+    except ValueError as exc:
+        db.session.rollback()
+        return jsonify({'error': str(exc)}), 400
+    response = jsonify({'place_id': place_id, **verification})
+    response.headers['Cache-Control'] = 'no-store'
+    return response
 
 @app.route('/api/recommendations', methods=['POST'])
 @require_auth
@@ -806,15 +790,22 @@ def create_recommendations():
         )
         # Candidate retrieval runs against our own index. No paid API call ever
         # populates a deck -- see docs/sourcing-cost-decision-brief.md.
-        result = local_index_service.recommend(
-            db=db,
-            location={"latitude": float(latitude), "longitude": float(longitude)},
-            radius_meters=int(data.get("radius_meters", 3200)),
-            constraints=data.get("constraints", {}),
-        )
+        with deck_boundary():
+            result = local_index_service.recommend(
+                db=db,
+                location={"latitude": float(latitude), "longitude": float(longitude)},
+                radius_meters=int(data.get("radius_meters", 3200)),
+                constraints=data.get("constraints", {}),
+                user_id=user.id,
+            )
+        decision_service.attach(db, user.id, result["recommendations"], getattr(g, "test_activity", False))
+        db.session.commit()
+        logger.info("deck_served user=%s cards=%s provider_requests=0", user.id, len(result["recommendations"]))
     except ValueError as exc:
+        db.session.rollback()
         return jsonify({"error": str(exc)}), 400
     except Exception as exc:
+        db.session.rollback()
         logger.exception("Recommendation request failed")
         return jsonify({"error": "Recommendation request failed", "detail": str(exc)}), 500
 
@@ -856,50 +847,21 @@ def get_place_ratings(place_id):
     })
 
 @app.route('/geocode', methods=['GET'])
-def geocode():    
-    address = request.args.get('address')
-    latitude = request.args.get('latitude')
-    longitude = request.args.get('longitude')
-
-    logger.info("Received geocode request address=%s latitude=%s longitude=%s", address, latitude, longitude)
-
-    if address:
-        try:
-            coordinates = GoogleServicesAPI.fetch_city_coordinates(address)
-            if not coordinates:
-                return jsonify({"error": "Unable to resolve address to coordinates"}), 404
-            return jsonify(coordinates)
-        except Exception as e:
-            return jsonify({"error": f"Error resolving address: {str(e)}"}), 500
-    elif latitude and longitude:
-        try:
-            location = GoogleServicesAPI.reverse_geocode(latitude, longitude)
-            if not location:
-                location = GoogleServicesAPI.coordinate_fallback(latitude, longitude)
-            return jsonify(location)
-        except Exception as e:
-                logger.exception("Error resolving coordinates")
-                return jsonify({"error": f"Error resolving coordinates: {str(e)}"}), 500
-    else:
-        return jsonify({"error": "Either address or coordinates must be provided"}), 400
+@require_auth
+def geocode():
+    try:
+        if request.args.get('address'):
+            result = launch_service.resolve(db, request.args['address'])
+        else:
+            result = launch_service.coordinates(request.args.get('latitude'), request.args.get('longitude'))
+        return jsonify(result)
+    except (ValueError, TypeError) as exc:
+        return jsonify({'error': str(exc)}), 400
 
 @app.route('/api/places/autocomplete', methods=['GET'])
+@require_auth
 def places_autocomplete():
-    input_text = request.args.get('input', '').strip()
-    latitude = request.args.get('latitude')
-    longitude = request.args.get('longitude')
-    radius_meters = int(request.args.get('radius_meters', 3200))
-
-    if len(input_text) < 3:
-        return jsonify({"predictions": []})
-
-    predictions = GoogleServicesAPI.fetch_autocomplete(
-        input_text,
-        latitude,
-        longitude,
-        radius_meters,
-    )
-    return jsonify({"predictions": predictions})
+    return jsonify({'predictions': launch_service.suggestions(db, request.args.get('input', ''))})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", "8080")))

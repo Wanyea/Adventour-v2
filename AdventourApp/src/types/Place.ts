@@ -1,5 +1,10 @@
 export type Place = {
+  own_review?: string;
   place_id: string;
+  decision_id?: string;
+  score_components?: { confidence: number; socials: number; density: number; chain_multiplier: number };
+  approximate_location?: boolean;
+  needs_booking?: boolean;
   provider?: string;
   provider_place_id?: string;
   name: string;

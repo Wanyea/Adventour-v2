@@ -117,7 +117,7 @@ export const TAG_GROUPS: TagGroup[] = [
     id: 'local_gems',
     label: 'Local Gems',
     emoji: '💎',
-    description: 'Places Adventour thinks may feel less generic, more local, or more discovery-worthy.',
+    description: 'Locally endorsed destinations. Popular places can be local gems too.',
     color: '#92400e',
     backgroundColor: '#fef3c7',
     types: [],
@@ -131,21 +131,9 @@ export const tagGroupsForPlace = (place: Pick<Place, 'name' | 'types' | 'user_ra
   const normalizedName = (place.name || '').toLowerCase();
   const groups = TAG_GROUPS.filter((group) => {
     const typeMatch = group.types.some((type) => types.has(normalize(type)));
-    const nameMatch = (group.nameHints || []).some((hint) => normalizedName.includes(hint));
+    const nameMatch = (group.nameHints || []).some((hint) => new RegExp(`\\b${hint}\\b`, 'i').test(normalizedName));
     return typeMatch || nameMatch;
   });
-
-  const isHiddenGemCandidate = (place.user_ratings_total ?? 0) > 0 && (place.user_ratings_total ?? 0) <= 250;
-  if (isHiddenGemCandidate && !groups.some((group) => group.id === 'local_gems')) {
-    const localGemGroup = TAG_GROUPS.find((group) => group.id === 'local_gems');
-    if (localGemGroup) {
-      groups.push(localGemGroup);
-    }
-  }
-
-  if (!groups.length) {
-    return TAG_GROUPS.filter((group) => group.id === 'local_gems');
-  }
 
   return groups;
 };
