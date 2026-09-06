@@ -1,6 +1,7 @@
 # Scope E (proposed) — Local Events & Third Spaces
 
-**Status:** researched 2026-08-18, not scoped. Requires approval before any implementation.
+**Status:** researched 2026-08-18. **Approved and in scope** as of 2026-08-19 — see
+`HANDOFF.md` §5F. This document is a starting survey, not a verdict.
 
 ## The idea
 
@@ -65,9 +66,14 @@ labelled ZIPs, and exactly the demographic the third-space idea targets.
 
 ## Where it sits
 
-**After Scope B and C, not before.** The ranking problem is unsolved (490 places share one score)
-and there is no evaluation harness. Adding a second content type before either is fixed would mean
-two unranked, unmeasured surfaces instead of one.
+**Sequencing is the next agent's call.** The original advice was to defer this behind ranking and
+evaluation. The evaluation harness now exists, and the owner has since asked for this feature to be
+carried to completion rather than parked — so the argument for deferring is weaker than when it was
+written. Order it wherever the plan justifies.
+
+What has *not* changed is the evidence bar: measure yield before building a pipeline on an
+assumption, and hold out a metro. The survey below establishes that the local long tail sits in no
+API. It does **not** establish that the gap cannot be closed — nobody tried.
 
 The cheap part starts now regardless: the Orlando labelling tool asks where locals actually hear
 about events, which recurring events matter, and which indexed venues host them. That is free

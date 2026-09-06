@@ -28,7 +28,7 @@ one code path and no feature flag.
 | 2 | **Ranking** — scoring, weights, explanations | ⛔ **blocked** — no measurable signal yet | Scope B |
 | 3 | **Evaluation** — how we know a recommendation is good | ✅ **done** | `scope-c-evaluation.md` |
 | 4 | **Group blending** — friend-aware recommendations | ⬜ not started | Scope D |
-| 5 | **Local events & third spaces** | 🔍 researched, not scoped | `scope-e-local-events.md` |
+| 5 | **Local events & third spaces** | 🔍 researched; **in scope for the next agent** (HANDOFF §5F) | `scope-e-local-events.md` |
 
 Deferred by explicit decision, not forgotten:
 

@@ -131,17 +131,35 @@ This is the most valuable section. Treat the confidence levels as real.
 - **Overture `confidence` as a junk filter.** HOAs and property managers score *higher* than
   real destinations. It is an existence score, not a quality score.
 
-### Open problems you are inheriting
+### Unsolved — these are invitations, not walls
 
-1. **The score cannot rank.** 490 places share one value. Ties are broken by distance.
-   Breaking them properly needs behavioural data — `place_event` already snapshots the score
-   at decision time so that data is usable when it exists.
-2. **Closure detection.** The plan of record is lazy per-place verification with a persisted
-   suppression list: `$387.70` one-time for both current metros, and Palm Coast fits inside
-   Google's free tier. Cost scales with distinct places, not impressions. See brief §10b/§10c.
-   The owner has approved storing a Google `place_id` + our own `suppressed_at` only.
-3. **Hours.** ~80% of independents have none obtainable. Category-daypart priors cover
-   spontaneous mode; full-trip planning genuinely needs a paid licence. Brief §8.
+**Read this framing carefully.** Everything above under *disproved* is a measured fact about a
+**specific approach that was tried**. None of it proves the underlying problem is unsolvable.
+The previous agent ran out of ideas, not out of possibilities.
+
+You are explicitly encouraged to attack these. Finding a better answer is **in scope and
+wanted** — it is the opposite of scope creep. The only rule is the same one that governs
+everything else: **measure it, hold out a metro, and report the sample size.** Do not assert a
+solution works; show it.
+
+1. **The score cannot rank.** 490 places share one value; ties break by distance. The previous
+   agent concluded this needs behavioural data and stopped. That conclusion may be too
+   pessimistic — it tested five signals, all cheap and structural. Text embeddings over names
+   and categories, review-free quality proxies, cross-referencing FSQ OS Places, or signals
+   from the venue's own website were never tried. `place_event` already snapshots the score at
+   decision time, so behavioural data works when it exists — but it is not the only route.
+2. **Closure detection.** ~9% of the index is dead and no free signal finds it. Plan of record
+   is lazy per-place verification with a persisted suppression list — `$387.70` one-time for
+   both metros, Palm Coast fits in Google's free tier, cost scales with distinct places rather
+   than impressions (brief §10b/§10c). The owner has approved storing a Google `place_id` plus
+   our own `suppressed_at` and nothing else. **A cheaper or free detector would be a real
+   win** and was not seriously attempted: HTTP liveness of the venue's own website, socials
+   activity recency, and user reports are all unexplored.
+3. **Hours.** ~80% of independents have none obtainable *by the methods tried* — static
+   homepage fetch plus one subpage. Headless rendering for the 19% JS-shell sites was costed
+   but never built. Category-daypart priors cover spontaneous mode; full-trip planning is the
+   mode that genuinely needs better hours. Brief §8.
+4. **Local events / third spaces.** See §5F — now in scope, and the most open-ended of these.
 
 ---
 
@@ -192,13 +210,46 @@ The owner's stretch goals are included deliberately so that "done" is a real sta
     advance booking. `needs_booking` is already computed; `external_links` is reserved on
     `adventour_stops`. Linking out is sufficient; do not build a booking engine.
 
-### F. Data tooling the owner keeps
-19. **Field kit** — a single self-contained HTML file the owner emails to anyone; recipient
+### F. Local events & third spaces
+
+The owner's framing, and why this is core rather than a bolt-on: young people in Orlando and
+elsewhere want to build community and have no good way to find or organise the things they
+would actually care about — local art markets, run clubs, open mics, pickup sport. Surfacing
+those serves **locals** looking for third spaces *and* **visitors** wanting something genuinely
+of the place. It is the authenticity thesis in its strongest form, because an event is
+time-bound and attended by people who live there.
+
+19. **Local events surfaced in the app** for the seed metros, from at least one working source,
+    with an explicit freshness guarantee and automatic expiry. A stale event does not merely
+    disappoint — it sends someone to an empty parking lot.
+20. **A decision, made and documented, on where events belong in the product.** A swipe deck
+    answers "where should I go now"; an event answers "what is happening Saturday." Those may
+    be different surfaces. The Orlando field-kit questions ask the owner directly whether they
+    would use Adventour to find an event; **read their answer before designing this.**
+
+Research is in `docs/scope-e-local-events.md`. **It is research, not a verdict.** What is
+known: Ticketmaster's Discovery API is free (5,000 calls/day) but covers arena shows — the
+"chain" equivalent of events. Eventbrite removed public event search in Dec 2019. Meetup is
+paid per group. The genuinely local long tail is in no API at any price.
+
+**That is a gap, not a dead end — and closing it is the interesting part of this feature.** The
+strongest untried lead is that we already hold ~14,000 indexed venues with websites and
+socials, and a crawler that follows internal links looking for structured data. Venues host
+events and publish them on their own sites; `schema.org/Event` is the same shape of problem as
+the hours crawl, which yielded 21% JSON-LD. Municipal open-data portals, library and parks
+calendars, and university feeds are also unexplored — note **32816 is UCF**, inside a
+ZIP the owner labelled, and squarely the demographic this feature is for.
+
+Do not treat the previous agent's provider survey as the ceiling. It surveyed vendors; it did
+not seriously try to build the thing.
+
+### G. Data tooling the owner keeps
+21. **Field kit** — a single self-contained HTML file the owner emails to anyone; recipient
     picks their ZIPs, labels a deck, answers written questions, exports JSON.
     `Server/data_pipeline/make_field_kit.py`. Improve it; keep it emailable and offline.
-20. **Evaluation harness** — `Server/evaluation/`. One command, held-out discipline,
+22. **Evaluation harness** — `Server/evaluation/`. One command, held-out discipline,
     regression detection.
-21. **Ingest pipeline** for adding a new metro. Ordering matters:
+23. **Ingest pipeline** for adding a new metro. Ordering matters:
     `load_postgres` → `apply_junk_filter` → `score_authenticity` → `run_dedup`.
 
 ---
@@ -213,6 +264,8 @@ The project is complete when **all** of these are true. There is no phase after 
 - [ ] `python -m evaluation.harness --strict` exits 0
 - [ ] The owner can add a new metro by running the documented pipeline, unaided
 - [ ] The owner can send the field kit to a stranger and ingest what comes back, unaided
+- [ ] Local events appear in the app for at least one seed metro, from a source whose coverage
+      you have **measured and reported**, with expiry that provably works
 - [ ] `docs/README.md` accurately describes the state of the repo
 - [ ] No paid API call occurs while building a deck (verifiable in the server log)
 
@@ -232,8 +285,9 @@ it, or it is scope creep. Say which.
 5. `docs/recommender-data-design.md` — original architecture. **Partly superseded**: its
    `places` schema and its authenticity signals were both disproved. Its blending and event
    design are still good
-6. `docs/scope-e-local-events.md` — researched, unscoped. Local events / third spaces. **Not
-   in the §5 list**; treat as future work unless the owner says otherwise
+6. `docs/scope-e-local-events.md` — local events / third spaces. **This is now in scope
+   (§5F).** Read it as a starting survey, not a verdict: it establishes that the local long
+   tail is in no API, and stops there. Closing that gap is your problem to solve
 7. `AGENTS.md` — working agreement and the data boundary
 8. `Server/data_pipeline/qa/*.json` — **the 268 human labels. The only ground truth that
    exists.** Read the free-text answers, not just the labels
