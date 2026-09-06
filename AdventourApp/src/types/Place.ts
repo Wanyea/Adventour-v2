@@ -2,6 +2,11 @@ export type Place = {
   own_review?: string;
   place_id: string;
   decision_id?: string;
+  model?: string;
+  structural_score?: number;
+  ranking_components?: { interests: number; feedback: number; distance: number; local_policy: number; repeat: number };
+  matched_interests?: string[];
+  feedback_count?: number;
   score_components?: { confidence: number; socials: number; density: number; chain_multiplier: number };
   approximate_location?: boolean;
   needs_booking?: boolean;

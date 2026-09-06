@@ -58,6 +58,9 @@ type HistoryPlace = {
   decision_id?: string;
   score?: number;
   score_components?: Place['score_components'];
+  model?: string;
+  ranking_components?: Place['ranking_components'];
+  structural_score?: number;
   explanation?: string;
   own_rating?: number;
   own_review?: string;
@@ -331,6 +334,9 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onSignOut, onAccountDelet
       decision_id: item.decision_id,
       relevance: item.score ?? undefined,
       score_components: item.score_components,
+      model: item.model,
+      ranking_components: item.ranking_components,
+      structural_score: item.structural_score,
       explanation: item.explanation,
       provider: item.provider,
       provider_place_id: item.provider_place_id,

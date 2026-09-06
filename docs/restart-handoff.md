@@ -1,0 +1,157 @@
+# Restart handoff — 2026-09-06
+
+The owner requested an immediate pause to restart the PC. Resume Phase 2 from
+this checkpoint; do not restart the takeover or request Phase 2 approval again.
+Read HANDOFF.md completely, then AGENTS.md and this file before implementation.
+
+## Authorization and limits
+
+- Repo `D:\source\Adventour\Adventour-v2`, branch `codex-astra`, cut from claude.
+- Phase 1 approved Sept 5. Phase 2 approved Sept 6: "Lets move onto phase 2. ill
+  do a review of both phases after." This explicitly overrides the Phase 1 review/
+  merge prerequisite for this transition. No merge or push has been done.
+- Five phases/23 features only, ending at HANDOFF §6; no additional features.
+  Phase 3 social/Beacon/groups, Phase 4 full-trip/booking, Phase 5 map/achievements
+  remain closed. Phase 2 includes discovery, three experiments, hours/access and
+  local events. Follow docs/takeover-plan.md and docs/phase2-discovery.md.
+- UI additions only fit explanations and dated events inside Discover. No new
+  top-level screen, palette/layout redesign or UI dependency. <=1,200 lines per
+  authored app source; generated lockfiles and third-party dependencies exempt.
+- Reviewable checkpoints roughly every two hours. Never treat tests or in-sample
+  labels as proof of recommendation quality. No subagents unless explicitly asked.
+- Never store Google Places content; paid APIs never populate decks. Source
+  permissions must be checked before event facts are persisted.
+
+## Implemented in the current Phase 2 slice
+
+- `personal_ranking_service.py`: saved-interest match, smoothed own category
+  feedback, distance, independent/regional preference, and impression penalty.
+  Latest decisive event per entity, not nine votes for nine lifecycle events.
+  Recent rejects hidden 30 days; accepted/arrived/rated hidden 7 days; impression
+  penalty 24 hours. Owned feedback is user-private. Dev activity affects only its
+  own dev user, not other users or evaluation labels.
+- `local_index_service.py` ranks the full eligible pool before limiting. Existing
+  structural eligibility floor remains; structural score is separate from fit.
+  Model `personal_v1`, exact contribution fields and explanations in immutable
+  decisions. `decision_service.attach` preserves supplied model version.
+- App card/detail shows Fit and its contributions; structural breakdown remains
+  explicitly non-personal/non-probabilistic. Profile history reads original
+  ranking and structural fields from its serving snapshot.
+- Four focused checks passed: two personal-ranking checks plus both existing
+  core lifecycle/provider checks against isolated Postgres. `tsc --noEmit` passed.
+  These were before the subsequent event scaffolding was written.
+- Actual emulator screens: `verification/2026-09-06/personal-palm.png` (Rodie's
+  Place, fit .6976) and `personal-breakdown.png` (interest .5, feedback 0,
+  distance .0976, local policy .1, repeat 0). The screen is a synthetic test-user
+  behavior demonstration, not a human quality judgement.
+- `personal-palm.json` is a SEPARATE API call after the visible card generated an
+  impression. Its ordering differs legitimately; do not claim it is the exact
+  screenshot's serving decision. Query recommendation_decision for that if needed.
+- Remaining ranking verification: comparable Orlando screen, declared 8km two-
+  profile before/after report, current full suite/ceiling check and honest harness
+  annotation that its authenticity diagnostic does not evaluate personalized fit.
+
+## Event work is unfinished — exact pause point
+
+New files (not yet exercised as a complete system):
+
+- `Server/data_pipeline/event_sources.json`: UCF source roster, permitted fields,
+  six-hour refresh/24-hour maximum age, gallery admission and owned location rule.
+- `ucf_events.py`: collect fourteen daily documented feeds, transient description
+  inspection, retain factual fields only, conservative gallery-only eligibility,
+  owned name+bounding-box+website host location match, explicit-selection recheck.
+- `local_event_service.py`: two-table schema, atomic source-window replacement,
+  query-time expiry/staleness, geographic query and dedup with source provenance.
+- `refresh_events.py`: one-shot refresh / optional six-hour watch loop.
+- `routes/local_events.py`: draft list/recheck blueprint. **Known unfinished
+  import: it refers to nonexistent `adventour_backend.extensions`; db actually
+  lives in `adventour_backend.models`. Fix this before registering the blueprint.**
+- `index_schema_service.py` now includes event DDL. No backend restart/test has
+  run since that edit; event tables/real event persistence are not claimed done.
+- Blueprint is NOT imported or registered by app.py. There is NO event UI yet.
+  No refresh worker or scheduled task is installed/running. Do not claim events
+  are operational or that automatic expiry has been demonstrated.
+- Next: finish imports/wiring, inspect single-event feed shape, focused isolated
+  tests for end/stale/cancel/failed refresh and source replacement. Run first
+  permitted refresh, then small dated Discover component. Preserve existing deck
+  navigation. Show real events and expiry on emulator. Check latest source facts
+  again after reboot; dates and verification are time-sensitive.
+
+## Measured sourcing evidence and pending experiments
+
+- UCF help explicitly documents JSON/RSS/XML/ICS feeds for custom applications:
+  https://events.ucf.edu/help/ . Daily path `/2026/9/7/feed.json` returned HTTP200
+  and a list. Single event path is documented but not yet checked by this adapter.
+- Fixed sample Sept 6–19: **98 occurrences, 98 unique IDs**. Categories include
+  20 workshops, 16 tour/info sessions, 12 recreation, 8 socials, 8 lectures,
+  7 health, **7 art exhibits**, 6 sports, 6 careers, and other smaller categories.
+  This count was printed in research, not yet saved as a reproducible report.
+- Public campus visibility does not establish public access. Gallery is an
+  initial explicitly verified subset, not all 98 events or city-wide coverage.
+- Current gallery series: Connective Tissue by Hanna Washburn; opening reception
+  Sept10 5–7pm, exhibition Sept11/14/15/16/17/18 10am–5pm, America/New_York.
+  Example https://events.ucf.edu/event/4151936/opening-reception-and-artist-talk-connective-tissue-by-hanna-washburn/
+- https://cah.ucf.edu/events/ticketing/ explicitly confirms free public gallery
+  admission/receptions. Adapter rechecks that policy; no description/image/contact
+  retention. Feed's Google Maps location URL is deliberately not used for coords.
+- Owned Overture gallery ID `09f69bf0-1c91-4414-99bc-ce44c0144682`, lat28.6027336121,
+  lon-81.2037887573, website `http://gallery.cah.ucf.edu/`. A different school-of-
+  visual-arts record was downtown; do not match it by loose name alone.
+- Palm Coast https://www.palmcoast.gov/events and Orlando https://ocls.org/calendar/
+  both show current community activities. No permitted storage route measured
+  or implemented for them yet. Their guessed policy URLs were unusable; inspect
+  actual site links rather than guessing more URLs. UCF gallery site web open
+  was blocked; do not bypass tool URL security policy via another route.
+- FSQ OS: official access now requires Places Portal account/token; old public
+  S3 dataset deprecated. https://docs.foursquare.com/data-products/docs/access-fsq-os-places
+  Hugging Face official dataset is also gated (contact sharing and organization
+  marketing terms): https://huggingface.co/datasets/foursquare/fsq-os-places .
+  No credentials/terms accepted, no extract acquired, no match-rate claim.
+  An async question asks whether owner already has access; no answer yet. Continue
+  independent work while awaiting. Do not substitute paid API or bypass access.
+- Text and website experiments were PREDECLARED in phase2-discovery.md, not run.
+  Reuse extraction_spike parsing but fix crawl failure semantics before new crawl;
+  do not infer closure from failed HTTP. Try up to six permitted JS-shell renders.
+- Jackie's NYC leads retained in plan: @nycforfree, @thekatieromero, @coolstuffnyc,
+  @clubraisin, @fieldnotesnyc on Substack; cafes/coffee/desserts/parks taste context.
+  NYC is not a new implementation metro. Public RSS alone does not grant commercial
+  collection rights. Social/Partiful/newsletter sources still need bounded access
+  and incremental-coverage assessment; not written off as impossible.
+
+## Restart environment
+
+1. Confirm PostgreSQL17 service, localhost5432, DB `adventour`; no PostGIS.
+2. Backend from `Server`: `$env:ENV_FILE='.env.local'`, then
+   `.venv\Scripts\python.exe app.py` (8080). Never print credentials from env files.
+3. From `AdventourApp`, `npm run android:local:pixel7`; existing installed dev build
+   uses `.env.android.local`. Metro8081; Android backend10.0.2.2:8080. SDK:
+   `C:\Users\wanye\AppData\Local\Android\Sdk`, device emulator-5554, Pixel_7_API_30.
+4. Emulator identity `phase1screen@adventour.local`, dev token syntax
+   `Bearer dev:phase1screen@adventour.local`, user3. Onboarded coffee_sweets/outdoors,
+   DOB1995-01-01. Owner user1 remains preserved. All emulator activity test-marked.
+5. GPS Palm Coast: `adb emu geo fix -81.2079 29.5844`. App was in the fit-details
+   modal; stored app/profile/index state survives a normal reboot.
+6. Isolated test database `adventour_ingest_check_20260905`, `.env.ingest-check`,
+   StAugustine sample. Run core/personal tests with ENV_FILE set to that file;
+   never point default app at it. Full index test also needs ADVENTOUR_TEST_PG_DSN
+   derived securely from its DATABASE_URL. Avoid printing passwords.
+7. Before reboot backend exec session57095, verified Python parentPID30724/child29336;
+   these IDs/sessions are invalid after reboot. No running ingestion or event
+   refresh was in flight at pause. Metro/emulator were running. Normal reboot is
+   sufficient; do not kill unrelated Python/Node processes.
+
+Use `git -c safe.directory=D:/source/Adventour/Adventour-v2 ...` on this machine.
+PowerShell login=false avoids noisy profiles. UTF-8 text through PowerShell→Python
+stdin previously lost Unicode replacement matches: verify document edits actually
+applied. Prefer apply_patch. For screenshots use adb shell screencap then adb pull
+(binary safe), then view_image; displayed image coords scale from1080x2400.
+
+## Phase 1 acceptance carried forward
+
+See verification/2026-09-05/phase1-core.md and core-contract.md. Core/tooling are
+implemented; 13 focused backend checks and TS passed before Phase 2. Historical
+labels unchanged. Both metros are development, no fresh heldout: harness strict
+correctly fails. Accepted v2 baseline also absent. Live Firebase/Google, offline
+HTML rendered review, unaided owner kit/metro workflows remain unverified. Do not
+claim joint review or HANDOFF §6 complete. Phase 1 latest commit19e154dc; Phase 2
+protocol commitd4f9ef27. This restart checkpoint saves partial work, not acceptance.

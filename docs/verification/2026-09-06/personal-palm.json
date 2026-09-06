@@ -1,0 +1,391 @@
+{
+  "provider_errors": [],
+  "recommendations": [
+    {
+      "approximate_location": false,
+      "availability": "unknown",
+      "category": "food",
+      "decision_id": "491f76d0-a5bd-41d1-85dd-12c27bba3c49",
+      "display": {
+        "name": "Green Lion Cafe",
+        "types": [
+          "restaurant"
+        ],
+        "vicinity": "1663 m away"
+      },
+      "distance_meters": 1663,
+      "explanation": "Matches your coffee sweets interests. Your past choices in these categories affect this order. Distance and local-first policy also affect the order. Hours and public access are unverified.",
+      "feedback_count": 2,
+      "latitude": 29.570478439331055,
+      "longitude": -81.20162200927734,
+      "matched_interests": [
+        "coffee_sweets"
+      ],
+      "metro": "palm_coast",
+      "model": "personal_v1",
+      "name": "Green Lion Cafe",
+      "needs_booking": false,
+      "place_id": "b3e4a193-ded4-46d1-8906-24da789ed832",
+      "provider": "adventour_index",
+      "provider_place_id": "b3e4a193-ded4-46d1-8906-24da789ed832",
+      "ranking_components": {
+        "distance": 0.096063,
+        "feedback": -0.01,
+        "interests": 0.5,
+        "local_policy": 0.1,
+        "repeat": 0.0
+      },
+      "score": 0.686063,
+      "score_components": {
+        "chain_multiplier": 1.0,
+        "confidence": 0.642525,
+        "density": 0.03733048224778867,
+        "socials": 0.0
+      },
+      "structural_score": 0.6799,
+      "tag_groups": [
+        "food_drink",
+        "coffee_sweets"
+      ]
+    },
+    {
+      "approximate_location": false,
+      "availability": "unknown",
+      "category": "food",
+      "decision_id": "395fb79b-ec65-4c73-b584-493dd666131f",
+      "display": {
+        "name": "La Piazza Cafe",
+        "types": [
+          "restaurant"
+        ],
+        "vicinity": "1676 m away"
+      },
+      "distance_meters": 1676,
+      "explanation": "Matches your coffee sweets interests. Your past choices in these categories affect this order. Distance and local-first policy also affect the order. Hours and public access are unverified.",
+      "feedback_count": 2,
+      "latitude": 29.575519561767578,
+      "longitude": -81.19389343261719,
+      "matched_interests": [
+        "coffee_sweets"
+      ],
+      "metro": "palm_coast",
+      "model": "personal_v1",
+      "name": "La Piazza Cafe",
+      "needs_booking": false,
+      "place_id": "ad3f43de-94ee-4c58-9595-a8c673a94eb6",
+      "provider": "adventour_index",
+      "provider_place_id": "ad3f43de-94ee-4c58-9595-a8c673a94eb6",
+      "ranking_components": {
+        "distance": 0.09525,
+        "feedback": -0.01,
+        "interests": 0.5,
+        "local_policy": 0.1,
+        "repeat": 0.0
+      },
+      "score": 0.68525,
+      "score_components": {
+        "chain_multiplier": 1.0,
+        "confidence": 0.6205519735813141,
+        "density": 0.16396732757769542,
+        "socials": 0.15
+      },
+      "structural_score": 0.9345,
+      "tag_groups": [
+        "food_drink",
+        "coffee_sweets"
+      ]
+    },
+    {
+      "approximate_location": false,
+      "availability": "unknown",
+      "category": "food",
+      "decision_id": "8c30b364-f2fe-418a-8edc-9666c3e85ea2",
+      "display": {
+        "name": "Hammock Organics Cafe and Boutique",
+        "types": [
+          "cafe"
+        ],
+        "vicinity": "2121 m away"
+      },
+      "distance_meters": 2121,
+      "explanation": "Matches your coffee sweets interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified.",
+      "feedback_count": 0,
+      "latitude": 29.601261138916016,
+      "longitude": -81.19764709472656,
+      "matched_interests": [
+        "coffee_sweets"
+      ],
+      "metro": "palm_coast",
+      "model": "personal_v1",
+      "name": "Hammock Organics Cafe and Boutique",
+      "needs_booking": false,
+      "place_id": "1a69acbf-161c-4f3c-bbb5-d62e4e4b4be4",
+      "provider": "adventour_index",
+      "provider_place_id": "1a69acbf-161c-4f3c-bbb5-d62e4e4b4be4",
+      "ranking_components": {
+        "distance": 0.067437,
+        "feedback": 0.0,
+        "interests": 0.5,
+        "local_policy": 0.1,
+        "repeat": 0.0
+      },
+      "score": 0.667437,
+      "score_components": {
+        "chain_multiplier": 1.0,
+        "confidence": 0.5979429423809052,
+        "density": 0.07466096449557734,
+        "socials": 0.15
+      },
+      "structural_score": 0.8226,
+      "tag_groups": [
+        "coffee_sweets",
+        "shopping"
+      ]
+    },
+    {
+      "approximate_location": false,
+      "availability": "unknown",
+      "category": "food",
+      "decision_id": "cbe290cd-6861-4edf-8693-b88ea28c8c0a",
+      "display": {
+        "name": "Dream Wake Journey",
+        "types": [
+          "cafe",
+          "non_alcoholic_beverage_venue"
+        ],
+        "vicinity": "2234 m away"
+      },
+      "distance_meters": 2234,
+      "explanation": "Matches your coffee sweets interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified.",
+      "feedback_count": 0,
+      "latitude": 29.570873260498047,
+      "longitude": -81.1908187866211,
+      "matched_interests": [
+        "coffee_sweets"
+      ],
+      "metro": "palm_coast",
+      "model": "personal_v1",
+      "name": "Dream Wake Journey",
+      "needs_booking": false,
+      "place_id": "52c13991-d625-4de5-9d52-d26d3a8485d0",
+      "provider": "adventour_index",
+      "provider_place_id": "52c13991-d625-4de5-9d52-d26d3a8485d0",
+      "ranking_components": {
+        "distance": 0.060375,
+        "feedback": 0.0,
+        "interests": 0.5,
+        "local_policy": 0.1,
+        "repeat": 0.0
+      },
+      "score": 0.660375,
+      "score_components": {
+        "chain_multiplier": 1.0,
+        "confidence": 0.5979429423809052,
+        "density": 0.16396732757769542,
+        "socials": 0.15
+      },
+      "structural_score": 0.9119,
+      "tag_groups": [
+        "coffee_sweets"
+      ]
+    },
+    {
+      "approximate_location": false,
+      "availability": "unknown",
+      "category": "food",
+      "decision_id": "b90f8e9e-cb3c-4a53-a509-1bf3ae343a90",
+      "display": {
+        "name": "Tram's Cafe",
+        "types": [
+          "restaurant"
+        ],
+        "vicinity": "2261 m away"
+      },
+      "distance_meters": 2261,
+      "explanation": "Matches your coffee sweets interests. Your past choices in these categories affect this order. Distance and local-first policy also affect the order. Hours and public access are unverified.",
+      "feedback_count": 2,
+      "latitude": 29.570770263671875,
+      "longitude": -81.1905517578125,
+      "matched_interests": [
+        "coffee_sweets"
+      ],
+      "metro": "palm_coast",
+      "model": "personal_v1",
+      "name": "Tram's Cafe",
+      "needs_booking": false,
+      "place_id": "6b6bdfcd-e7fa-4978-b693-83e65312ae2a",
+      "provider": "adventour_index",
+      "provider_place_id": "6b6bdfcd-e7fa-4978-b693-83e65312ae2a",
+      "ranking_components": {
+        "distance": 0.058688,
+        "feedback": -0.01,
+        "interests": 0.5,
+        "local_policy": 0.1,
+        "repeat": 0.0
+      },
+      "score": 0.648688,
+      "score_components": {
+        "chain_multiplier": 1.0,
+        "confidence": 0.6211541175842286,
+        "density": 0.059167414496581874,
+        "socials": 0.15
+      },
+      "structural_score": 0.8303,
+      "tag_groups": [
+        "food_drink",
+        "coffee_sweets"
+      ]
+    },
+    {
+      "approximate_location": false,
+      "availability": "unknown",
+      "category": "food",
+      "decision_id": "21794e0a-b47c-4a15-9c79-be56fdb8cbba",
+      "display": {
+        "name": "PC Nutrition",
+        "types": [
+          "cafe",
+          "non_alcoholic_beverage_venue"
+        ],
+        "vicinity": "2866 m away"
+      },
+      "distance_meters": 2866,
+      "explanation": "Matches your coffee sweets interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified.",
+      "feedback_count": 0,
+      "latitude": 29.558635711669922,
+      "longitude": -81.20716857910156,
+      "matched_interests": [
+        "coffee_sweets"
+      ],
+      "metro": "palm_coast",
+      "model": "personal_v1",
+      "name": "PC Nutrition",
+      "needs_booking": false,
+      "place_id": "82135f41-ac49-426b-a588-69b93b727f60",
+      "provider": "adventour_index",
+      "provider_place_id": "82135f41-ac49-426b-a588-69b93b727f60",
+      "ranking_components": {
+        "distance": 0.020875,
+        "feedback": 0.0,
+        "interests": 0.5,
+        "local_policy": 0.1,
+        "repeat": 0.0
+      },
+      "score": 0.620875,
+      "score_components": {
+        "chain_multiplier": 1.0,
+        "confidence": 0.5979429423809052,
+        "density": 0.14932192899115468,
+        "socials": 0.0
+      },
+      "structural_score": 0.7473,
+      "tag_groups": [
+        "coffee_sweets"
+      ]
+    },
+    {
+      "approximate_location": false,
+      "availability": "unknown",
+      "category": "food",
+      "decision_id": "d14f7530-6f5c-4662-a206-5c0dfbc330c3",
+      "display": {
+        "name": "Rodie's Place",
+        "types": [
+          "cafe"
+        ],
+        "vicinity": "1639 m away"
+      },
+      "distance_meters": 1639,
+      "explanation": "Matches your coffee sweets interests. No past category feedback yet. Distance and local-first policy also affect the order. Hours and public access are unverified.",
+      "feedback_count": 0,
+      "latitude": 29.590993881225586,
+      "longitude": -81.19274139404297,
+      "matched_interests": [
+        "coffee_sweets"
+      ],
+      "metro": "palm_coast",
+      "model": "personal_v1",
+      "name": "Rodie's Place",
+      "needs_booking": false,
+      "place_id": "26e04b2d-6143-4ba2-b39b-e9450753ace9",
+      "provider": "adventour_index",
+      "provider_place_id": "26e04b2d-6143-4ba2-b39b-e9450753ace9",
+      "ranking_components": {
+        "distance": 0.097562,
+        "feedback": 0.0,
+        "interests": 0.5,
+        "local_policy": 0.1,
+        "repeat": -0.1
+      },
+      "score": 0.597562,
+      "score_components": {
+        "chain_multiplier": 1.0,
+        "confidence": 0.6436425417661668,
+        "density": 0.059167414496581874,
+        "socials": 0.15
+      },
+      "structural_score": 0.8528,
+      "tag_groups": [
+        "coffee_sweets"
+      ]
+    },
+    {
+      "approximate_location": false,
+      "availability": "unknown",
+      "category": "food",
+      "decision_id": "8c1e0dab-b9a3-4938-b969-ad9249202285",
+      "display": {
+        "name": "Turtle Shack Cafe",
+        "types": [
+          "restaurant"
+        ],
+        "vicinity": "2212 m away"
+      },
+      "distance_meters": 2212,
+      "explanation": "Matches your coffee sweets interests. Your past choices in these categories affect this order. Distance and local-first policy also affect the order. Hours and public access are unverified.",
+      "feedback_count": 2,
+      "latitude": 29.571128845214844,
+      "longitude": -81.19086456298828,
+      "matched_interests": [
+        "coffee_sweets"
+      ],
+      "metro": "palm_coast",
+      "model": "personal_v1",
+      "name": "Turtle Shack Cafe",
+      "needs_booking": false,
+      "place_id": "1fe0e1e6-c18c-49b0-9378-5c9adf5a6e10",
+      "provider": "adventour_index",
+      "provider_place_id": "1fe0e1e6-c18c-49b0-9378-5c9adf5a6e10",
+      "ranking_components": {
+        "distance": 0.06175,
+        "feedback": -0.01,
+        "interests": 0.5,
+        "local_policy": 0.1,
+        "repeat": -0.1
+      },
+      "score": 0.55175,
+      "score_components": {
+        "chain_multiplier": 1.0,
+        "confidence": 0.6319405227899552,
+        "density": 0.16396732757769542,
+        "socials": 0.15
+      },
+      "structural_score": 0.9459,
+      "tag_groups": [
+        "food_drink",
+        "coffee_sweets"
+      ]
+    }
+  ],
+  "tag_group_counts": {
+    "arts_culture": 2,
+    "coffee_sweets": 8,
+    "entertainment": 1,
+    "food_drink": 55,
+    "local_gems": 0,
+    "nightlife": 13,
+    "outdoors": 11,
+    "shopping": 1,
+    "wellness": 0
+  }
+}

@@ -1,5 +1,8 @@
 # Adventour v2 — current state
 
+**Paused for PC restart (2026-09-06).** Continue from
+[restart-handoff.md](restart-handoff.md); Phase 2 event work is unfinished.
+
 Updated 2026-09-06. Read [HANDOFF.md](../HANDOFF.md) for the closed 23-feature
 product and stopping point, then [AGENTS.md](../AGENTS.md) for the working agreement.
 

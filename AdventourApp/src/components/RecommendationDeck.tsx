@@ -150,7 +150,7 @@ const CompactPlaceContent = ({
       <TravelTimes place={place} muted={muted} />
       <View style={styles.scoreRow}>
         {place.relevance !== undefined ? (
-          <Text style={styles.score}>Index {place.relevance.toFixed(3)}</Text>
+          <Text style={styles.score}>{place.ranking_components ? 'Fit' : 'Index'} {place.relevance.toFixed(3)}</Text>
         ) : <View />}
         <View style={styles.ratingRow}>
           <StarRating rating={place.rating} size={15} />

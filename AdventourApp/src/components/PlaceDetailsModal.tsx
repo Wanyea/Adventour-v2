@@ -103,7 +103,7 @@ const PlaceDetailsModal: React.FC<Props> = ({ place, visible, onClose, onClosedR
               {place.category ? <Text style={styles.pill}>{place.category}</Text> : null}
               {place.price_level ? <Text style={styles.pill}>{'$'.repeat(place.price_level)}</Text> : null}
               {place.relevance !== undefined ? (
-                <Text style={styles.pill}>Index {place.relevance.toFixed(4)}</Text>
+                <Text style={styles.pill}>{place.ranking_components ? 'Fit' : 'Index'} {place.relevance.toFixed(4)}</Text>
               ) : null}
             </View>
 
@@ -116,6 +116,18 @@ const PlaceDetailsModal: React.FC<Props> = ({ place, visible, onClose, onClosedR
 
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Score breakdown</Text>
+              {place.ranking_components ? (
+                <Text style={styles.bodyText}>
+                  Saved interests: {place.ranking_components.interests.toFixed(4)}{'\n'}
+                  Your feedback: {place.ranking_components.feedback.toFixed(4)}{'\n'}
+                  Distance: {place.ranking_components.distance.toFixed(4)}{'\n'}
+                  Local-first policy: {place.ranking_components.local_policy.toFixed(4)}{'\n'}
+                  Recent impression: {place.ranking_components.repeat.toFixed(4)}{'\n'}
+                  Fit is a ranking score, not a probability.{'\n\n'}
+                  Structural index score: {place.structural_score?.toFixed(4)}{'\n'}
+                  The structural inputs below do not measure personal taste or prove authenticity.
+                </Text>
+              ) : null}
               {place.score_components ? (
                 <Text style={styles.bodyText}>
                   Source confidence: {place.score_components.confidence.toFixed(4)}{'\n'}

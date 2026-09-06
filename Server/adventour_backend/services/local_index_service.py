@@ -4,9 +4,9 @@ This replaces provider-driven candidate retrieval. No paid API call is made to
 build a deck -- the whole point of the sourcing decision in
 docs/sourcing-cost-decision-brief.md.
 
-The approved Phase 1 keeps the structural baseline: filter by its score floor,
-order by score descending, then distance ascending. This is not evidence of
-authenticity or personal fit. Tag filtering applies before the batch limit.
+Phase 2 keeps the structural eligibility floor and ranks the full pool by
+transparent personal fit. Tag and recent-decision exclusions precede the limit.
+Structural inputs remain separate; neither score proves authenticity.
 """
 
 import math
@@ -14,7 +14,7 @@ import math
 import h3
 from sqlalchemy import text
 from data_pipeline.authenticity import authenticity_score
-from . import tag_group_service
+from . import tag_group_service, personal_ranking_service
 
 # Keep the production floor explicit for evaluation's default serving population.
 AUTHENTICITY_FLOOR = 0.30
@@ -176,16 +176,17 @@ def recommend(db, location, radius_meters=3200, constraints=None, user_id=0):
         },
     ).mappings().all()
 
+    history = personal_ranking_service.context(db, user_id)
     recommendations = []
     counts = {key: 0 for key in tag_group_service.GROUPS}
     for r in rows:
-        if r["entity_id"] in excluded:
+        if r["entity_id"] in excluded or r["entity_id"] in history['hidden']:
             continue
         types = _types_for(r["basic_category"], r["taxonomy_bucket"])
         groups = tag_group_service.for_place(r["name"], types)
         for group in groups:
             counts[group] += 1
-        if (selected_tag != "all" and selected_tag not in groups) or len(recommendations) >= limit:
+        if selected_tag != "all" and selected_tag not in groups:
             continue
         distance = int(round(r["distance_meters"]))
         # Location is unreliable when a merged cluster's members disagreed; the
@@ -197,7 +198,7 @@ def recommend(db, location, radius_meters=3200, constraints=None, user_id=0):
                 r["confidence"], bool(r["socials"]), r["cell_density"], r["chain_class"])
             if abs(reconstructed - float(r["authenticity"])) < .00001:
                 components = candidate_components
-        recommendations.append(
+        recommendations.append(personal_ranking_service.score(
             {
                 "place_id": r["entity_id"],
                 "provider": "adventour_index",
@@ -205,6 +206,7 @@ def recommend(db, location, radius_meters=3200, constraints=None, user_id=0):
                 "name": r["name"],
                 "category": "food" if r["taxonomy_bucket"] in FOOD_BUCKETS else "activity",
                 "score": float(r["authenticity"] or 0),
+                "structural_score": float(r["authenticity"] or 0),
                 "score_components": components,
                 "explanation": "Structural index score from source confidence, social-link presence and nearby indexed places. It is not a probability of liking this place.",
                 "metro": r["metro"],
@@ -220,6 +222,7 @@ def recommend(db, location, radius_meters=3200, constraints=None, user_id=0):
                     + (" · approximate" if approximate else ""),
                     "types": types,
                 },
-            }
-        )
-    return {"recommendations": recommendations, "tag_group_counts": counts, "provider_errors": []}
+            }, history, radius_meters, r['chain_class']
+        ))
+    recommendations.sort(key=lambda p: (-p['score'], p['distance_meters'], p['place_id']))
+    return {"recommendations": recommendations[:limit], "tag_group_counts": counts, "provider_errors": []}

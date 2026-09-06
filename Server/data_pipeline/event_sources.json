@@ -1,0 +1,21 @@
+{
+  "ucf_main": {
+    "name": "UCF Events",
+    "metro": "orlando",
+    "method": "documented_json_feed",
+    "permission_url": "https://events.ucf.edu/help/",
+    "permission_checked": "2026-09-06",
+    "permission_basis": "UCF documents consuming its feeds in custom applications. Retain factual occurrence fields only; no descriptions, images or contacts.",
+    "refresh_hours": 6,
+    "max_age_hours": 24,
+    "retention": "Active-window facts only; expired rows purged on successful refresh.",
+    "access_url": "https://cah.ucf.edu/events/ticketing/",
+    "locations": [{
+      "feed_name": "UCF Art Gallery",
+      "owned_name": "UCF Art Gallery",
+      "website_hosts": ["gallery.cah.ucf.edu", "cah.ucf.edu"],
+      "bbox": [-81.21, 28.60, -81.20, 28.61],
+      "access": "Public admission; free exhibition and reception. Check organizer details before leaving."
+    }]
+  }
+}

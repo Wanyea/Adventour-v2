@@ -9,7 +9,7 @@ from sqlalchemy import text
 def attach(db, user_id, recommendations, test_activity=False):
     for rank, place in enumerate(recommendations, 1):
         decision_id = str(uuid.uuid4())
-        payload = {**place, "rank": rank, "model": "structural_baseline_v1"}
+        payload = {**place, "rank": rank}
         db.session.execute(text("""INSERT INTO recommendation_decision
             (id,user_id,entity_id,record_id,metro,payload,test_activity)
             VALUES(:id,:uid,:entity,:record,:metro,CAST(:payload AS jsonb),:test)"""),
