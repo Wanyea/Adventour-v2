@@ -6,7 +6,9 @@ Latest active slice: NYC Parks is now connected and populated (302 eligible
 occurrences / 1,198 source rows). Seven UCF events remain. The six-hour local
 worker refreshes both adapters; NYC expiry is bounded by daily publication age,
 not just fetch age. 38 tests pass; isolated real-snapshot removal passed. Actual
-emulator NYC list/source-check screens and API report are saved. See the latest
+emulator NYC list/source-check screens and API report are saved. Maps directions
+also reached the supplied NYC point after clearing the stuck permission
+controller; see nyc-event-directions.png. Earlier Maps-blocked notes are historical. See the latest
 sections in local-events.md and phase2-results.md; preview-only statements below
 are historical. No app layout/source changes in this slice.
 Current backend session88728 and worker session89057 replace the sessions/PIDs

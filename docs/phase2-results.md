@@ -13,7 +13,10 @@ The six-hour worker runs both adapters. NYC freshness is capped by the city's
 daily publication timestamp; successful refetches cannot rejuvenate old data.
 Cancelled/restricted/ambiguous events are excluded, with exact counts and the
 factual reuse basis in [local-events.md](local-events.md). 38 backend tests pass.
-Screens: `nyc-events-screen.png`, `nyc-event-recheck.png`. Existing app layout and
+Screens: `nyc-events-screen.png`, `nyc-event-recheck.png`, and
+`nyc-event-directions.png`. The Maps permission-controller hang was resolved on
+the test emulator; directions now reach the supplied NYC point from its Palm
+Coast GPS origin. Earlier blocked directions notes below are historical. Existing app layout and
 source files are unchanged. Earlier NYC-empty screenshots below are historical.
 
 ## Owner-reported launch correction

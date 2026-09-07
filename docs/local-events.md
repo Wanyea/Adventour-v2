@@ -72,8 +72,11 @@ Tests cover cancellation, registration closure, location validity, stale/truncat
 source failure and publication age. A pre-existing test used a UTC date for a
 New York calendar window; that fixture now uses the calendar timezone.
 No app source, screen structure, styles or dependencies changed in this slice.
-The external Maps handoff still encountered the emulator permission-controller
-dialog; directions are not counted as visually verified by this checkpoint.
+The Maps handoff initially encountered a stuck permission-controller dialog.
+Stopping that controller and granting location on this test emulator unblocked it.
+The app then opened directions to the supplied Bryant Park coordinates in NYC
+(`nyc-event-directions.png`). The origin remains the emulator GPS in Palm Coast;
+this verifies the NYC destination handoff, not a surveyed entrance or route quality.
 
 ## Source and storage boundary
 
