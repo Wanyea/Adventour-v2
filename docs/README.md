@@ -6,7 +6,9 @@ has run: six sources, 24 parsed pages, 11 candidates, none promoted to productio
 anywhere with acquisition/backend on the owner's PC, without seeded-city limits.
 Automatic coverage acquisition and iOS distribution are not yet implemented.
 The [pilot measurement contract](pilot-measurement-contract.md) defines the data,
-optional questions and verification required before friends testing; design only.
+optional questions and verification required before friends testing. Its
+[first implementation slice](pilot-runbook.md) adds pilot-only feedback and study
+records, verified on Android; the friends release is not ready yet.
 
 **Resumed after PC restart (2026-09-06).** Current checkpoint:
 [phase2-results.md](phase2-results.md), with [local-events.md](local-events.md)

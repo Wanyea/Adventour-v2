@@ -62,7 +62,9 @@ specification for implementation. The owner approved the small Discover feedback
 controls exclusively for the pilot build. Standard builds retain core logging and
 reviews but show no study controls and collect no extra study telemetry. This
 requires explicit build configuration and server enrollment, with one shared
-recommendation engine. The controls and build separation are not yet implemented.
+recommendation engine. The first control/build/logging slice is implemented and
+has Android emulator evidence; see [pilot runbook](pilot-runbook.md). Full study
+readiness, worldwide acquisition and iOS distribution are still open.
 
 Existing place decisions preserve rank, model, score components and user identity;
 interaction events can reference the immutable decision. Existing trip-stop

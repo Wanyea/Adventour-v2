@@ -1,0 +1,7 @@
+{
+  "pilot_request": 2,
+  "pilot_decision": 20,
+  "pilot_signal": 1,
+  "pilot_invitation": 1,
+  "pilot_feedback": 1
+}

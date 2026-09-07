@@ -3,6 +3,7 @@ node_modules/
 
 # Build outputs
 android/app/build/
+/AdventourApp/android/.kotlin/
 ios/build/
 *.xcworkspace
 *.xcodeproj/project.xcworkspace/
@@ -63,4 +64,5 @@ Server/**/__pycache__/
 /emulator-verification.stderr.log
 /event-refresh.stdout.log
 /event-refresh.stderr.log
+/pilot-build.stdout.log
 /adventour-verification.png

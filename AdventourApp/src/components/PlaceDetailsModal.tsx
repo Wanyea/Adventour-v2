@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Place } from '../types/Place';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import PilotFeedback from '../pilot/PilotFeedback';
 
 type Props = {
   place: Place | null;
@@ -98,6 +99,7 @@ const PlaceDetailsModal: React.FC<Props> = ({ place, visible, onClose, onClosedR
             </View>
             <TravelTimes place={place} />
             {place.own_review ? <Text style={styles.bodyText}>Your review: {place.own_review}</Text> : null}
+            <PilotFeedback decisionId={place.pilot_decision_id} title={place.name} />
 
             <View style={styles.metaRow}>
               {place.category ? <Text style={styles.pill}>{place.category}</Text> : null}

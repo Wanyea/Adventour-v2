@@ -1,0 +1,38 @@
+{
+  "largest_authored": [
+    [
+      1021,
+      "AdventourApp/Screens/ProfileScreen.tsx"
+    ],
+    [
+      819,
+      "AdventourApp/HomeScreen.tsx"
+    ],
+    [
+      715,
+      "AdventourApp/Screens/SocialScreen.tsx"
+    ],
+    [
+      641,
+      "AdventourApp/src/components/RecommendationDeck.tsx"
+    ],
+    [
+      531,
+      "AdventourApp/src/components/AdventourJourneyPanel.tsx"
+    ],
+    [
+      432,
+      "AdventourApp/Screens/FirebaseAuthScreen.tsx"
+    ],
+    [
+      383,
+      "AdventourApp/src/components/AdventourLaunchHero.tsx"
+    ],
+    [
+      380,
+      "AdventourApp/Screens/ProfileSetupScreen.tsx"
+    ]
+  ],
+  "over_1200": [],
+  "excluded": "Generated files/lockfiles and third-party vendor/node_modules dependencies, per owner exception."
+}

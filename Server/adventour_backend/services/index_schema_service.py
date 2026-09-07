@@ -6,6 +6,7 @@ from psycopg2.extras import execute_values
 from data_pipeline.create_events_table import DDL
 from data_pipeline.postgres_index import SCHEMA
 from .local_event_service import DDL as EVENT_DDL
+from .pilot_schema import DDL as PILOT_DDL
 
 
 def ensure(engine):
@@ -17,6 +18,7 @@ def ensure(engine):
             cur.execute(SCHEMA)
             cur.execute(DDL)
             cur.execute(EVENT_DDL)
+            cur.execute(PILOT_DDL)
             cur.execute("""SELECT id,COALESCE(canonical_lat,lat),COALESCE(canonical_lon,lon)
                 FROM places WHERE canonical_h3_r8 IS NULL""")
             updates = [(pid, h3.latlng_to_cell(lat, lon, 8)) for pid, lat, lon in cur.fetchall()]

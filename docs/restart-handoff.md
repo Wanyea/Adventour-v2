@@ -2,6 +2,36 @@
 
 ## Current checkpoint after resuming (supersedes the pause record below)
 
+Latest implementation checkpoint (September 7): owner said “Go ahead” after
+approving pilot-only controls. [Screens, exact joined answer and standard-build
+no-write proof](verification/2026-09-07/pilot/README.md) now exist. Read
+[pilot-runbook.md](pilot-runbook.md) for what is implemented versus the remaining
+measurement contract. Do not return to proposing controls instead of continuing.
+
+Native pilot/standard debug builds succeeded. Place feedback round trip and
+460-candidate scoring replay matched; synthetic event unknown answer survived
+server outage/app force-stop and uploaded once. Standard app showed no controls
+and wrote no study rows, including for the enrolled dev account. 11 backend +
+3 client tests and TypeScript passed. Model is now personal_v2_ambiguous_rejects
+in both variants; raw rejects no longer train negative category preferences.
+All real owner labels/history are preserved; study actions here are synthetic.
+
+Emulator currently uses `.env.pilot.local`: native pilot-local-001, study
+phase2-local-rehearsal, isolated backend on port8082, session40544 (ephemeral).
+Original working backend8080 and Metro8081 were not stopped. The installed dev
+identity is phase1screen in the isolated DB, not the original working user.
+To return to normal dev, rebuild/install with ENVFILE=.env.android.local; changing
+Metro environment alone does not change native values. Both private rehearsal
+env files are ignored. Synthetic event fixtures were cleaned after the test.
+
+Next slice: missing request/source/coverage/outcome accounting and feedback
+recovery/reporting, then GPS-driven new-region acquisition. Apple Developer/Mac
+availability was asked via async question; no answer received at this checkpoint.
+No iOS release, public exposure, invitations, full-study readiness or Phase 2
+acceptance claimed. Preserve the user's existing edit to old review.md.
+
+The following design notes predate this implementation checkpoint:
+
 Latest owner steering: pilot must collect exact, consistent useful data while
 being friendly and encouraging optional responses. Read
 [pilot-measurement-contract.md](pilot-measurement-contract.md) before implementing

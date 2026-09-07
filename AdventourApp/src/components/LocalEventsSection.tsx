@@ -4,13 +4,24 @@ import { useIsFocused } from '@react-navigation/native';
 import axios from 'axios';
 import Config from '../Config';
 import { Coordinates } from '../home/homeUtils';
+import PilotFeedback from '../pilot/PilotFeedback';
+import { pilotConfig, signalPilot } from '../pilot/PilotService';
 
 type LocalEvent = {
+  pilot_decision_id?: string;
   source_id: string; occurrence_id: string; title: string; starts_at: string; ends_at: string;
   timezone: string; venue_name: string; latitude: number; longitude: number;
   source_name?: string; official_url: string; access_note: string;
   verified_at: string; expires_at: string;
 };
+
+function EventCard({ event, children }: { event: LocalEvent; children: React.ReactNode }) {
+  const cardRef = useRef<View>(null);
+  if (!Config.PILOT_BUILD || !event.pilot_decision_id) { return <View style={styles.event}>{children}</View>; }
+  return <View><View ref={cardRef} style={styles.event}>{children}</View>
+    <PilotFeedback decisionId={event.pilot_decision_id} title={event.title} cardRef={cardRef} />
+  </View>;
+}
 
 const when = (event: LocalEvent) => {
   const date = new Date(event.starts_at).toLocaleDateString('en-US', {
@@ -34,17 +45,25 @@ const LocalEventsSection = ({ coordinates }: { coordinates: Coordinates }) => {
   const requestId = useRef(0);
   const mounted = useRef(true);
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
-  const load = useCallback(async () => {
+  const load = useCallback(async (capture = false) => {
     const id = ++requestId.current;
     setBusy(true);
     try {
       const result = await axios.get(`${Config.BACKEND_BASE_URL}/api/local-events`, {
+        ...(capture ? await pilotConfig() : {}),
         params: { ...coordinates, radius_meters: 50000 }, timeout: 15000,
       });
       if (id !== requestId.current) return;
       serverOffset.current = Date.parse(result.data.checked_at) - Date.now();
       setClock(Date.now() + serverOffset.current);
-      setEvents(result.data.events);
+      setEvents(previous => result.data.events.map((item: LocalEvent) => {
+        if (capture) { return item; }
+        const prior = previous.find(p => p.source_id === item.source_id && p.occurrence_id === item.occurrence_id);
+        const fields: (keyof LocalEvent)[] = ['title','starts_at','ends_at','timezone','venue_name',
+          'latitude','longitude','official_url','access_note','verified_at','expires_at'];
+        return prior && fields.every(field => prior[field] === item[field]) ?
+          { ...item, pilot_decision_id: prior.pilot_decision_id } : item;
+      }));
       setError('');
     } catch {
       if (id === requestId.current) {
@@ -59,7 +78,7 @@ const LocalEventsSection = ({ coordinates }: { coordinates: Coordinates }) => {
   useEffect(() => {
     setEvents([]);
     setExpanded(false);
-    if (focused) load();
+    if (focused) load(true);
     const refresh = setInterval(() => {
       if (focused && AppState.currentState === 'active') load();
     }, 60000);
@@ -73,15 +92,21 @@ const LocalEventsSection = ({ coordinates }: { coordinates: Coordinates }) => {
   const open = async (event: LocalEvent) => {
     setChecking(event.occurrence_id);
     try {
-      const result = await axios.post(`${Config.BACKEND_BASE_URL}/api/local-events/${encodeURIComponent(event.source_id)}/${encodeURIComponent(event.occurrence_id)}/verify`, {}, { timeout: 45000 });
+      const config = await pilotConfig();
+      const result = await axios.post(`${Config.BACKEND_BASE_URL}/api/local-events/${encodeURIComponent(event.source_id)}/${encodeURIComponent(event.occurrence_id)}/verify`, {}, {
+        ...config, headers: { ...config.headers, ...(event.pilot_decision_id ? { 'X-Adventour-Decision': event.pilot_decision_id } : {}) }, timeout: 45000 });
       if (!mounted.current) return;
       const fresh: LocalEvent = result.data.event;
+      setEvents(previous => previous.map(item => item.source_id === fresh.source_id && item.occurrence_id === fresh.occurrence_id ? { ...item, ...fresh } : item));
       const follow = (url: string) => {
         if (!mounted.current) return;
         if (Date.now() + serverOffset.current >= Math.min(Date.parse(fresh.ends_at), Date.parse(fresh.expires_at))) {
           Alert.alert('Check this event again', 'The event check has expired.');
           load();
           return;
+        }
+        if (fresh.pilot_decision_id) {
+          signalPilot(fresh.pilot_decision_id, url === fresh.official_url ? 'open_source' : 'navigate').catch(() => {});
         }
         openLink(url);
       };
@@ -105,7 +130,7 @@ const LocalEventsSection = ({ coordinates }: { coordinates: Coordinates }) => {
     <View style={styles.section}>
       <View style={styles.heading}>
         <Text style={styles.title}>Upcoming local events</Text>
-        <TouchableOpacity disabled={busy} onPress={load} accessibilityRole="button">
+        <TouchableOpacity disabled={busy} onPress={() => load(true)} accessibilityRole="button">
           <Text style={styles.link}>{busy ? 'Checking…' : 'Refresh'}</Text>
         </TouchableOpacity>
       </View>
@@ -114,7 +139,7 @@ const LocalEventsSection = ({ coordinates }: { coordinates: Coordinates }) => {
       {error ? <Text style={styles.note}>{error}</Text> : null}
       {!busy && !error && !current.length ? <Text style={styles.empty}>No verified events in this region right now.</Text> : null}
       {(expanded ? current : current.slice(0, 3)).map(event => (
-        <View key={`${event.source_id}/${event.occurrence_id}`} style={styles.event}>
+        <EventCard key={`${event.source_id}/${event.occurrence_id}`} event={event}>
           <Text style={styles.date}>{when(event)}</Text>
           <Text style={styles.eventTitle}>{event.title}</Text>
           <Text style={styles.note}>{event.venue_name}</Text>
@@ -123,7 +148,7 @@ const LocalEventsSection = ({ coordinates }: { coordinates: Coordinates }) => {
           <TouchableOpacity disabled={checking !== null} onPress={() => open(event)} accessibilityRole="button">
             <Text style={styles.link}>{checking === event.occurrence_id ? 'Checking organizer…' : 'Check event & directions'}</Text>
           </TouchableOpacity>
-        </View>
+        </EventCard>
       ))}
       {current.length > 3 ? <TouchableOpacity onPress={() => setExpanded(value => !value)}>
         <Text style={styles.link}>{expanded ? 'Show fewer dates' : `Show all ${current.length} dates`}</Text>

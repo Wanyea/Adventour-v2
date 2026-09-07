@@ -1,0 +1,21 @@
+{
+  "synthetic_enrolled_account": "phase1screen",
+  "compiled_variant": "standard",
+  "same_pilot_build_ids_present_but_disabled": true,
+  "before": {
+    "pilot_request": 2,
+    "pilot_decision": 20,
+    "pilot_signal": 1,
+    "pilot_invitation": 1,
+    "pilot_feedback": 1
+  },
+  "after": {
+    "pilot_request": 2,
+    "pilot_decision": 20,
+    "pilot_signal": 1,
+    "pilot_invitation": 1,
+    "pilot_feedback": 1
+  },
+  "unchanged": true,
+  "note": "Standard emulator GPS launch/deck and background event reads; normal core decisions/impressions still recorded."
+}

@@ -19,10 +19,11 @@ import AdventourLaunchHero from './src/components/AdventourLaunchHero';
 import LocalEventsSection from './src/components/LocalEventsSection';
 import LaunchLocationService, { LaunchSuggestion } from './src/LaunchLocationService';
 import Config from './src/Config';
+import { flushPilot, pilotConfig } from './src/pilot/PilotService';
 import { recordPlaceEvent } from './src/services/PlaceEventService';
 import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
-import { PermissionsAndroid, Platform } from 'react-native';
+import { AppState, PermissionsAndroid, Platform } from 'react-native';
 import { Place } from './src/types/Place';
 import { AdventourSession, AdventourStop } from './src/types/Adventour';
 import { TAG_GROUPS, tagGroupDisplayLabel } from './src/placeTagGroups';
@@ -47,6 +48,14 @@ const greetingForNow = () => {
 };
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
+  useEffect(() => {
+    if (!Config.PILOT_BUILD || !user?.id) { return; }
+    flushPilot().catch(() => {});
+    const subscription = AppState.addEventListener('change', state => {
+      if (state === 'active') { flushPilot().catch(() => {}); }
+    });
+    return () => subscription.remove();
+  }, [user?.id]);
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -396,6 +405,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
       let recommendationResponse;
       const requestRecommendations = async (location: Coordinates) => axios.post(`${Config.BACKEND_BASE_URL}/api/recommendations`, {
         mode: 'spontaneous',
+        location_origin: locationMode,
         location,
         radius_meters: radiusOption.meters,
         constraints: {
@@ -404,7 +414,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
           tag_group: tagGroup,
           exclude_entity_ids: append ? Array.from(recentlyDecidedPlaceIds.current).slice(-500) : [],
         },
-      });
+      }, await pilotConfig());
 
       if (locationMode === 'gps' && currentCoords) {
         step = 'recommendations';
@@ -778,6 +788,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
             <Text style={styles.emptyText}>Loading...</Text>
           ) : hasLoadedRecommendations ? (
             <RecommendationDeck
+              pilotActive={!selectedPlace}
               places={filteredPlaces}
               activeFilterLabel={selectedTagLabel}
               totalPlaces={places.length}

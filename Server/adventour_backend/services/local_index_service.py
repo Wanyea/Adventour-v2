@@ -144,7 +144,7 @@ def _cells_for(latitude, longitude, radius_meters):
     return list(h3.grid_disk(origin, rings))
 
 
-def recommend(db, location, radius_meters=3200, constraints=None, user_id=0):
+def recommend(db, location, radius_meters=3200, constraints=None, user_id=0, trace=None):
     constraints = constraints or {}
     lat = float(location["latitude"])
     lon = float(location["longitude"])
@@ -177,18 +177,33 @@ def recommend(db, location, radius_meters=3200, constraints=None, user_id=0):
     ).mappings().all()
 
     history = personal_ranking_service.context(db, user_id)
+    if trace is not None:
+        from .pilot_service import source_fingerprint
+        trace.update({'rules': source_fingerprint(), 'model': personal_ranking_service.MODEL,
+                      'history': history, 'radius_meters': radius_meters,
+                      'limit': limit, 'tag_group': selected_tag, 'client_excluded': excluded,
+                      'sql_eligible_ids': [r['entity_id'] for r in rows],
+                      'scoring_inputs': [], 'excluded_after_sql': [], 'provider_calls': 0,
+                      'limitation': 'Replay starts at SQL-eligible candidates; pre-SQL source/filter inventory not snapshotted.'})
     recommendations = []
     counts = {key: 0 for key in tag_group_service.GROUPS}
     for r in rows:
         if r["entity_id"] in excluded or r["entity_id"] in history['hidden']:
+            if trace is not None:
+                trace['excluded_after_sql'].append({'id': r['entity_id'], 'reason': 'client_or_history'})
             continue
         types = _types_for(r["basic_category"], r["taxonomy_bucket"])
         groups = tag_group_service.for_place(r["name"], types)
         for group in groups:
             counts[group] += 1
         if selected_tag != "all" and selected_tag not in groups:
+            if trace is not None:
+                trace['excluded_after_sql'].append({'id': r['entity_id'], 'reason': 'tag_filter'})
             continue
         distance = int(round(r["distance_meters"]))
+        if trace is not None:
+            trace['scoring_inputs'].append({'place_id': r['entity_id'], 'tag_groups': groups,
+                                           'distance_meters': distance, 'chain_class': r['chain_class']})
         # Location is unreliable when a merged cluster's members disagreed; the
         # deck can still show it, but navigation should re-resolve at accept time.
         approximate = (r["loc_spread_m"] or 0) > 5000
@@ -225,4 +240,7 @@ def recommend(db, location, radius_meters=3200, constraints=None, user_id=0):
             }, history, radius_meters, r['chain_class']
         ))
     recommendations.sort(key=lambda p: (-p['score'], p['distance_meters'], p['place_id']))
+    if trace is not None:
+        trace['ranked'] = [{'id': p['place_id'], 'score': p['score'],
+                            'components': p['ranking_components']} for p in recommendations]
     return {"recommendations": recommendations[:limit], "tag_group_counts": counts, "provider_errors": []}

@@ -1,6 +1,10 @@
 import NativeConfig from 'react-native-config';
 
 class Config {
+  static PILOT_BUILD = NativeConfig.APP_VARIANT === 'pilot' &&
+    Boolean(NativeConfig.PILOT_ID && NativeConfig.APP_BUILD_ID);
+  static PILOT_ID = NativeConfig.PILOT_ID || '';
+  static APP_BUILD_ID = NativeConfig.APP_BUILD_ID || '';
   static BACKEND_BASE_URL =
     NativeConfig.BACKEND_BASE_URL || 'http://10.0.2.2:8080';
   static GOOGLE_API_KEY = NativeConfig.GOOGLE_API_KEY || '';

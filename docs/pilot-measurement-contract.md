@@ -1,7 +1,9 @@
 # Phase 2 pilot measurement contract — v1, September 7, 2026
 
 Status: owner approved the small feedback controls on September 7, explicitly
-restricted to the pilot version. Not yet implemented telemetry or an iOS release.
+restricted to the pilot version. The first implementation slice now exists;
+see [runbook and remaining gates](pilot-runbook.md). This contract describes the
+full required instrument; an iOS release and complete study readiness remain open.
 Fits existing discovery, interaction logging, ratings and data tooling (features
 4, 7, 16, 19, 21–23). No additional product phase or social feature. This narrow
 pilot-only UI approval satisfies the AGENTS.md freeze for the controls below.

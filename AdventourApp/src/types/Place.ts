@@ -2,6 +2,7 @@ export type Place = {
   own_review?: string;
   place_id: string;
   decision_id?: string;
+  pilot_decision_id?: string;
   model?: string;
   structural_score?: number;
   ranking_components?: { interests: number; feedback: number; distance: number; local_policy: number; repeat: number };

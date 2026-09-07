@@ -42,6 +42,7 @@ export const placeFromRecommendation = (item: any): Place => {
     provider: item.provider,
     provider_place_id: item.provider_place_id,
     decision_id: item.decision_id,
+    pilot_decision_id: item.pilot_decision_id,
     model: item.model,
     structural_score: item.structural_score,
     ranking_components: item.ranking_components,

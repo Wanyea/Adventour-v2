@@ -1,10 +1,11 @@
 """Event list reads our index; explicit selection rechecks the free official source."""
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, g, jsonify, request
 from sqlalchemy import text
 
 from adventour_backend.models import db
 from adventour_backend.services import local_event_service as events
+from adventour_backend.services import pilot_service as pilot
 from adventour_backend.auth import require_auth
 
 blueprint = Blueprint('local_events', __name__)
@@ -14,12 +15,26 @@ blueprint = Blueprint('local_events', __name__)
 @require_auth
 def listing():
     try:
+        capture = pilot.begin(db, g.current_user.id, {
+            'location': {'latitude': float(request.args['latitude']), 'longitude': float(request.args['longitude'])},
+            'radius_meters': float(request.args.get('radius_meters', 50000)),
+            'tag_group': request.args.get('tag_group','all'),
+            'interests': (g.current_user.preferences or '').split(','),
+            'surface': 'local_events', 'date_context': 'next_14_days',
+        })
         result = events.listing(db, float(request.args['latitude']), float(request.args['longitude']),
                                 float(request.args.get('radius_meters', 50000)), request.args.get('tag_group','all'))
+        if capture:
+            capture['trace'].update({'model': 'event_chronological_v1', 'personalized': False,
+                                    'checked_at': result['checked_at'], 'provider_calls': 0,
+                                    'limitation': 'Returned occurrence facts only; full pre-filter event inventory not snapshotted.'})
+            pilot.attach(db, capture, result['events'], 'event')
+            db.session.commit()
         response = jsonify(result)
         response.headers['Cache-Control'] = 'no-store'
         return response
     except (ValueError, KeyError):
+        db.session.rollback()
         return jsonify(error='Valid latitude, longitude and radius are required'), 400
 
 
@@ -42,6 +57,20 @@ def verify(source_id, occurrence_id):
                            {'s':source_id,'o':occurrence_id})
         db.session.commit()
         return jsonify(error='Event ended, changed or is no longer available'), 410
+    capture = None
+    if pilot.enrollment(db, g.current_user.id) and request.headers.get('X-Adventour-Decision'):
+        try:
+            prior = pilot.decision(db, g.current_user.id, request.headers['X-Adventour-Decision'])
+            if prior['item_kind'] != 'event' or prior['item_key'] != source_id + '/' + occurrence_id:
+                raise ValueError('Recheck decision does not match occurrence')
+            capture = pilot.begin(db, g.current_user.id, {
+                **prior['context'], 'surface': 'event_recheck', 'parent_decision_id': prior['id']})
+            capture['trace'] = {'model': 'organizer_recheck_v1', 'personalized': False}
+            pilot.attach(db, capture, [checked], 'event')
+            db.session.commit()
+        except (ValueError, PermissionError) as exc:
+            db.session.rollback()
+            return jsonify(error=str(exc)), 400
     # Return fresh fields without persisting a partial source refresh. The regular
     # source snapshot remains the only writer/owner of its verification window.
     response = jsonify(event={k:v.isoformat() if hasattr(v,'isoformat') else v for k,v in checked.items()})

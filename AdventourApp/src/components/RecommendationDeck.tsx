@@ -16,6 +16,7 @@ import { StarRating } from './PlaceDetailsModal';
 import { tagGroupDisplayLabel, tagGroupMeta } from '../placeTagGroups';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useIsFocused } from '@react-navigation/native';
+import PilotFeedback from '../pilot/PilotFeedback';
 
 type Props = {
   places: Place[];
@@ -27,6 +28,7 @@ type Props = {
   onImpression?: (place: Place) => Promise<void>;
   onOpenPlace: (place: Place) => void;
   onExhausted?: () => void;
+  pilotActive?: boolean;
 };
 
 const loadedPhotoUrls = new Set<string>();
@@ -174,6 +176,7 @@ const RecommendationDeck: React.FC<Props> = ({
   onImpression,
   onOpenPlace,
   onExhausted,
+  pilotActive = true,
 }) => {
   const position = useRef(new Animated.ValueXY()).current;
   const promote = useRef(new Animated.Value(1)).current;
@@ -374,6 +377,8 @@ const RecommendationDeck: React.FC<Props> = ({
           </View>
         )}
       </View>
+      {currentPlace ? <PilotFeedback key={currentPlace.pilot_decision_id || currentPlace.decision_id}
+        decisionId={currentPlace.pilot_decision_id} title={currentPlace.name} cardRef={cardRef} active={pilotActive} /> : null}
     </View>
   );
 };

@@ -22,8 +22,11 @@ It moves trace/export verification ahead of friends recruitment. The owner appro
 the narrow feedback controls exclusively in the pilot version on September 7.
 The standard build must have no study controls or extra study telemetry. One
 shared recommender remains; pilot build configuration and server enrollment gate
-study participation. No questionnaire UI or new telemetry is implemented by the
-design. Current reject-as-taste and event-trace gaps remain.
+study participation. The [first implementation slice](pilot-runbook.md) now adds
+these controls, immutable place/event study records and optional feedback, with
+an exact emulator answer/score replay and a standard-build no-study-write check.
+Unexplained rejects no longer become category dislikes (`personal_v2_ambiguous_rejects`).
+The full instrument and iPhone/distribution/coverage gates remain incomplete.
 
 Owner approved the bounded follow-up event discovery experiment after reviewing
 the Sep20 miss. The [Sep26-27 results](verification/2026-09-06/event-source-experiment/README.md)
