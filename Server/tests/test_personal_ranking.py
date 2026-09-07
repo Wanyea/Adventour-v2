@@ -19,8 +19,8 @@ def test_feedback_is_one_vote_per_entity_and_repeat_windows_expire():
         event('e', 'impression', .5), event('f', 'impression', 1)], now)
     assert history['hidden'] == {'a', 'b'}
     assert history['impressed'] == {'e'}
-    assert history['counts']['coffee_sweets'] == 4
-    assert history['feedback']['coffee_sweets'] == pytest.approx(-.5 / 7)
+    assert history['counts']['coffee_sweets'] == 2
+    assert history['feedback']['coffee_sweets'] == pytest.approx(1.5 / 5)
     place = ranking.score({'place_id': 'e', 'tag_groups': ['coffee_sweets'],
                            'distance_meters': 500}, history, 1000, 'regional')
     assert place['ranking_components']['interests'] == .5

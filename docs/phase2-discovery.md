@@ -7,6 +7,13 @@ this transition only. Phases 3–5 remain closed. No acceptance gaps are waived.
 
 ## Personal baseline
 
+September 7 implementation amendment: `personal_v2_ambiguous_rejects` keeps the
+same scoring components and item-level repeat suppression but excludes ambiguous
+rejects from category taste votes. A pass can mean timing/distance/access rather
+than dislike. Explicit pilot questionnaire answers remain analysis-only. This
+corrects semantics, not a measured quality improvement; both build variants use
+the same model. The original `personal_v1` protocol below is preserved as history.
+
 Use saved tags and only this user's owned feedback. No demographic inference,
 popularity penalty, or new preference controls. Rank the full eligible radius
 pool before limiting. Keep existing candidate exclusions for comparison.

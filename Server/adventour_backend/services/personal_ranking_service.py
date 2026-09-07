@@ -9,7 +9,7 @@ from datetime import datetime, timedelta, timezone
 
 from sqlalchemy import text
 
-MODEL = "personal_v1"
+MODEL = "personal_v2_ambiguous_rejects"
 
 
 def context(db, user_id, now=None):
@@ -48,8 +48,13 @@ def from_history(preferences, rows, now):
                 latest[entity] = row
     votes = defaultdict(list)
     for row in latest.values():
+        # A pass may mean distance, timing or missing facts. Keep its item-level
+        # repeat suppression, but do not manufacture a durable category dislike.
+        # Study reason answers remain analysis-only until a reviewed learning rule.
+        if row['event_type'] == 'reject':
+            continue
         value = ((float(row['event_value']) - 3) / 2 if row['event_type'] == 'rate'
-                 else .5 if row['event_type'] == 'accept' else -1)
+                 else .5)
         for tag in set(row['tag_groups'] or []):
             votes[tag].append(value)
     return {'preferences': set(preferences) - {''}, 'hidden': hidden, 'impressed': impressed,
