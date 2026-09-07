@@ -25,6 +25,7 @@ from sqlalchemy import func, inspect, text
 import os
 import logging
 import json
+import time
 
 env_file = os.getenv("ENV_FILE")
 if env_file:
@@ -69,6 +70,26 @@ if os.getenv("GAE_ENV", "").startswith("standard"):
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SERVICE_VERSION"] = os.getenv("ADVENTOUR_SERVICE_VERSION", "unversioned-development")
 db.init_app(app)
+
+
+@app.after_request
+def log_request(response):
+    """Emit bounded access telemetry without logging request data or credentials."""
+    started = getattr(g, "request_started_at", None)
+    elapsed_ms = (time.perf_counter() - started) * 1000 if started is not None else None
+    logger.info(
+        "request method=%s path=%s status=%s duration_ms=%s",
+        request.method,
+        request.path,
+        response.status_code,
+        f"{elapsed_ms:.1f}" if elapsed_ms is not None else "unknown",
+    )
+    return response
+
+
+@app.before_request
+def mark_request_start():
+    g.request_started_at = time.perf_counter()
 
 # Register blueprints
 app.register_blueprint(social_bp, url_prefix='/api')
