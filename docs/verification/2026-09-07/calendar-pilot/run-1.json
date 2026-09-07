@@ -1,0 +1,520 @@
+{
+  "version": "calendar_pilot_v1",
+  "protocol_sha256": "304b9f600fd3d502865436ce9b48a3ade618da0c04660c9bbd68cd2dd186e49a",
+  "started_at": "2026-09-07T05:15:11.166927+00:00",
+  "sources": [
+    {
+      "id": "nyc_multimodal",
+      "region": "new_york",
+      "seed_url": "https://www.multimodalroasting.com/",
+      "pages": [
+        {
+          "requested_url": "https://www.multimodalroasting.com/",
+          "status": "parsed",
+          "resolved_url": "https://www.multimodalroasting.com/",
+          "event_nodes": 0,
+          "jsonld_parse_errors": 0,
+          "discovered_same_host_links": 1,
+          "visible_date_signal": false,
+          "visible_event_signal": true
+        },
+        {
+          "requested_url": "https://www.multimodalroasting.com/events",
+          "status": "parsed",
+          "resolved_url": "https://www.multimodalroasting.com/events",
+          "event_nodes": 0,
+          "jsonld_parse_errors": 0,
+          "discovered_same_host_links": 70,
+          "visible_date_signal": true,
+          "visible_event_signal": true
+        },
+        {
+          "requested_url": "https://www.multimodalroasting.com/events/cafe-granja-esperanza-tasting",
+          "status": "parsed",
+          "resolved_url": "https://www.multimodalroasting.com/events/cafe-granja-esperanza-tasting",
+          "event_nodes": 1,
+          "jsonld_parse_errors": 0,
+          "discovered_same_host_links": 4,
+          "visible_date_signal": true,
+          "visible_event_signal": true
+        },
+        {
+          "requested_url": "https://www.multimodalroasting.com/events/cafe-granja-esperanza-tasting?format=ical",
+          "status": "not_html",
+          "resolved_url": "https://www.multimodalroasting.com/events/cafe-granja-esperanza-tasting?format=ical"
+        }
+      ],
+      "event_nodes_seen": 1,
+      "duplicate_nodes": 0,
+      "reuse_basis": "Offline diagnostic only; commercial event retention not established.",
+      "candidates": [
+        {
+          "id": "ca770fe406ddd5555bb7",
+          "title": "Cafe Granja Esperanza Tasting \u2014 Multimodal ",
+          "source_url": "https://www.multimodalroasting.com/events/cafe-granja-esperanza-tasting",
+          "start_local": null,
+          "end_local": null,
+          "region_evidence": false,
+          "overlaps_window": false,
+          "public_phrase_detected": false,
+          "restriction_detected": false,
+          "cancelled_or_postponed": false,
+          "coffee_activity_text_signal": true,
+          "flags": [
+            "start_invalid_time",
+            "end_invalid_time",
+            "region_unconfirmed",
+            "public_access_unconfirmed",
+            "outside_window_or_unknown"
+          ],
+          "status": "review_required",
+          "storage_permission": "not_established",
+          "precise_venue_verified": false
+        }
+      ],
+      "pending_same_host_links": 68,
+      "candidate_cap_reached": false,
+      "external_leads": [
+        "http://events.com/",
+        "http://www.google.com/calendar/event?action=TEMPLATE&text=Cafe%20Granja%20Esperanza%20Tasting&dates=20260117T160000Z/20260117T170000Z",
+        "http://www.google.com/calendar/event?action=TEMPLATE&text=Cup%20of%20Excellence%20Guatemala%202026%20Tasting%20&dates=20260725T150000Z/20260725T160000Z",
+        "http://www.google.com/calendar/event?action=TEMPLATE&text=Cup%20of%20Excellence%20Honduras%202026%20Tasting&dates=20260718T150000Z/20260718T160000Z",
+        "http://www.google.com/calendar/event?action=TEMPLATE&text=Emissions%20and%20Regenerative%20Agriculture%3A%20A%20talk%20with%20Dr.%20Mandi%20Caudill&dates=20260912T143000Z/20260912T160000Z",
+        "http://www.google.com/calendar/event?action=TEMPLATE&text=Excellence%20in%20Roasting%3A%20Amaris%20Gutierrez-Ray%20%28Postponed%20to%20Saturday%203%2F7%29&dates=20260228T153000Z/20260228T170000Z",
+        "http://www.google.com/calendar/event?action=TEMPLATE&text=Excellence%20in%20Roasting%3A%20Amaris%20Gutierrez-Ray%20&dates=20260307T153000Z/20260307T163000Z",
+        "http://www.google.com/calendar/event?action=TEMPLATE&text=Green%20Forums%3A%20Amativo%20Coffee&dates=20260814T170000Z/20260814T180000Z",
+        "http://www.google.com/calendar/event?action=TEMPLATE&text=Green%20Forums%3A%20Catalogue%20Coffee%20Merchants&dates=20260115T190000Z/20260115T200000Z",
+        "http://www.google.com/calendar/event?action=TEMPLATE&text=Green%20Forums%3A%20Finca%20La%20Argelia&dates=20260430T160000Z/20260430T170000Z",
+        "http://www.google.com/calendar/event?action=TEMPLATE&text=Green%20Forums%3A%20JA%20Coffee%20Importers&dates=20260423T180000Z/20260423T190000Z",
+        "http://www.google.com/calendar/event?action=TEMPLATE&text=Green%20Forums%3A%20Osito&dates=20260612T160000Z/20260612T170000Z"
+      ],
+      "external_leads_total": 39,
+      "counts": {
+        "parsed_pages": 3,
+        "unique_retained_candidates": 1,
+        "dated_in_region": 0,
+        "production_ready": 0
+      }
+    },
+    {
+      "id": "nyc_sequoia",
+      "region": "new_york",
+      "seed_url": "https://www.sequoiacafenyc.com/events",
+      "pages": [
+        {
+          "requested_url": "https://www.sequoiacafenyc.com/events",
+          "status": "parsed",
+          "resolved_url": "https://www.sequoiacafenyc.com/events",
+          "event_nodes": 0,
+          "jsonld_parse_errors": 0,
+          "discovered_same_host_links": 78,
+          "visible_date_signal": true,
+          "visible_event_signal": true
+        },
+        {
+          "requested_url": "https://www.sequoiacafenyc.com/events/closed",
+          "status": "parsed",
+          "resolved_url": "https://www.sequoiacafenyc.com/events/closed",
+          "event_nodes": 1,
+          "jsonld_parse_errors": 0,
+          "discovered_same_host_links": 4,
+          "visible_date_signal": true,
+          "visible_event_signal": true
+        },
+        {
+          "requested_url": "https://www.sequoiacafenyc.com/events/closed-6xfcb",
+          "status": "parsed",
+          "resolved_url": "https://www.sequoiacafenyc.com/events/closed-6xfcb",
+          "event_nodes": 1,
+          "jsonld_parse_errors": 0,
+          "discovered_same_host_links": 4,
+          "visible_date_signal": true,
+          "visible_event_signal": true
+        },
+        {
+          "requested_url": "https://www.sequoiacafenyc.com/events/closed-6xfcb?format=ical",
+          "status": "not_html",
+          "resolved_url": "https://www.sequoiacafenyc.com/events/closed-6xfcb?format=ical"
+        }
+      ],
+      "event_nodes_seen": 2,
+      "duplicate_nodes": 1,
+      "reuse_basis": "Offline diagnostic only; commercial event retention not established.",
+      "candidates": [
+        {
+          "id": "0b9af17fcadca3fdad21",
+          "title": "CLOSED \u2014 Sequoia Cafe",
+          "source_url": "https://www.sequoiacafenyc.com/events/closed",
+          "start_local": null,
+          "end_local": null,
+          "region_evidence": true,
+          "overlaps_window": false,
+          "public_phrase_detected": false,
+          "restriction_detected": false,
+          "cancelled_or_postponed": false,
+          "coffee_activity_text_signal": true,
+          "flags": [
+            "start_invalid_time",
+            "end_invalid_time",
+            "public_access_unconfirmed",
+            "outside_window_or_unknown"
+          ],
+          "status": "review_required",
+          "storage_permission": "not_established",
+          "precise_venue_verified": false
+        }
+      ],
+      "pending_same_host_links": 75,
+      "candidate_cap_reached": false,
+      "external_leads": [
+        "http://www.google.com/calendar/event?action=TEMPLATE&text=CLOSED&dates=20260704T200000Z/20260705T010000Z&location=1203%20Bay%20Street%2C%20Staten%20Island%2C%20NY%2C%2010305%2C%20United%20States",
+        "http://www.google.com/calendar/event?action=TEMPLATE&text=CLOSED&dates=20260705T200000Z/20260706T000000Z&location=1203%20Bay%20Street%2C%20Staten%20Island%2C%20NY%2C%2010305%2C%20United%20States",
+        "http://www.google.com/calendar/event?action=TEMPLATE&text=Club%20de%20Fran%C3%A7ais%3A%20Learn%20and%20Practice%20French&dates=20260614T220000Z/20260615T000000Z&location=1203%20Bay%20Street%2C%20Staten%20Island%2C%20NY%2C%2010305%2C%20United%20States",
+        "http://www.google.com/calendar/event?action=TEMPLATE&text=Club%20de%20Fran%C3%A7ais%3A%20Learn%20and%20Practice%20French&dates=20260719T220000Z/20260720T000000Z&location=1203%20Bay%20Street%2C%20Staten%20Island%2C%20NY%2C%2010305%2C%20United%20States",
+        "http://www.google.com/calendar/event?action=TEMPLATE&text=Club%20de%20Fran%C3%A7ais%3A%20Learn%20and%20Practice%20French&dates=20260816T220000Z/20260817T000000Z&location=1203%20Bay%20Street%2C%20Staten%20Island%2C%20NY%2C%2010305%2C%20United%20States",
+        "http://www.google.com/calendar/event?action=TEMPLATE&text=Comic-Book%20Club&dates=20260624T220000Z/20260625T000000Z&location=1203%20Bay%20Street%2C%20Staten%20Island%2C%20NY%2C%2010305%2C%20United%20States",
+        "http://www.google.com/calendar/event?action=TEMPLATE&text=Comic-Book%20Club&dates=20260826T223000Z/20260827T003000Z&location=1203%20Bay%20Street%2C%20Staten%20Island%2C%20NY%2C%2010305%2C%20United%20States",
+        "http://www.google.com/calendar/event?action=TEMPLATE&text=Comic-Book%20Club&dates=20260916T220000Z/20260917T000000Z&location=1203%20Bay%20Street%2C%20Staten%20Island%2C%20NY%2C%2010305%2C%20United%20States",
+        "http://www.google.com/calendar/event?action=TEMPLATE&text=Cuppa%20Cartoons%20Triva%20Night&dates=20260730T220000Z/20260731T000000Z&location=1203%20Bay%20Street%2C%20Staten%20Island%2C%20NY%2C%2010305%2C%20United%20States",
+        "http://www.google.com/calendar/event?action=TEMPLATE&text=D%26D%20Intro%20Workshop&dates=20260708T220000Z/20260709T010000Z&location=1203%20Bay%20Street%2C%20Staten%20Island%2C%20NY%2C%2010305%2C%20United%20States",
+        "http://www.google.com/calendar/event?action=TEMPLATE&text=Draw%20from%20Memory%20Challenge%20w%2F%20Matt%20P&dates=20260910T220000Z/20260911T000000Z&location=1203%20Bay%20Street%2C%20Staten%20Island%2C%20NY%2C%2010305%2C%20United%20States",
+        "http://www.google.com/calendar/event?action=TEMPLATE&text=Dungeon%20Master%20Workshop&dates=20260812T220000Z/20260813T010000Z&location=1203%20Bay%20Street%2C%20Staten%20Island%2C%20NY%2C%2010305%2C%20United%20States"
+      ],
+      "external_leads_total": 40,
+      "counts": {
+        "parsed_pages": 3,
+        "unique_retained_candidates": 1,
+        "dated_in_region": 0,
+        "production_ready": 0
+      }
+    },
+    {
+      "id": "nyc_corgi",
+      "region": "new_york",
+      "seed_url": "https://luma.com/usecorginyc",
+      "pages": [
+        {
+          "requested_url": "https://luma.com/usecorginyc",
+          "status": "parsed",
+          "resolved_url": "https://luma.com/usecorginyc",
+          "event_nodes": 6,
+          "jsonld_parse_errors": 0,
+          "discovered_same_host_links": 1,
+          "visible_date_signal": true,
+          "visible_event_signal": true
+        },
+        {
+          "requested_url": "https://luma.com/discover",
+          "status": "parsed",
+          "resolved_url": "https://luma.com/discover",
+          "event_nodes": 0,
+          "jsonld_parse_errors": 0,
+          "discovered_same_host_links": 47,
+          "visible_date_signal": false,
+          "visible_event_signal": true
+        },
+        {
+          "requested_url": "https://luma.com/ai?k=t",
+          "status": "parsed",
+          "resolved_url": "https://luma.com/ai?k=t",
+          "event_nodes": 0,
+          "jsonld_parse_errors": 0,
+          "discovered_same_host_links": 3,
+          "visible_date_signal": false,
+          "visible_event_signal": true
+        },
+        {
+          "requested_url": "https://luma.com/arts?k=t",
+          "status": "parsed",
+          "resolved_url": "https://luma.com/arts?k=t",
+          "event_nodes": 0,
+          "jsonld_parse_errors": 0,
+          "discovered_same_host_links": 4,
+          "visible_date_signal": false,
+          "visible_event_signal": true
+        }
+      ],
+      "event_nodes_seen": 6,
+      "duplicate_nodes": 0,
+      "reuse_basis": "Offline diagnostic only; no platform-wide crawl permission inferred.",
+      "candidates": [
+        {
+          "id": "a87d7accaac7b664cc6b",
+          "title": "Founders Breakfast Club and Coworking @ Corgi Cafe",
+          "source_url": "https://luma.com/usecorginyc",
+          "start_local": "2026-09-08T10:00:00-04:00",
+          "end_local": "2026-09-08T17:00:00-04:00",
+          "region_evidence": true,
+          "overlaps_window": true,
+          "public_phrase_detected": false,
+          "restriction_detected": false,
+          "cancelled_or_postponed": false,
+          "coffee_activity_text_signal": true,
+          "flags": [
+            "public_access_unconfirmed"
+          ],
+          "status": "review_required",
+          "storage_permission": "not_established",
+          "precise_venue_verified": false
+        },
+        {
+          "id": "f25722a9f0c22cc11107",
+          "title": "Daytona AI GTM Brunch - NYC, September 2026 @Corgi Cafe",
+          "source_url": "https://luma.com/usecorginyc",
+          "start_local": "2026-09-10T11:00:00-04:00",
+          "end_local": "2026-09-10T13:00:00-04:00",
+          "region_evidence": true,
+          "overlaps_window": true,
+          "public_phrase_detected": false,
+          "restriction_detected": false,
+          "cancelled_or_postponed": false,
+          "coffee_activity_text_signal": true,
+          "flags": [
+            "public_access_unconfirmed"
+          ],
+          "status": "review_required",
+          "storage_permission": "not_established",
+          "precise_venue_verified": false
+        },
+        {
+          "id": "5fcc59d4fcf153f3d158",
+          "title": "Corgi Run Club NYC",
+          "source_url": "https://luma.com/usecorginyc",
+          "start_local": "2026-09-12T09:00:00-04:00",
+          "end_local": "2026-09-12T10:00:00-04:00",
+          "region_evidence": true,
+          "overlaps_window": true,
+          "public_phrase_detected": false,
+          "restriction_detected": false,
+          "cancelled_or_postponed": false,
+          "coffee_activity_text_signal": false,
+          "flags": [
+            "public_access_unconfirmed"
+          ],
+          "status": "review_required",
+          "storage_permission": "not_established",
+          "precise_venue_verified": false
+        },
+        {
+          "id": "6de53703b4b437612cb5",
+          "title": "YC Pitch & Roast \ud83d\udd25 by NYC Founders Club & Corgi",
+          "source_url": "https://luma.com/usecorginyc",
+          "start_local": "2026-09-15T19:00:00-04:00",
+          "end_local": "2026-09-15T21:00:00-04:00",
+          "region_evidence": false,
+          "overlaps_window": true,
+          "public_phrase_detected": false,
+          "restriction_detected": false,
+          "cancelled_or_postponed": false,
+          "coffee_activity_text_signal": false,
+          "flags": [
+            "region_unconfirmed",
+            "public_access_unconfirmed"
+          ],
+          "status": "review_required",
+          "storage_permission": "not_established",
+          "precise_venue_verified": false
+        },
+        {
+          "id": "33cb224e1af5f3e270f3",
+          "title": "NYFW Tech Soir\u00e9e",
+          "source_url": "https://luma.com/usecorginyc",
+          "start_local": "2026-09-16T19:00:00-04:00",
+          "end_local": "2026-09-16T22:00:00-04:00",
+          "region_evidence": true,
+          "overlaps_window": true,
+          "public_phrase_detected": false,
+          "restriction_detected": false,
+          "cancelled_or_postponed": false,
+          "coffee_activity_text_signal": false,
+          "flags": [
+            "public_access_unconfirmed"
+          ],
+          "status": "review_required",
+          "storage_permission": "not_established",
+          "precise_venue_verified": false
+        },
+        {
+          "id": "660f66577c995172dc78",
+          "title": "Coworking & Matcha @ Corgi Cafe",
+          "source_url": "https://luma.com/usecorginyc",
+          "start_local": "2026-09-17T09:00:00-04:00",
+          "end_local": "2026-09-17T17:00:00-04:00",
+          "region_evidence": true,
+          "overlaps_window": true,
+          "public_phrase_detected": false,
+          "restriction_detected": false,
+          "cancelled_or_postponed": false,
+          "coffee_activity_text_signal": true,
+          "flags": [
+            "public_access_unconfirmed"
+          ],
+          "status": "review_required",
+          "storage_permission": "not_established",
+          "precise_venue_verified": false
+        }
+      ],
+      "pending_same_host_links": 50,
+      "candidate_cap_reached": false,
+      "external_leads": [],
+      "external_leads_total": 0,
+      "counts": {
+        "parsed_pages": 4,
+        "unique_retained_candidates": 6,
+        "dated_in_region": 5,
+        "production_ready": 0
+      }
+    },
+    {
+      "id": "nyc_newsletter",
+      "region": "new_york",
+      "seed_url": "https://www.nycforfree.co/events",
+      "pages": [
+        {
+          "requested_url": "https://www.nycforfree.co/events",
+          "status": "parsed",
+          "resolved_url": "https://www.nycforfree.co/events",
+          "event_nodes": 0,
+          "jsonld_parse_errors": 0,
+          "discovered_same_host_links": 78,
+          "visible_date_signal": true,
+          "visible_event_signal": true
+        },
+        {
+          "requested_url": "https://www.nycforfree.co/events/100th-annual-feast-of-san-gennaro",
+          "status": "parsed",
+          "resolved_url": "https://www.nycforfree.co/events/100th-annual-feast-of-san-gennaro",
+          "event_nodes": 0,
+          "jsonld_parse_errors": 0,
+          "discovered_same_host_links": 2,
+          "visible_date_signal": true,
+          "visible_event_signal": true
+        },
+        {
+          "requested_url": "https://www.nycforfree.co/events/2026-citi-concert-series-on-today",
+          "status": "parsed",
+          "resolved_url": "https://www.nycforfree.co/events/2026-citi-concert-series-on-today",
+          "event_nodes": 0,
+          "jsonld_parse_errors": 0,
+          "discovered_same_host_links": 2,
+          "visible_date_signal": true,
+          "visible_event_signal": true
+        },
+        {
+          "requested_url": "https://www.nycforfree.co/events/25th-anniversary-of-911-day-of-remembrance-in-bryant-park",
+          "status": "parsed",
+          "resolved_url": "https://www.nycforfree.co/events/25th-anniversary-of-911-day-of-remembrance-in-bryant-park",
+          "event_nodes": 0,
+          "jsonld_parse_errors": 0,
+          "discovered_same_host_links": 2,
+          "visible_date_signal": true,
+          "visible_event_signal": true
+        }
+      ],
+      "event_nodes_seen": 0,
+      "duplicate_nodes": 0,
+      "reuse_basis": "Offline diagnostic only; no newsletter text or images retained.",
+      "candidates": [],
+      "pending_same_host_links": 75,
+      "candidate_cap_reached": false,
+      "external_leads": [],
+      "external_leads_total": 0,
+      "counts": {
+        "parsed_pages": 4,
+        "unique_retained_candidates": 0,
+        "dated_in_region": 0,
+        "production_ready": 0
+      }
+    },
+    {
+      "id": "orlando_library",
+      "region": "orlando",
+      "seed_url": "https://ocls.org/calendar/",
+      "pages": [
+        {
+          "requested_url": "https://ocls.org/calendar/",
+          "status": "ReadTimeout"
+        }
+      ],
+      "event_nodes_seen": 0,
+      "duplicate_nodes": 0,
+      "reuse_basis": "Offline diagnostic only; library feed/retention basis must be established before ingestion.",
+      "candidates": [],
+      "pending_same_host_links": 0,
+      "candidate_cap_reached": false,
+      "external_leads": [],
+      "external_leads_total": 0,
+      "counts": {
+        "parsed_pages": 0,
+        "unique_retained_candidates": 0,
+        "dated_in_region": 0,
+        "production_ready": 0
+      }
+    },
+    {
+      "id": "palm_coast_city",
+      "region": "palm_coast",
+      "seed_url": "https://www.palmcoast.gov/events",
+      "pages": [
+        {
+          "requested_url": "https://www.palmcoast.gov/events",
+          "status": "parsed",
+          "resolved_url": "https://www.palmcoast.gov/events",
+          "event_nodes": 0,
+          "jsonld_parse_errors": 0,
+          "discovered_same_host_links": 14,
+          "visible_date_signal": true,
+          "visible_event_signal": true
+        },
+        {
+          "requested_url": "https://www.palmcoast.gov/events/home/details/beats-and-eats",
+          "status": "parsed",
+          "resolved_url": "https://www.palmcoast.gov/events/home/details/beats-and-eats",
+          "event_nodes": 0,
+          "jsonld_parse_errors": 0,
+          "discovered_same_host_links": 7,
+          "visible_date_signal": true,
+          "visible_event_signal": true
+        },
+        {
+          "requested_url": "https://www.palmcoast.gov/events/home/details/connecting-palm-coast",
+          "status": "parsed",
+          "resolved_url": "https://www.palmcoast.gov/events/home/details/connecting-palm-coast",
+          "event_nodes": 0,
+          "jsonld_parse_errors": 0,
+          "discovered_same_host_links": 7,
+          "visible_date_signal": true,
+          "visible_event_signal": true
+        },
+        {
+          "requested_url": "https://www.palmcoast.gov/events/home/details/hall-of-terror",
+          "status": "parsed",
+          "resolved_url": "https://www.palmcoast.gov/events/home/details/hall-of-terror",
+          "event_nodes": 0,
+          "jsonld_parse_errors": 0,
+          "discovered_same_host_links": 7,
+          "visible_date_signal": true,
+          "visible_event_signal": true
+        }
+      ],
+      "event_nodes_seen": 0,
+      "duplicate_nodes": 0,
+      "reuse_basis": "Offline diagnostic only; municipal source retention basis must be established before ingestion.",
+      "candidates": [],
+      "pending_same_host_links": 13,
+      "candidate_cap_reached": false,
+      "external_leads": [],
+      "external_leads_total": 0,
+      "counts": {
+        "parsed_pages": 4,
+        "unique_retained_candidates": 0,
+        "dated_in_region": 0,
+        "production_ready": 0
+      }
+    }
+  ],
+  "limitation": "Factual extraction diagnostics; no acquired source prose, verified attendance, storage permission, ranking quality or production writes.",
+  "requests": 28,
+  "response_bytes": 4209818,
+  "elapsed_seconds": 44.44
+}
