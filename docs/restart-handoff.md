@@ -7,8 +7,12 @@ being friendly and encouraging optional responses. Read
 [pilot-measurement-contract.md](pilot-measurement-contract.md) before implementing
 pilot telemetry. It specifies question versions/ordinal scales, automatic request/
 candidate/decision/exposure/source snapshots, explicit missingness and retry rules,
-small optional feedback controls, pretest and seven-day review gates. Design only;
-UI approval for the proposed controls is pending. No algorithm or UI changed.
+small optional feedback controls, pretest and seven-day review gates. The owner
+then approved these controls ONLY in the pilot version. Build configuration and
+server-recognized enrollment must gate extra study UI/collection; standard app
+keeps normal core logging/reviews only. One engine, no alternative ranker. Design
+only; no build separation, algorithm or UI changed yet. Do not ask again for this
+narrow pilot UI approval. Verify pilot AND standard behavior before distribution.
 Current ranker treats every reject as negative taste; current events lack decision
 trace; deck polls visibility at 700ms rather than measuring continuous exposure.
 These are named implementation gaps, not completed fixes. Preserve old labels.

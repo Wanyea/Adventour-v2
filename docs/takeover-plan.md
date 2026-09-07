@@ -12,8 +12,10 @@ The [bounded source pilot](verification/2026-09-07/calendar-pilot/README.md) has
 
 The subsequent [pilot measurement contract](pilot-measurement-contract.md) makes
 traceable collection, short optional feedback, replay/export verification and a
-finite review prerequisite to friends testing. It stays inside Phase 2; proposed
-small feedback controls still need the UI approval specified in AGENTS.md.
+finite review prerequisite to friends testing. It stays inside Phase 2. The owner
+approved the small feedback controls exclusively for the pilot build, with no
+extra study UI/collection in standard builds and one shared recommendation engine.
+This is a narrow build distinction for the study, not a competing product path.
 
 Prepared 2026-09-05 after reading HANDOFF.md completely, AGENTS.md, the references in
 HANDOFF §7, and both label files including their written answers. HANDOFF §5 is the

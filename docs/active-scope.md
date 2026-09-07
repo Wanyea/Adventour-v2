@@ -18,9 +18,12 @@ no worldwide coverage, remote deployment or iOS build is claimed implemented.
 Owner then required a rigorous, low-burden pilot. The concrete
 [measurement contract](pilot-measurement-contract.md) defines required evidence,
 short optional questions, limits, collection semantics and a seven-day review.
-It moves trace/export verification ahead of friends recruitment. Narrow feedback
-controls are proposed under the UI freeze; no questionnaire UI or new telemetry
-is implemented by the design. Current reject-as-taste and event-trace gaps remain.
+It moves trace/export verification ahead of friends recruitment. The owner approved
+the narrow feedback controls exclusively in the pilot version on September 7.
+The standard build must have no study controls or extra study telemetry. One
+shared recommender remains; pilot build configuration and server enrollment gate
+study participation. No questionnaire UI or new telemetry is implemented by the
+design. Current reject-as-taste and event-trace gaps remain.
 
 Owner approved the bounded follow-up event discovery experiment after reviewing
 the Sep20 miss. The [Sep26-27 results](verification/2026-09-06/event-source-experiment/README.md)

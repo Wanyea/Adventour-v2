@@ -58,8 +58,11 @@ The owner's follow-up requires consistent, useful data and low-effort feedback.
 The [measurement contract](pilot-measurement-contract.md) now defines exact
 questions/scales, automatic records, exposure/skip semantics, sampling limits,
 replay/export gates and the finite first review. This is the instrumentation
-specification for implementation; the small Discover feedback controls are
-proposed for explicit UI approval, not already built.
+specification for implementation. The owner approved the small Discover feedback
+controls exclusively for the pilot build. Standard builds retain core logging and
+reviews but show no study controls and collect no extra study telemetry. This
+requires explicit build configuration and server enrollment, with one shared
+recommendation engine. The controls and build separation are not yet implemented.
 
 Existing place decisions preserve rank, model, score components and user identity;
 interaction events can reference the immutable decision. Existing trip-stop

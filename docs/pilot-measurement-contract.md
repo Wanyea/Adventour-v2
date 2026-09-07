@@ -1,9 +1,46 @@
 # Phase 2 pilot measurement contract — v1, September 7, 2026
 
-Status: concrete design for owner review; not implemented telemetry or an iOS
-release. Fits existing discovery, interaction logging, ratings and data tooling
-(features 4, 7, 16, 19, 21–23). No additional product phase or social feature.
-UI controls below need the narrow approval required by AGENTS.md's UI freeze.
+Status: owner approved the small feedback controls on September 7, explicitly
+restricted to the pilot version. Not yet implemented telemetry or an iOS release.
+Fits existing discovery, interaction logging, ratings and data tooling (features
+4, 7, 16, 19, 21–23). No additional product phase or social feature. This narrow
+pilot-only UI approval satisfies the AGENTS.md freeze for the controls below.
+
+## Pilot-only boundary — owner approved
+
+Pilot feedback panels, voluntary Feedback entries, instrumented invitations,
+sampling counters, study outbox and additional study snapshots exist only in the
+pilot experience. The standard build must neither show them nor collect/send
+these additional study records. Existing core interaction logging, ratings and
+reviews continue normally in both builds. No public settings switch enables the
+study; do not infer pilot participation just from TestFlight installation.
+
+Use an explicit build configuration (existing react-native-config integration)
+that defaults to standard when absent or invalid. Pilot enablement also requires
+an active, server-recognized study enrollment for the authenticated account and
+the pilot request context. An enrolled friend using the standard build must not
+trigger extra study capture. A client-supplied pilot flag is not authorization.
+Server-created request/decision study context, rather than arbitrary feedback
+metadata, binds uploads to the correct study. Background workers must not
+misclassify normal traffic as study data.
+
+Allow delivery of already captured, valid pilot feedback after reconnect only
+under the same participant/study policy; revocation or withdrawal stops new
+capture and is honored during upload. Standard builds do not flush a leftover
+pilot outbox. Do not copy study enrollment or counters into ordinary preferences.
+
+Keep one app source tree, backend and recommendation algorithm. This explicit
+owner-requested build distinction gates study instrumentation, not competing
+recommendation implementations. Real pilot feedback may inform separately
+reviewed future improvements; no pilot-only ranking branch or silent population
+training is authorized. UI additions must remain in small cohesive modules.
+
+Before distribution, demonstrate both configurations: pilot controls plus joined
+study records, and standard UI with zero study requests/records, including for
+an enrolled account. Missing build settings, non-enrolled accounts and background
+refresh must fail closed for study capture. Standard release verification checks
+the effective native configuration, not just a JavaScript environment file.
+Exact native build/signing wiring and these checks are still implementation work.
 
 ## Decisions this pilot must support
 
@@ -210,7 +247,7 @@ as adequate power. Approve a separate frozen comparison before claiming a winner
 
 ## Go/no-go and review checkpoints
 
-1. **Before friends:** approve the small feedback controls; implement/place-and-event
+1. **Before friends:** implement the approved pilot-only controls and place/event
    trace plus export before changing acquisition/ranking. Show the exact phone
    card, response, persisted joined row and score calculation to the owner.
 2. **Technical rehearsal:** all acknowledged feedback joins to the correct original
