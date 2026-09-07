@@ -19,6 +19,44 @@ TLS tunnel or reverse proxy in front of that loopback listener; do not expose
 Postgres or bind the app to `0.0.0.0`. The public endpoint must use the real
 Firebase project and must not use `ADVENTOUR_DEV_AUTH`.
 
+## Tailscale Funnel pilot route
+
+The approved pilot route is Tailscale Funnel on the Windows PC. Install the
+current Tailscale client on that PC, sign it into the owner's tailnet, and
+confirm that the device has a stable `*.ts.net` hostname. Friends' iPhones do
+not need the Tailscale app because Funnel is public HTTPS; Firebase remains the
+application authentication layer.
+
+After the local service has passed preflight and is listening on loopback, run
+the following in an elevated PowerShell window on the Windows PC:
+
+```powershell
+tailscale funnel --bg http://127.0.0.1:8080
+tailscale funnel status
+```
+
+The status output is the source of truth for the public HTTPS URL. Use that
+exact URL as `BACKEND_BASE_URL` in the Mac-only pilot env file. Do not use
+`tailscale serve` for the friends pilot: Serve is restricted to the tailnet and
+will not work for iPhones outside it. `tailscale serve` may be used separately
+for private operator diagnostics, but never as the public route.
+
+Keep Funnel configured on the same device and use `--bg` so it resumes after a
+Tailscale restart or Windows reboot. After every service restart, verify the
+local health/readiness/version endpoints first, then verify the public health
+URL and make the authenticated pilot request. If the local service is stopped,
+Funnel must not be treated as a healthy backend even if its public listener
+still responds.
+
+To remove the public route after the pilot, run:
+
+```powershell
+tailscale funnel reset
+```
+
+Do not record auth keys, private tailnet policy, or Tailscale account details in
+the repository or in the public verification packet.
+
 Before an off-network pilot check, verify locally:
 
 ```powershell
