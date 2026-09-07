@@ -51,6 +51,8 @@ def validate_environment(env: Mapping[str, str] | None = None) -> dict[str, str]
         raise PreflightError("ADVENTOUR_REMOTE_MODE=true is required")
     if _truthy(values.get("ADVENTOUR_DEV_AUTH")):
         raise PreflightError("ADVENTOUR_DEV_AUTH must be false for remote service")
+    if values.get("FIREBASE_AUTH_EMULATOR_HOST", "").strip() or values.get("FIREBASE_AUTH_EMULATOR_HOSTS", "").strip():
+        raise PreflightError("Firebase Auth emulator host overrides are forbidden for remote service")
 
     database_url = values.get("DATABASE_URL", "").strip()
     if not database_url:

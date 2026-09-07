@@ -29,6 +29,8 @@ def test_remote_preflight_accepts_local_postgres_and_real_auth(tmp_path):
 @pytest.mark.parametrize("field,value", [
     ("ADVENTOUR_REMOTE_MODE", "false"),
     ("ADVENTOUR_DEV_AUTH", "true"),
+    ("FIREBASE_AUTH_EMULATOR_HOST", "127.0.0.1:9099"),
+    ("FIREBASE_AUTH_EMULATOR_HOSTS", "127.0.0.1:9099"),
     ("DATABASE_URL", "postgresql://pilot:secret@db.example.test:5432/adventour"),
     ("DATABASE_URL", "sqlite:///adventour.db"),
     ("ADVENTOUR_BIND_HOST", "0.0.0.0"),
