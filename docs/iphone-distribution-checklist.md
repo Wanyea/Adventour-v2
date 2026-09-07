@@ -28,9 +28,10 @@ release has been performed from this Windows workspace.
    signing profile for the pilot App ID. Do not commit a team ID or certificate
    material to the repository.
 4. Confirm the Release configuration receives the pilot env file through
-   `react-native-config` before archiving. A nonempty `APP_VARIANT`, `PILOT_ID`
-   and `APP_BUILD_ID` are required for pilot feedback controls and study
-   capture; a standard build must leave them unset or use `APP_VARIANT=standard`.
+   `react-native-config` before archiving. The pilot build must set exactly
+   `APP_VARIANT=pilot`, plus nonempty `PILOT_ID` and `APP_BUILD_ID`, for pilot
+   feedback controls and study capture. A standard build must set
+   `APP_VARIANT=standard` or leave the variant unset.
 5. Verify the archive has bundle ID `com.adventour.app`, a new
    `CFBundleVersion`, and the intended marketing version before uploading.
 
@@ -39,16 +40,25 @@ Example Mac commands from `AdventourApp/`:
 ```sh
 cp .env.ios.pilot.example .env.ios.pilot.local
 cd ios && bundle exec pod install && cd ..
-ENVFILE=.env.ios.pilot.local npx react-native run-ios --configuration Release
+# Release simulator smoke check
+ENVFILE=.env.ios.pilot.local npx react-native run-ios --mode Release --simulator "iPhone 15"
+# Registered-device smoke check (replace with the actual device name)
+ENVFILE=.env.ios.pilot.local npx react-native run-ios --mode Release --device "Owner's iPhone"
 ```
 
 The first command only creates a template copy; the URL and Firebase values
-must be supplied locally. Use Xcode's Archive flow for the signed distribution
-artifact and inspect the archive before uploading it.
+must be supplied locally. The `run-ios` commands are simulator/device smoke
+checks; they do not produce the signed distribution artifact. Use Xcode's
+Product → Archive flow for the archive, then inspect its bundle ID, build
+number, signing, and embedded pilot environment before uploading it.
 
 ## Device and TestFlight gates
 
-Run these in order and record the result with the build ID:
+Distribution is gated by the dependency chain P2-06 → P2-07 → P2-08 → P2-09 →
+P2-10. Complete and retain the reporting/rehearsal, unseeded-region,
+remote-service, iOS-build, and physical-iPhone evidence for those tickets
+before treating P2-11/TestFlight preparation as ready. Run these gates in order
+and record the result with the build ID:
 
 1. Install the signed build on one registered iPhone. Confirm real Firebase
    sign-in creates/loads that user's own profile and preferences.
@@ -63,10 +73,11 @@ Run these in order and record the result with the build ID:
    network loss, and appears once in the private export.
 5. Verify a standard build separately: no pilot controls, no extra pilot
    network writes, and no reuse of a stale pilot card ID.
-6. Upload the Release archive to App Store Connect, complete the required
-   privacy/export declarations, and distribute to the trusted internal or
-   external TestFlight group. Send invitations only after the previous checks
-   and the server enrollment/build allowlist are complete.
+6. Upload the Release archive to App Store Connect and complete the required
+   privacy/export declarations. Internal TestFlight distribution still waits
+   for the previous checks and the server enrollment/build allowlist. External
+   friends additionally require Apple's external TestFlight review/approval
+   before invitations can be sent.
 
 TestFlight distribution does not enroll a person automatically. The operator
 must create the Firebase account, explain consent/retention, enroll the backend
@@ -81,6 +92,11 @@ one event request ID, and the matching export/replay check. Do not commit
 tester accounts, Firebase plist files, certificates, private exports, or
 location-bearing screenshots.
 
-The remaining blockers are external: Apple/Mac access, Firebase iOS
+The remaining blockers include external Apple/Mac access, Firebase iOS
 configuration, reachable HTTPS operation, and a real-device/TestFlight smoke
-pass. This checklist does not claim any of them is complete.
+pass. Internal implementation gaps also remain: native Firebase AppDelegate
+initialization and archive environment wiring have not been demonstrated, and
+the full instrumentation, regional acquisition, and remote-service path is
+incomplete. The pilot must use exactly `APP_VARIANT=pilot`. External friends
+also require Apple's external TestFlight review/approval. This checklist does
+not claim any of these gates is complete.

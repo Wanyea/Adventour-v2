@@ -44,8 +44,23 @@ Commit:
 
 P2-09 through P2-11 are distribution/readiness work, not a new product phase. They remain blocked by external Apple/macOS, Firebase, HTTPS, and TestFlight access until those are actually available and verified.
 
-Social, gamification, full-trip planning, and local-event expansion remain later roadmap features. They do not enter the Phase 2 queue merely because the pilot may generate evidence about them.
+Social, gamification, and full-trip planning remain later roadmap features. Local-event expansion, including NYC event coverage, remains within the active Phase 2 discovery work; it does not open a new phase or enter a later-phase queue merely because the pilot may generate evidence about it.
 
 ## Review record
 
 Each closed ticket should link its evidence packet and commit here. Keep Phase 1 acceptance debt visible; closing this queue does not silently accept Phase 1 or open Phase 3.
+
+### P2-09 — iPhone distribution readiness
+
+Status: review/preparation
+Phase/scope: Phase 2 friends pilot distribution
+Authority: owner-approved Phase 2 pilot request
+Depends on: P2-01; integrates with P2-06 through P2-08
+Outcome: prepare the iOS pilot configuration and the reviewable path to a signed, installable artifact.
+In scope: iOS pilot environment, Firebase/signing/archive instructions, physical-device gates, and TestFlight readiness evidence.
+Excluded: native Firebase implementation, iOS build/archive, TestFlight upload, and external distribution approval from this Windows workspace.
+Acceptance evidence: [iPhone distribution checklist](../iphone-distribution-checklist.md), [pilot implementation checkpoint](../verification/2026-09-07/pilot/README.md), and the documented dependency chain through P2-06, P2-07, P2-08, P2-09, and P2-10. The current record shows preparation and gaps; it does not show a physical-device run or an installable artifact.
+Reviewer: technical review pending; owner phase acceptance/merge remains separate.
+Blocker or decision needed: native Firebase AppDelegate initialization, archive environment wiring, instrumentation/acquisition/remote implementation, physical iPhone evidence, and TestFlight access/approval remain open.
+Commit: `610c0004`
+Installable artifact: open — no signed archive or TestFlight build has been produced.
