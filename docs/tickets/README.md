@@ -60,7 +60,7 @@ Outcome: prepare the iOS pilot configuration and the reviewable path to a signed
 In scope: iOS pilot environment, Firebase/signing/archive instructions, physical-device gates, and TestFlight readiness evidence.
 Excluded: native Firebase implementation, iOS build/archive, TestFlight upload, and external distribution approval from this Windows workspace.
 Acceptance evidence: [iPhone distribution checklist](../iphone-distribution-checklist.md), [pilot implementation checkpoint](../verification/2026-09-07/pilot/README.md), and the documented dependency chain through P2-06, P2-07, P2-08, P2-09, and P2-10. The current record shows preparation and gaps; it does not show a physical-device run or an installable artifact.
-Reviewer: technical review pending; owner phase acceptance/merge remains separate.
+Reviewer: high-capability technical review completed; owner phase acceptance/merge remains separate.
 Blocker or decision needed: native Firebase AppDelegate initialization, archive environment wiring, instrumentation/acquisition/remote implementation, physical iPhone evidence, and TestFlight access/approval remain open.
 Commit: `610c0004`
 Installable artifact: open — no signed archive or TestFlight build has been produced.
