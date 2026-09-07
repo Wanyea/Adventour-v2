@@ -1,0 +1,52 @@
+{
+  "version": "event_source_discovery_v1",
+  "status": "owner_approved_experiment",
+  "scenario": {
+    "city": "NYC five boroughs",
+    "dates": [
+      "2026-09-26",
+      "2026-09-27"
+    ],
+    "timezone": "America/New_York",
+    "interest": "cafes",
+    "profile": "No real-user biography or inferred demographic/friend/dwell claims."
+  },
+  "scope": "Offline discovery/extraction comparison. No production DB, adapter, ranker or UI change; no paid provider or model call. Public links/derived diagnostic facts only.",
+  "hypotheses": [
+    "Explicit source searches may find cafe-related events missed by general date/interest searches.",
+    "Structured Event metadata can verify dates and venues for temporary events without an indexed POI.",
+    "More detailed labels can distinguish a coffee activity from incidental coffee; profile-summary effectiveness remains a proposed separate ablation."
+  ],
+  "queries": [
+    {
+      "arm": "general",
+      "q": "NYC \"September 26\" \"2026\" coffee event"
+    },
+    {
+      "arm": "general",
+      "q": "NYC \"September 27\" \"2026\" cafe event"
+    },
+    {
+      "arm": "general",
+      "q": "Brooklyn Manhattan Queens \"September 26\" \"September 27\" \"2026\" cafe"
+    },
+    {
+      "arm": "source",
+      "q": "site:partiful.com/e NYC \"September\" \"2026\" coffee"
+    },
+    {
+      "arm": "source",
+      "q": "site:luma.com NYC \"September\" \"2026\" cafe"
+    },
+    {
+      "arm": "source",
+      "q": "site:nycforfree.co/events \"September\" \"2026\" coffee"
+    }
+  ],
+  "budget": "Each query individually, retain first two distinct URLs in returned order. Dedupe pooled URLs, max12 selected. Read every selected page once; one ordinary public HTTP fallback on internal reader failure only, never bypass a denial. At most one original-event link per selected aggregator/calendar page. No target-name queries. No extra queries after results.",
+  "eligibility": "Public event evidence for Sep26 or27 local time and identifiable NYC venue. Exclude cancelled, private-only, wrong city/day, routine opening-hours listings; uncertain remains unverified. All selected URLs receive disposition. Event summaries from calendar entries are distinct from confirmed primary listings.",
+  "scoring": "Reuse v0 50 coffee-centered /40 cafe setting /10 participatory weights; evidence labels manual, no tuning. v1 adds diagnostic activity/setting/format/access fields but no new score weights.",
+  "success": "Compare verified relevant new events per selected URL and incremental unique events. Disclose unequal query specificity: source arm searches month broadly, eligibility still exact two days. Small availability study, not recall or personal quality proof. Do not declare source-arm success if no incremental verified cafe event.",
+  "provenance": "Sep20 previously seen events and owner-supplied Last Bite are development examples excluded from unseen yield, even if resurfaced. Known source leads were owner-suggested; not wholly unknown-source discovery.",
+  "followthrough": "Save source/link dispositions, verified candidate facts, provisional score components and a score-hidden human review sheet. Rights to automate collection/storage must be separately established before ingestion."
+}
