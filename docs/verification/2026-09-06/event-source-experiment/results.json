@@ -1,0 +1,236 @@
+{
+  "protocol_commit": "d4cc4bf6",
+  "method": "Fixed before retrieval; 12 selected URL slots, 15 unique page URLs inspected including 3 original-event/organizer links. Some same-page excerpts revisited. No new queries, no target friend/host queries, no paid API, no automatic ingestion.",
+  "counts": {
+    "selected_general": 6,
+    "selected_source": 6,
+    "general_verified_distinct_events": 3,
+    "general_conditional_distinct_events": 1,
+    "source_verified_incremental_events": 0,
+    "general_coffee_centered_events": 2,
+    "coffee_centered_requires_age_check": 1
+  },
+  "meaning": "Coffee-centered count includes conditional 21+ event; not two ready-to-serve recommendations. This tiny sample does not estimate recall or validate personal taste.",
+  "dispositions": [
+    {
+      "title": "Yes Chef Food Fest 2026",
+      "url": "https://yescheffoodfest.com/",
+      "ref": "turn55search0",
+      "arm": "general",
+      "status": "verified",
+      "finding": "Food festival; Sep26-27 11:00-19:00, Citi Field Queens. Broad food/vendor participation, no established coffee-centered activity.",
+      "linked_verification": null
+    },
+    {
+      "title": "Regalia: Community Brewing — Multimodal",
+      "url": "https://www.multimodalroasting.com/events/regalia-community-brewing-msmaz-ghcgb",
+      "ref": "turn55search1",
+      "arm": "general",
+      "status": "verified",
+      "finding": "Coffee brewing workshop; Sep26 13:00-14:45. Linked Regalia page corroborates activity and roastery address in LIC. Capacity 15; tickets listed $5, current remaining inventory unknown.",
+      "linked_verification": "https://regaliacoffee.com/products/community-brewing"
+    },
+    {
+      "title": "Brew & House - Coffee Party (NYC Edition) All White Party | Avenue Ticketing",
+      "url": "https://brewandhouse.avenueticket.com/event/nyc02",
+      "ref": "turn50search0",
+      "arm": "general",
+      "status": "conditional",
+      "finding": "Coffee/house-music party; Sep27 11:00-14:00 Manhattan rooftop. 21+ eligibility must be checked; provider prints EST in September, so local-time interpretation flagged.",
+      "linked_verification": null
+    },
+    {
+      "title": "Brew & House - Coffee Party (NYC Edition) All White Party | Avenue Ticketing",
+      "url": "https://avenueticket.com/event/nyc02",
+      "ref": "turn50search1",
+      "arm": "general",
+      "status": "duplicate",
+      "finding": "Same event as preceding organizer-host URL; one occurrence, not two discoveries.",
+      "linked_verification": null
+    },
+    {
+      "title": "Events for September 2026 – Manhattan Association of Cabarets",
+      "url": "https://macnyc.com/events/month/",
+      "ref": "turn51search0",
+      "arm": "general",
+      "status": "unverified",
+      "finding": "Search showed September but opened monthly calendar showed July. No target-weekend occurrence verified within frozen budget.",
+      "linked_verification": null
+    },
+    {
+      "title": "Peoples’ Voice Cafe — Judson",
+      "url": "https://www.judson.org/calendar/peoples-voice-cafe-9-26-26",
+      "ref": "turn51search1",
+      "arm": "general",
+      "status": "verified",
+      "finding": "Peoples' Voice Cafe performance Sep26 20:00-22:00 at Judson Assembly Hall NYC; organizer confirms program. Coffeehouse name is not evidence of coffee service.",
+      "linked_verification": "https://www.peoplesvoicecafe.org/"
+    },
+    {
+      "title": "NEW YORK FASHION WEEK - SEPTEM… | Partiful",
+      "url": "https://partiful.com/e/ZcMk6aDMRQxY9uUdYsDL",
+      "ref": "turn53search0",
+      "arm": "source",
+      "status": "excluded_date",
+      "finding": "Partiful Fashion Week is September12, outside target weekend.",
+      "linked_verification": null
+    },
+    {
+      "title": "My Chemical Picnic | Partiful",
+      "url": "https://partiful.com/e/RNSFqUt9dZHqXGiB3j7n",
+      "ref": "turn53search1",
+      "arm": "source",
+      "status": "excluded_date",
+      "finding": "Partiful picnic is September6; outside target weekend, also past/RSVP closed.",
+      "linked_verification": null
+    },
+    {
+      "title": "Corgi NYC · Events Calendar",
+      "url": "https://luma.com/usecorginyc?k=c",
+      "ref": "turn54search0",
+      "arm": "source",
+      "status": "unverified_calendar",
+      "finding": "Corgi calendar has cafe-related leads without visible occurrence dates. One linked coffee meetup verified as September6, outside target weekend.",
+      "linked_verification": "https://luma.com/iyadyjib"
+    },
+    {
+      "title": "SIS 2026 - Kickoff & Welcome Reception: The Evolution · Luma",
+      "url": "https://luma.com/mkq0vei5",
+      "ref": "turn54search1",
+      "arm": "source",
+      "status": "excluded_date",
+      "finding": "SIS reception/summit September20-21; outside target weekend. Coffee is incidental to professional summit.",
+      "linked_verification": null
+    },
+    {
+      "title": "Events — NYC for FREE",
+      "url": "https://www.nycforfree.co/events/",
+      "ref": "turn52search0",
+      "arm": "source",
+      "status": "unverified_calendar",
+      "finding": "NYC for FREE current parsed calendar exposed no Sep26-27 dated item; incomplete publication/rendering coverage remains possible.",
+      "linked_verification": null
+    },
+    {
+      "title": "Free NYC Events Calendar — This Week & Beyond | NYC for FREE",
+      "url": "https://nycforfree.co/events",
+      "ref": "turn52search1",
+      "arm": "source",
+      "status": "duplicate_calendar",
+      "finding": "Redirects to same NYC for FREE calendar; cached representation differs and is older. No verified target-date event.",
+      "linked_verification": null
+    }
+  ],
+  "candidates": [
+    {
+      "id": "E1",
+      "title": "Yes Chef Food Fest",
+      "url": "https://yescheffoodfest.com/",
+      "dates": [
+        "2026-09-26",
+        "2026-09-27"
+      ],
+      "start_local": "11:00",
+      "end_local": "19:00",
+      "setting": "outdoor food festival",
+      "activity": [
+        "food sampling",
+        "vendor fair"
+      ],
+      "coffee": false,
+      "cafe": false,
+      "social": true,
+      "eligible": "verified",
+      "access": "Paid entry; separate ticket per day, most food extra. Price not verified.",
+      "note": "Coffee activity/coffee-serving cafe not established. No authenticity inference.",
+      "points": {
+        "coffee": 0,
+        "cafe": 0,
+        "social": 10
+      },
+      "experimental_fit": 10
+    },
+    {
+      "id": "E2",
+      "title": "Regalia: Community Brewing",
+      "url": "https://www.multimodalroasting.com/events/regalia-community-brewing-msmaz-ghcgb",
+      "dates": [
+        "2026-09-26"
+      ],
+      "start_local": "13:00",
+      "end_local": "14:45",
+      "setting": "coffee roastery laboratory",
+      "activity": [
+        "coffee brewing",
+        "tasting",
+        "hands-on workshop"
+      ],
+      "coffee": true,
+      "cafe": false,
+      "social": true,
+      "eligible": "verified",
+      "access": "Listed $5, 15 participants maximum; remaining capacity unknown.",
+      "note": "Coffee laboratory confirmed, conventional or temporary cafe setting not explicitly established, so no 40-point setting bonus. Date from linked calendar, location/activity corroborated by organizer.",
+      "points": {
+        "coffee": 50,
+        "cafe": 0,
+        "social": 10
+      },
+      "experimental_fit": 60
+    },
+    {
+      "id": "E3",
+      "title": "Brew & House Coffee Party",
+      "url": "https://brewandhouse.avenueticket.com/event/nyc02",
+      "dates": [
+        "2026-09-27"
+      ],
+      "start_local": "11:00",
+      "end_local": "14:00",
+      "setting": "rooftop music/dance venue",
+      "activity": [
+        "specialty coffee",
+        "house music",
+        "dancing"
+      ],
+      "coffee": true,
+      "cafe": false,
+      "social": true,
+      "eligible": "conditional",
+      "access": "21+; tickets advertised from $28.14; all-white dress encouraged.",
+      "note": "Subject to age eligibility. EST label conflicts with NYC daylight-saving season; record local advertised clock time, do not guess UTC. Cafe setting not established.",
+      "points": {
+        "coffee": 50,
+        "cafe": 0,
+        "social": 10
+      },
+      "experimental_fit": 60
+    },
+    {
+      "id": "E4",
+      "title": "Peoples' Voice Cafe: Songs of Freedom & Resistance",
+      "url": "https://www.judson.org/calendar/peoples-voice-cafe-9-26-26",
+      "dates": [
+        "2026-09-26"
+      ],
+      "start_local": "20:00",
+      "end_local": "22:00",
+      "setting": "community performance hall",
+      "activity": [
+        "live music"
+      ],
+      "coffee": false,
+      "cafe": false,
+      "social": false,
+      "eligible": "verified",
+      "access": "Suggested contribution $20 with lower-contribution options; organizer says no one turned away for lack of money. Capacity not guaranteed.",
+      "note": "Coffeehouse branding alone does not establish coffee service. Conservative participation label: attendance at performance alone earns no points.",
+      "points": {
+        "coffee": 0,
+        "cafe": 0,
+        "social": 0
+      },
+      "experimental_fit": 0
+    }
+  ]
+}

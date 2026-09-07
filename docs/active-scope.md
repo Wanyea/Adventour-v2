@@ -5,6 +5,13 @@ phases after." This overrides the Phase 1 review/merge prerequisite for this
 transition only. Phases 3–5 remain closed. Phase 1 acceptance gaps remain open.
 
 **Resume entry point:** [restart-handoff.md](restart-handoff.md).
+
+Owner approved the bounded follow-up event discovery experiment after reviewing
+the Sep20 miss. The [Sep26-27 results](verification/2026-09-06/event-source-experiment/README.md)
+and [preference-summary assessment](preference-profile-assessment.md) preserve
+that work and distinguish the owner's architectural idea from implementation
+authorization. Human taste validation is pending; no new production source or
+LLM serving path was added.
 Protocol: [phase2-discovery.md](phase2-discovery.md), following Phase 2 of the
 approved takeover plan. Personal ranking is demonstrated in both seed metros;
 the UCF event pipeline, Discover cards and organizer recheck now work. Current

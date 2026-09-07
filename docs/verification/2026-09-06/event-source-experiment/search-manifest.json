@@ -1,0 +1,98 @@
+[
+  {
+    "arm": "general",
+    "q": "NYC \"September 26\" \"2026\" coffee event",
+    "selected": [
+      {
+        "title": "Yes Chef Food Fest 2026",
+        "url": "https://yescheffoodfest.com/",
+        "ref": "turn55search0"
+      },
+      {
+        "title": "Regalia: Community Brewing — Multimodal",
+        "url": "https://www.multimodalroasting.com/events/regalia-community-brewing-msmaz-ghcgb",
+        "ref": "turn55search1"
+      }
+    ]
+  },
+  {
+    "arm": "general",
+    "q": "NYC \"September 27\" \"2026\" cafe event",
+    "selected": [
+      {
+        "title": "Brew & House - Coffee Party (NYC Edition) All White Party | Avenue Ticketing",
+        "url": "https://brewandhouse.avenueticket.com/event/nyc02",
+        "ref": "turn50search0"
+      },
+      {
+        "title": "Brew & House - Coffee Party (NYC Edition) All White Party | Avenue Ticketing",
+        "url": "https://avenueticket.com/event/nyc02",
+        "ref": "turn50search1"
+      }
+    ]
+  },
+  {
+    "arm": "general",
+    "q": "Brooklyn Manhattan Queens \"September 26\" \"September 27\" \"2026\" cafe",
+    "selected": [
+      {
+        "title": "Events for September 2026 – Manhattan Association of Cabarets",
+        "url": "https://macnyc.com/events/month/",
+        "ref": "turn51search0"
+      },
+      {
+        "title": "Peoples’ Voice Cafe — Judson",
+        "url": "https://www.judson.org/calendar/peoples-voice-cafe-9-26-26",
+        "ref": "turn51search1"
+      }
+    ]
+  },
+  {
+    "arm": "source",
+    "q": "site:partiful.com/e NYC \"September\" \"2026\" coffee",
+    "selected": [
+      {
+        "title": "NEW YORK FASHION WEEK - SEPTEM… | Partiful",
+        "url": "https://partiful.com/e/ZcMk6aDMRQxY9uUdYsDL",
+        "ref": "turn53search0"
+      },
+      {
+        "title": "My Chemical Picnic | Partiful",
+        "url": "https://partiful.com/e/RNSFqUt9dZHqXGiB3j7n",
+        "ref": "turn53search1"
+      }
+    ]
+  },
+  {
+    "arm": "source",
+    "q": "site:luma.com NYC \"September\" \"2026\" cafe",
+    "selected": [
+      {
+        "title": "Corgi NYC · Events Calendar",
+        "url": "https://luma.com/usecorginyc?k=c",
+        "ref": "turn54search0"
+      },
+      {
+        "title": "SIS 2026 - Kickoff & Welcome Reception: The Evolution · Luma",
+        "url": "https://luma.com/mkq0vei5",
+        "ref": "turn54search1"
+      }
+    ]
+  },
+  {
+    "arm": "source",
+    "q": "site:nycforfree.co/events \"September\" \"2026\" coffee",
+    "selected": [
+      {
+        "title": "Events — NYC for FREE",
+        "url": "https://www.nycforfree.co/events/",
+        "ref": "turn52search0"
+      },
+      {
+        "title": "Free NYC Events Calendar — This Week & Beyond | NYC for FREE",
+        "url": "https://nycforfree.co/events",
+        "ref": "turn52search1"
+      }
+    ]
+  }
+]

@@ -2,6 +2,16 @@
 
 ## Current checkpoint after resuming (supersedes the pause record below)
 
+Owner then approved the next event experiment and proposed a preference-summary
+idea for critique (not an instruction to replace serving). The frozen Sep26-27
+NYC comparison is in [event-source-experiment](verification/2026-09-06/event-source-experiment/README.md):
+12 selected URLs, two coffee-centered general-search leads (one 21+ conditional),
+zero additional verified events from source-restricted searches. Human review
+pending in its review.md. No app/source roster/DB changes or model inference.
+[Preference assessment](preference-profile-assessment.md) records current code,
+evidence-backed summary proposal and an unrun fair three-arm comparison. Do not
+claim an LLM biography or ranking improvement exists. Phase 2 remains active.
+
 Latest offline follow-up: NYC + September 20 + cafe interest comparison completed.
 The owner's Partiful home-cafe event was MISSED by the fixed search and supplied
 after retrieval. Its counterfactual 100/100 rubric score is not an organic find
