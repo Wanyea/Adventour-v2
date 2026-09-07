@@ -1,0 +1,180 @@
+{
+  "method_note": "First three queries were initially batched, then repeated unchanged individually because the batch response merged attribution. Only individually attributed first-five distinct URLs are used. Frozen before receiving the friend's link.",
+  "queries": [
+    {
+      "query": "\"New York\" \"September 20, 2026\" coffee",
+      "results": [
+        {
+          "title": "Fika & Performance | American Swedish Historical Museum",
+          "url": "https://www.americanswedish.org/events/fika-performance",
+          "ref": "turn39search0"
+        },
+        {
+          "title": "Events for week of September 20, 2026 – The First Presbyterian Church in the City of New York",
+          "url": "https://fpcnyc.org/events/week/2026-09-20",
+          "ref": "turn39search1"
+        },
+        {
+          "title": "THE URBAN BEAR",
+          "url": "https://www.theurbanbear.com/",
+          "ref": "turn39search2"
+        },
+        {
+          "title": "IABE-2014 Orlando: Winter Conference Program Outline",
+          "url": "https://iabe.org/IABEX/Documents/2026%20New%20York/Live%20Documents/Program%20Outline/IABE-2026%20New%20York%20-%20Program%20Outline.pdf",
+          "ref": "turn39search12"
+        },
+        {
+          "title": "MBA Coffee Chat - New York at Variety Coffee Roasters, New York on 20th September, 2026",
+          "url": "https://happeningnext.com/event/mba-coffee-chat-new-york-eid1ef0l19t5r9r",
+          "ref": "turn39search3"
+        }
+      ]
+    },
+    {
+      "query": "NYC \"September 20\" \"2026\" cafe event",
+      "results": [
+        {
+          "title": "THE URBAN BEAR",
+          "url": "https://www.theurbanbear.com/",
+          "ref": "turn38search0"
+        },
+        {
+          "title": "Events — Sequoia Cafe",
+          "url": "https://www.sequoiacafenyc.com/events",
+          "ref": "turn38search1"
+        },
+        {
+          "title": "The Stand Presents on September 20, 2026 | The Stand Restaurant & Comedy Club in NYC",
+          "url": "https://thestandnyc.com/shows/show/13753/2026-09-20-200000-the-stand-presents",
+          "ref": "turn38search2"
+        },
+        {
+          "title": "The Stand Presents on September 20, 2026 | The Stand Restaurant & Comedy Club in NYC",
+          "url": "https://thestandnyc.com/shows/show/13754/2026-09-20-190000-the-stand-presents",
+          "ref": "turn38search3"
+        },
+        {
+          "title": "New York City Concert Tickets - Upcoming event tickets in New York City | Ticketmaster Page 18",
+          "url": "https://www.ticketmaster.com/discover/new-york-city?categoryId=KZFzniwnSyZfZ7v7nJ&msockid=0a7f4c8854666ca22d2d5bbe55826d73&page=18&tt_scene=anchor_view",
+          "ref": "turn38search4"
+        }
+      ]
+    },
+    {
+      "query": "Brooklyn \"September 20\" \"2026\" coffee",
+      "results": [
+        {
+          "title": "LOCAL GRANDMA BINGO PARTY: The Kaffeeklatsch Edition! Tickets, Sunday, September 20  •  4 PM - 7 PM | Eventbrite",
+          "url": "https://www.eventbrite.com/e/local-grandma-bingo-party-the-kaffeeklatsch-edition-tickets-1998960307089",
+          "ref": "turn41search0"
+        },
+        {
+          "title": "Hudson Table | BROOKLYN CLASS & EVENT SCHEDULE",
+          "url": "https://hudsontable.com/brooklyn/schedule/",
+          "ref": "turn41search1"
+        },
+        {
+          "title": "The Ornate Project: (Open-Air Event) w/ GRUM - Sun. Sept. 20th, 2026 Tickets, Sunday, September 20  •  2 PM - 10 PM | Eventbrite",
+          "url": "https://www.eventbrite.com/e/the-ornate-project-open-air-event-w-grum-sun-sept-20th-2026-tickets-1984157675018?aff=ebdssbcategorybrowse",
+          "ref": "turn41search2"
+        },
+        {
+          "title": "September 2026 Knit+Wine Night, Sun, Sep 20, 2026, 5:00 PM | Meetup",
+          "url": "https://www.meetup.com/knitandwinebklyn/events/316156689/?eventOrigin=group_upcoming_events",
+          "ref": "turn41search3"
+        },
+        {
+          "title": "Hudson Table | BROOKLYN CLASS & EVENT SCHEDULE",
+          "url": "https://hudsontable.com/brooklyn/schedule/?classtype=Chef+Competition&month=&tags=shellfish-free",
+          "ref": "turn41search4"
+        }
+      ]
+    },
+    {
+      "query": "Manhattan \"September 20\" \"2026\" cafe",
+      "results": [
+        {
+          "title": "THE URBAN BEAR",
+          "url": "https://www.theurbanbear.com/",
+          "ref": "turn43search0"
+        },
+        {
+          "title": "Events — Sequoia Cafe",
+          "url": "https://www.sequoiacafenyc.com/events",
+          "ref": "turn43search1"
+        },
+        {
+          "title": "Cafe Wha? - New York, NY | Tickets, 2026-2027 Event Schedule, Seating Chart",
+          "url": "https://www.ticketmaster.com/cafe-wha-tickets-new-york/venue/338471?tt_scene=anchor_view",
+          "ref": "turn43search2"
+        },
+        {
+          "title": "The Stand Presents on September 20, 2026 | The Stand Restaurant & Comedy Club in NYC",
+          "url": "https://thestandnyc.com/shows/show/13754/2026-09-20-190000-the-stand-presents",
+          "ref": "turn43search3"
+        },
+        {
+          "title": "junk journal matcha cafe with jasmine and lamcha – Sunday, September 20 2026",
+          "url": "https://somo.social/e/junk-journal-matcha-cafe-with-jasmine-and-lamcha-20-september-2026",
+          "ref": "turn43search4"
+        }
+      ]
+    },
+    {
+      "query": "Queens \"September 20\" \"2026\" coffee event",
+      "results": [
+        {
+          "title": "Home | Carnaval de la Cultura Latina",
+          "url": "https://www.carnavalculturalatina.com/",
+          "ref": "turn40search0"
+        },
+        {
+          "title": "2026 Street Works Earth",
+          "url": "https://www.climateweeknyc.org/event-search/past-events/2026-street-works-earth",
+          "ref": "turn40search1"
+        },
+        {
+          "title": "ConRules_You + 1 For a Year of Fun",
+          "url": "https://globalnews.ca/wp-content/uploads/2026/01/20260105_03385_ConRules_You1-For-a-Year-of-Fun_v1.0.pdf",
+          "ref": "turn40search12"
+        },
+        {
+          "title": "Amazing Maize Maze - Queens County Farm Museum",
+          "url": "https://www.queensfarm.org/event/amazing-maize-maze-29/",
+          "ref": "turn40search2"
+        },
+        {
+          "title": "Queens Center | Events | Project TCG Card Show Comes To Queens Center",
+          "url": "https://www.shopqueenscenter.com/Events/Details/580822",
+          "ref": "turn40search3"
+        }
+      ]
+    },
+    {
+      "query": "NYC \"September 20\" \"2026\" matcha",
+      "results": [
+        {
+          "title": "Pre Fall Festival 2026",
+          "url": "https://sites.google.com/japansocietyfc.org/home/pre-fall-festival-2026",
+          "ref": "turn42search0"
+        },
+        {
+          "title": "THE URBAN BEAR",
+          "url": "https://www.theurbanbear.com/",
+          "ref": "turn42search1"
+        },
+        {
+          "title": "A Drop of Japan: Apothékary x SUKOSHI Pop-Up | NYC for FREE",
+          "url": "https://www.nycforfree.co/events/a-drop-of-japan-apothekary-x-sukoshi-pop-up",
+          "ref": "turn42search2"
+        },
+        {
+          "title": "Upcoming Stories — Yoseka Land",
+          "url": "https://www.yosekaland.com/upcoming-events",
+          "ref": "turn42search3"
+        }
+      ]
+    }
+  ]
+}

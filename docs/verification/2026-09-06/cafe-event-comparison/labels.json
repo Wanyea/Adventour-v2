@@ -1,0 +1,317 @@
+{
+  "methodology": "Weights/queries committed before retrieval. Friend URL supplied after retrieval manifest was fixed, before evidence coding was complete. Manual evidence coding is not a blind automated-labeling evaluation.",
+  "reviewed_web_pages": 11,
+  "review_selection": "Assistant prioritized apparent cafe leads, then two non-cafe controls within the frozen page budget. This selection order was not preregistered. Unreviewed results are not scored or silently treated as irrelevant.",
+  "labels_coded_by": "assistant; evidence-backed manual labels, not a deployed classifier",
+  "candidates": [
+    {
+      "title": "Storytelling Art Fair (S.T.A.F.)",
+      "origin": "fixed_search_previously_seen",
+      "eligible": true,
+      "start": "16:00",
+      "coffee": false,
+      "cafe": true,
+      "social": true,
+      "url": "https://www.sequoiacafenyc.com/events",
+      "evidence": "September 20, 16:00-20:00; artist/vendor fair at Sequoia. Same calendar documents coffee service. Venue homepage establishes Staten Island.",
+      "support_url": "https://www.sequoiacafenyc.com/",
+      "access": "Fair admission/RSVP not stated; check organizer."
+    },
+    {
+      "title": "Final Shop Day",
+      "origin": "fixed_search_previously_seen",
+      "eligible": true,
+      "start": "16:00",
+      "coffee": false,
+      "cafe": true,
+      "social": false,
+      "url": "https://www.sequoiacafenyc.com/events",
+      "evidence": "Special dated final-day announcement, September 20 16:00-20:00, at the coffee-serving cafe. No explicit coffee-focused or participatory activity. May overlap the art fair; not independent recommendation diversity.",
+      "access": "Availability/fees not specified; event-versus-shop-announcement interpretation is uncertain."
+    },
+    {
+      "title": "TRAVELER'S COMPANY CARAVAN 20th Anniversary - NYC",
+      "origin": "fixed_search",
+      "eligible": true,
+      "start": "10:00",
+      "coffee": false,
+      "cafe": false,
+      "social": true,
+      "url": "https://www.yosekaland.com/upcoming-events",
+      "evidence": "September 20 10:00-19:00 at Yoseka Land, Brooklyn; notebook customization at the popup. No cafe setting or coffee activity established. Do not carry September 11-12 workshop dates into September 20.",
+      "access": "September 18-20 popup is free admission; stock limited."
+    },
+    {
+      "title": "2026 Street Works Earth",
+      "origin": "fixed_search",
+      "eligible": true,
+      "start": "11:00",
+      "coffee": false,
+      "cafe": false,
+      "social": true,
+      "url": "https://www.climateweeknyc.org/event-search/past-events/2026-street-works-earth",
+      "evidence": "September 20 11:00-18:00, Jackson Heights; public hands-on art festival. No cafe/coffee evidence.",
+      "access": "Public listing; registration link; current capacity not checked."
+    },
+    {
+      "title": "Urban Bear NYC Street Fair",
+      "origin": "fixed_search_previously_seen",
+      "eligible": true,
+      "start": "13:00",
+      "coffee": false,
+      "cafe": false,
+      "social": true,
+      "url": "https://www.theurbanbear.com/",
+      "evidence": "September 20 13:00-19:00, Little West 12th Street NYC; vendor/community fair. No cafe/coffee evidence.",
+      "access": "Street-fair admission not established from weekend-pass pricing; don't transfer bar-party conditions."
+    }
+  ],
+  "unranked_reviewed": [
+    {
+      "url": "https://fpcnyc.org/events/week/2026-09-20",
+      "reason": "Coffee fellowship lead; web fetch timed out twice, ordinary HTTP fetch returned 403. Snippet evidence only."
+    },
+    {
+      "url": "https://happeningnext.com/event/mba-coffee-chat-new-york-eid1ef0l19t5r9r",
+      "reason": "Aggregator reports MBA admissions chat at Variety Coffee; organizer link unavailable. Held out of confirmed ranking. Recruitment purpose shows why coffee/cafe keywords alone can be a poor recommendation."
+    },
+    {
+      "url": "https://www.eventbrite.com/e/local-grandma-bingo-party-the-kaffeeklatsch-edition-tickets-1998960307089",
+      "reason": "Search lead; event-page retrieval failed. Date/venue not independently confirmed."
+    },
+    {
+      "url": "https://somo.social/e/junk-journal-matcha-cafe-with-jasmine-and-lamcha-20-september-2026",
+      "reason": "Excluded: linked organizer page places event in Philadelphia, not NYC.",
+      "support_url": "https://luma.com/56mb9i0y?ref=somo"
+    },
+    {
+      "url": "https://www.nycforfree.co/events/a-drop-of-japan-apothekary-x-sukoshi-pop-up",
+      "reason": "Promising matcha popup snippet; publisher-page fetch failed and retry returned non-retryable safe-open rejection. No alternate route attempted; unverified."
+    }
+  ],
+  "user_supplied_diagnostic": {
+    "title": "The Last Bite Turns 1! Home Cafe",
+    "url": "https://partiful.com/e/g82v9vaY5E2YPxRq2OYT",
+    "origin": "user_supplied_after_retrieval",
+    "organic_find": false,
+    "eligible": true,
+    "start": "12:00",
+    "coffee": true,
+    "cafe": true,
+    "social": true,
+    "date": "2026-09-20",
+    "end": "15:00",
+    "timezone": "America/New_York",
+    "city": "New York City",
+    "evidence": "Public organizer event metadata: time/date and NYC address. Description advertises a temporary home cafe, coffee/chai service, tasting samples and an open-invite anniversary gathering.",
+    "access": "Open invitation with RSVP requested; samples/complimentary drinks and optional purchases. No RSVP submitted or capacity verified.",
+    "extraction": "Web reader returned internal error; ordinary unauthenticated HTTP returned 200 with Event JSON-LD and public OG metadata. No private API, login, guest list, image, contact details, address or source prose saved.",
+    "score_note": "Counterfactual relevance once supplied, not organic discovery or production score. Maximum coarse rubric score is not evidence of calibrated recommendation quality."
+  },
+  "parks_candidates": [
+    {
+      "title": "Summer on the Hudson: Tai Chi",
+      "url": "http://www.nycgovparks.org/events/2026/09/20/summer-on-the-hudson-tai-chi",
+      "origin": "existing_parks_source_date_override",
+      "eligible": true,
+      "start": "08:00",
+      "coffee": false,
+      "cafe": false,
+      "social": true,
+      "evidence": "Manual coding from published title/venue/category: explicit group exercise, volunteer work, workshop or walk.",
+      "uncertainty": "No cafe setting or coffee activity established; zero evidence points does not establish absence. No attendee eligibility/capacity guarantee."
+    },
+    {
+      "title": "Celebrate 50 Years Through the Five Boroughs with Open Run: Conference House Park",
+      "url": "http://www.nycgovparks.org/events/2026/09/20/nyrr-open-run-conference-house-park",
+      "origin": "existing_parks_source_date_override",
+      "eligible": true,
+      "start": "08:45",
+      "coffee": false,
+      "cafe": false,
+      "social": true,
+      "evidence": "Manual coding from published title/venue/category: explicit group exercise, volunteer work, workshop or walk.",
+      "uncertainty": "No cafe setting or coffee activity established; zero evidence points does not establish absence. No attendee eligibility/capacity guarantee."
+    },
+    {
+      "title": "NYRR Open Run: Marine Park",
+      "url": "http://www.nycgovparks.org/events/2026/09/20/nyrr-open-run-marine-park",
+      "origin": "existing_parks_source_date_override",
+      "eligible": true,
+      "start": "08:45",
+      "coffee": false,
+      "cafe": false,
+      "social": true,
+      "evidence": "Manual coding from published title/venue/category: explicit group exercise, volunteer work, workshop or walk.",
+      "uncertainty": "No cafe setting or coffee activity established; zero evidence points does not establish absence. No attendee eligibility/capacity guarantee."
+    },
+    {
+      "title": "NYRR Open Run: Cunningham Park Back to School Chalk Challenge",
+      "url": "http://www.nycgovparks.org/events/2026/09/20/nyrr-open-run-cunningham-park",
+      "origin": "existing_parks_source_date_override",
+      "eligible": true,
+      "start": "09:00",
+      "coffee": false,
+      "cafe": false,
+      "social": true,
+      "evidence": "Manual coding from published title/venue/category: explicit group exercise, volunteer work, workshop or walk.",
+      "uncertainty": "No cafe setting or coffee activity established; zero evidence points does not establish absence. No attendee eligibility/capacity guarantee."
+    },
+    {
+      "title": "Urban Farm Volunteers",
+      "url": "http://www.nycgovparks.org/events/2026/09/20/urban-farm-volunteers",
+      "origin": "existing_parks_source_date_override",
+      "eligible": true,
+      "start": "10:00",
+      "coffee": false,
+      "cafe": false,
+      "social": true,
+      "evidence": "Manual coding from published title/venue/category: explicit group exercise, volunteer work, workshop or walk.",
+      "uncertainty": "No cafe setting or coffee activity established; zero evidence points does not establish absence. No attendee eligibility/capacity guarantee."
+    },
+    {
+      "title": "Sunday Stewardship",
+      "url": "http://www.nycgovparks.org/events/2026/09/20/sunday-stewardship",
+      "origin": "existing_parks_source_date_override",
+      "eligible": true,
+      "start": "10:00",
+      "coffee": false,
+      "cafe": false,
+      "social": true,
+      "evidence": "Manual coding from published title/venue/category: explicit group exercise, volunteer work, workshop or walk.",
+      "uncertainty": "No cafe setting or coffee activity established; zero evidence points does not establish absence. No attendee eligibility/capacity guarantee."
+    },
+    {
+      "title": "Trail Maintenance Workshop",
+      "url": "http://www.nycgovparks.org/events/2026/09/20/trail-maintenance-workshop",
+      "origin": "existing_parks_source_date_override",
+      "eligible": true,
+      "start": "10:00",
+      "coffee": false,
+      "cafe": false,
+      "social": true,
+      "evidence": "Manual coding from published title/venue/category: explicit group exercise, volunteer work, workshop or walk.",
+      "uncertainty": "No cafe setting or coffee activity established; zero evidence points does not establish absence. No attendee eligibility/capacity guarantee."
+    },
+    {
+      "title": "Yoga in the Garden",
+      "url": "http://www.nycgovparks.org/events/2026/09/20/yoga-in-the-garden",
+      "origin": "existing_parks_source_date_override",
+      "eligible": true,
+      "start": "10:15",
+      "coffee": false,
+      "cafe": false,
+      "social": true,
+      "evidence": "Manual coding from published title/venue/category: explicit group exercise, volunteer work, workshop or walk.",
+      "uncertainty": "No cafe setting or coffee activity established; zero evidence points does not establish absence. No attendee eligibility/capacity guarantee."
+    },
+    {
+      "title": "Ongoing Outdoor Museum Exhibit: Alice's Terracotta Garden",
+      "url": "http://www.nycgovparks.org/events/2026/09/20/ongoing-outdoor-museum-exhibit-alices-terracotta-garden",
+      "origin": "existing_parks_source_date_override",
+      "eligible": true,
+      "start": "11:00",
+      "coffee": false,
+      "cafe": false,
+      "social": false,
+      "evidence": "Manual coding from published title/venue/category: No explicit interaction established from inspected fields; social evidence unknown.",
+      "uncertainty": "No cafe setting or coffee activity established; zero evidence points does not establish absence. No attendee eligibility/capacity guarantee."
+    },
+    {
+      "title": "Raptor Fest",
+      "url": "http://www.nycgovparks.org/events/2026/09/20/raptor-fest",
+      "origin": "existing_parks_source_date_override",
+      "eligible": true,
+      "start": "12:00",
+      "coffee": false,
+      "cafe": false,
+      "social": false,
+      "evidence": "Manual coding from published title/venue/category: No explicit interaction established from inspected fields; social evidence unknown.",
+      "uncertainty": "No cafe setting or coffee activity established; zero evidence points does not establish absence. No attendee eligibility/capacity guarantee."
+    },
+    {
+      "title": "Summer on the Hudson: Sun Gaze Sundays",
+      "url": "http://www.nycgovparks.org/events/2026/09/20/summer-on-the-hudson-sun-gaze-sundays",
+      "origin": "existing_parks_source_date_override",
+      "eligible": true,
+      "start": "13:00",
+      "coffee": false,
+      "cafe": false,
+      "social": false,
+      "evidence": "Manual coding from published title/venue/category: No explicit interaction established from inspected fields; social evidence unknown.",
+      "uncertainty": "No cafe setting or coffee activity established; zero evidence points does not establish absence. No attendee eligibility/capacity guarantee."
+    },
+    {
+      "title": "Hatha Flow",
+      "url": "http://www.nycgovparks.org/events/2026/09/20/hatha-flow",
+      "origin": "existing_parks_source_date_override",
+      "eligible": true,
+      "start": "13:00",
+      "coffee": false,
+      "cafe": false,
+      "social": true,
+      "evidence": "Manual coding from published title/venue/category: explicit group exercise, volunteer work, workshop or walk.",
+      "uncertainty": "No cafe setting or coffee activity established; zero evidence points does not establish absence. No attendee eligibility/capacity guarantee."
+    },
+    {
+      "title": "Garden Highlights Walk",
+      "url": "http://www.nycgovparks.org/events/2026/09/20/garden-highlights-walk",
+      "origin": "existing_parks_source_date_override",
+      "eligible": true,
+      "start": "13:00",
+      "coffee": false,
+      "cafe": false,
+      "social": true,
+      "evidence": "Manual coding from published title/venue/category: explicit group exercise, volunteer work, workshop or walk.",
+      "uncertainty": "No cafe setting or coffee activity established; zero evidence points does not establish absence. No attendee eligibility/capacity guarantee."
+    },
+    {
+      "title": "Oktoberfest at The Castle",
+      "url": "http://www.nycgovparks.org/events/2026/09/20/oktoberfest-at-the-castle",
+      "origin": "existing_parks_source_date_override",
+      "eligible": true,
+      "start": "13:00",
+      "coffee": false,
+      "cafe": false,
+      "social": false,
+      "evidence": "Manual coding from published title/venue/category: No explicit interaction established from inspected fields; social evidence unknown.",
+      "uncertainty": "No cafe setting or coffee activity established; zero evidence points does not establish absence. No attendee eligibility/capacity guarantee."
+    },
+    {
+      "title": "Moli\u00e8re in the Park presents: DON JUAN",
+      "url": "http://www.nycgovparks.org/events/2026/09/20/molire-in-the-park-presents-don-juan1",
+      "origin": "existing_parks_source_date_override",
+      "eligible": true,
+      "start": "15:00",
+      "coffee": false,
+      "cafe": false,
+      "social": false,
+      "evidence": "Manual coding from published title/venue/category: No explicit interaction established from inspected fields; social evidence unknown.",
+      "uncertainty": "No cafe setting or coffee activity established; zero evidence points does not establish absence. No attendee eligibility/capacity guarantee."
+    },
+    {
+      "title": "Gaga Pa'l Pueblo",
+      "url": "http://www.nycgovparks.org/events/2026/09/20/gaga-pal-pueblo",
+      "origin": "existing_parks_source_date_override",
+      "eligible": true,
+      "start": "15:00",
+      "coffee": false,
+      "cafe": false,
+      "social": false,
+      "evidence": "Manual coding from published title/venue/category: No explicit interaction established from inspected fields; social evidence unknown.",
+      "uncertainty": "No cafe setting or coffee activity established; zero evidence points does not establish absence. No attendee eligibility/capacity guarantee."
+    },
+    {
+      "title": "Moli\u00e8re in the Park presents: DON JUAN",
+      "url": "http://www.nycgovparks.org/events/2026/09/20/molire-in-the-park-presents-don-juan",
+      "origin": "existing_parks_source_date_override",
+      "eligible": true,
+      "start": "19:00",
+      "coffee": false,
+      "cafe": false,
+      "social": false,
+      "evidence": "Manual coding from published title/venue/category: No explicit interaction established from inspected fields; social evidence unknown.",
+      "uncertainty": "No cafe setting or coffee activity established; zero evidence points does not establish absence. No attendee eligibility/capacity guarantee."
+    }
+  ]
+}

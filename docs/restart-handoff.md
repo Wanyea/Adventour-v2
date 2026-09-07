@@ -2,6 +2,15 @@
 
 ## Current checkpoint after resuming (supersedes the pause record below)
 
+Latest offline follow-up: NYC + September 20 + cafe interest comparison completed.
+The owner's Partiful home-cafe event was MISSED by the fixed search and supplied
+after retrieval. Its counterfactual 100/100 rubric score is not an organic find
+or production personalization. Protocol, selected URLs, evidence labels, replay
+and proposed Phase 2 discovery gaps are in
+[the comparison report](verification/2026-09-06/cafe-event-comparison/README.md).
+No source roster, application or DB changes. Next experiments must preserve this
+provenance; the known supplied event cannot be called held-out discovery success.
+
 Latest active slice: NYC Parks is now connected and populated (302 eligible
 occurrences / 1,198 source rows). Seven UCF events remain. The six-hour local
 worker refreshes both adapters; NYC expiry is bounded by daily publication age,

@@ -1,0 +1,284 @@
+{
+  "protocol_sha256": "c6ce681b418d10ceca06f18cfd64d3ace1fae8718725e3b46a97430aab390f6a",
+  "fixed_search_ranked": [
+    {
+      "title": "Storytelling Art Fair (S.T.A.F.)",
+      "origin": "fixed_search_previously_seen",
+      "start": "16:00",
+      "points": {
+        "coffee": 0,
+        "cafe": 40,
+        "social": 10
+      },
+      "fit": 50,
+      "url": "https://www.sequoiacafenyc.com/events"
+    },
+    {
+      "title": "Final Shop Day",
+      "origin": "fixed_search_previously_seen",
+      "start": "16:00",
+      "points": {
+        "coffee": 0,
+        "cafe": 40,
+        "social": 0
+      },
+      "fit": 40,
+      "url": "https://www.sequoiacafenyc.com/events"
+    },
+    {
+      "title": "TRAVELER'S COMPANY CARAVAN 20th Anniversary - NYC",
+      "origin": "fixed_search",
+      "start": "10:00",
+      "points": {
+        "coffee": 0,
+        "cafe": 0,
+        "social": 10
+      },
+      "fit": 10,
+      "url": "https://www.yosekaland.com/upcoming-events"
+    },
+    {
+      "title": "2026 Street Works Earth",
+      "origin": "fixed_search",
+      "start": "11:00",
+      "points": {
+        "coffee": 0,
+        "cafe": 0,
+        "social": 10
+      },
+      "fit": 10,
+      "url": "https://www.climateweeknyc.org/event-search/past-events/2026-street-works-earth"
+    },
+    {
+      "title": "Urban Bear NYC Street Fair",
+      "origin": "fixed_search_previously_seen",
+      "start": "13:00",
+      "points": {
+        "coffee": 0,
+        "cafe": 0,
+        "social": 10
+      },
+      "fit": 10,
+      "url": "https://www.theurbanbear.com/"
+    }
+  ],
+  "parks_date_override_ranked": [
+    {
+      "title": "Summer on the Hudson: Tai Chi",
+      "origin": "existing_parks_source_date_override",
+      "start": "08:00",
+      "points": {
+        "coffee": 0,
+        "cafe": 0,
+        "social": 10
+      },
+      "fit": 10,
+      "url": "http://www.nycgovparks.org/events/2026/09/20/summer-on-the-hudson-tai-chi"
+    },
+    {
+      "title": "Celebrate 50 Years Through the Five Boroughs with Open Run: Conference House Park",
+      "origin": "existing_parks_source_date_override",
+      "start": "08:45",
+      "points": {
+        "coffee": 0,
+        "cafe": 0,
+        "social": 10
+      },
+      "fit": 10,
+      "url": "http://www.nycgovparks.org/events/2026/09/20/nyrr-open-run-conference-house-park"
+    },
+    {
+      "title": "NYRR Open Run: Marine Park",
+      "origin": "existing_parks_source_date_override",
+      "start": "08:45",
+      "points": {
+        "coffee": 0,
+        "cafe": 0,
+        "social": 10
+      },
+      "fit": 10,
+      "url": "http://www.nycgovparks.org/events/2026/09/20/nyrr-open-run-marine-park"
+    },
+    {
+      "title": "NYRR Open Run: Cunningham Park Back to School Chalk Challenge",
+      "origin": "existing_parks_source_date_override",
+      "start": "09:00",
+      "points": {
+        "coffee": 0,
+        "cafe": 0,
+        "social": 10
+      },
+      "fit": 10,
+      "url": "http://www.nycgovparks.org/events/2026/09/20/nyrr-open-run-cunningham-park"
+    },
+    {
+      "title": "Sunday Stewardship",
+      "origin": "existing_parks_source_date_override",
+      "start": "10:00",
+      "points": {
+        "coffee": 0,
+        "cafe": 0,
+        "social": 10
+      },
+      "fit": 10,
+      "url": "http://www.nycgovparks.org/events/2026/09/20/sunday-stewardship"
+    },
+    {
+      "title": "Trail Maintenance Workshop",
+      "origin": "existing_parks_source_date_override",
+      "start": "10:00",
+      "points": {
+        "coffee": 0,
+        "cafe": 0,
+        "social": 10
+      },
+      "fit": 10,
+      "url": "http://www.nycgovparks.org/events/2026/09/20/trail-maintenance-workshop"
+    },
+    {
+      "title": "Urban Farm Volunteers",
+      "origin": "existing_parks_source_date_override",
+      "start": "10:00",
+      "points": {
+        "coffee": 0,
+        "cafe": 0,
+        "social": 10
+      },
+      "fit": 10,
+      "url": "http://www.nycgovparks.org/events/2026/09/20/urban-farm-volunteers"
+    },
+    {
+      "title": "Yoga in the Garden",
+      "origin": "existing_parks_source_date_override",
+      "start": "10:15",
+      "points": {
+        "coffee": 0,
+        "cafe": 0,
+        "social": 10
+      },
+      "fit": 10,
+      "url": "http://www.nycgovparks.org/events/2026/09/20/yoga-in-the-garden"
+    },
+    {
+      "title": "Garden Highlights Walk",
+      "origin": "existing_parks_source_date_override",
+      "start": "13:00",
+      "points": {
+        "coffee": 0,
+        "cafe": 0,
+        "social": 10
+      },
+      "fit": 10,
+      "url": "http://www.nycgovparks.org/events/2026/09/20/garden-highlights-walk"
+    },
+    {
+      "title": "Hatha Flow",
+      "origin": "existing_parks_source_date_override",
+      "start": "13:00",
+      "points": {
+        "coffee": 0,
+        "cafe": 0,
+        "social": 10
+      },
+      "fit": 10,
+      "url": "http://www.nycgovparks.org/events/2026/09/20/hatha-flow"
+    },
+    {
+      "title": "Ongoing Outdoor Museum Exhibit: Alice's Terracotta Garden",
+      "origin": "existing_parks_source_date_override",
+      "start": "11:00",
+      "points": {
+        "coffee": 0,
+        "cafe": 0,
+        "social": 0
+      },
+      "fit": 0,
+      "url": "http://www.nycgovparks.org/events/2026/09/20/ongoing-outdoor-museum-exhibit-alices-terracotta-garden"
+    },
+    {
+      "title": "Raptor Fest",
+      "origin": "existing_parks_source_date_override",
+      "start": "12:00",
+      "points": {
+        "coffee": 0,
+        "cafe": 0,
+        "social": 0
+      },
+      "fit": 0,
+      "url": "http://www.nycgovparks.org/events/2026/09/20/raptor-fest"
+    },
+    {
+      "title": "Oktoberfest at The Castle",
+      "origin": "existing_parks_source_date_override",
+      "start": "13:00",
+      "points": {
+        "coffee": 0,
+        "cafe": 0,
+        "social": 0
+      },
+      "fit": 0,
+      "url": "http://www.nycgovparks.org/events/2026/09/20/oktoberfest-at-the-castle"
+    },
+    {
+      "title": "Summer on the Hudson: Sun Gaze Sundays",
+      "origin": "existing_parks_source_date_override",
+      "start": "13:00",
+      "points": {
+        "coffee": 0,
+        "cafe": 0,
+        "social": 0
+      },
+      "fit": 0,
+      "url": "http://www.nycgovparks.org/events/2026/09/20/summer-on-the-hudson-sun-gaze-sundays"
+    },
+    {
+      "title": "Gaga Pa'l Pueblo",
+      "origin": "existing_parks_source_date_override",
+      "start": "15:00",
+      "points": {
+        "coffee": 0,
+        "cafe": 0,
+        "social": 0
+      },
+      "fit": 0,
+      "url": "http://www.nycgovparks.org/events/2026/09/20/gaga-pal-pueblo"
+    },
+    {
+      "title": "Moli\u00e8re in the Park presents: DON JUAN",
+      "origin": "existing_parks_source_date_override",
+      "start": "15:00",
+      "points": {
+        "coffee": 0,
+        "cafe": 0,
+        "social": 0
+      },
+      "fit": 0,
+      "url": "http://www.nycgovparks.org/events/2026/09/20/molire-in-the-park-presents-don-juan1"
+    },
+    {
+      "title": "Moli\u00e8re in the Park presents: DON JUAN",
+      "origin": "existing_parks_source_date_override",
+      "start": "19:00",
+      "points": {
+        "coffee": 0,
+        "cafe": 0,
+        "social": 0
+      },
+      "fit": 0,
+      "url": "http://www.nycgovparks.org/events/2026/09/20/molire-in-the-park-presents-don-juan"
+    }
+  ],
+  "separate_user_supplied_diagnostic": {
+    "title": "The Last Bite Turns 1! Home Cafe",
+    "origin": "user_supplied_after_retrieval",
+    "start": "12:00",
+    "points": {
+      "coffee": 50,
+      "cafe": 40,
+      "social": 10
+    },
+    "fit": 100,
+    "url": "https://partiful.com/e/g82v9vaY5E2YPxRq2OYT"
+  },
+  "warning": "Manual labels and experimental relevance points; no production personalization or organic discovery claim."
+}

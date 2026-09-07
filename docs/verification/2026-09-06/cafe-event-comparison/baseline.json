@@ -1,0 +1,164 @@
+{
+  "checked_at": "2026-09-07 02:06:11.411708+00:00",
+  "db_sources": [
+    {
+      "source_id": "ucf_main",
+      "count": 7,
+      "first": "2026-09-10 17:00:00-04:00",
+      "last": "2026-09-18 10:00:00-04:00"
+    },
+    {
+      "source_id": "nyc_parks",
+      "count": 302,
+      "first": "2026-09-07 10:00:00-04:00",
+      "last": "2026-09-19 19:15:00-04:00"
+    }
+  ],
+  "db_target_day_nyc": 0,
+  "parks_publication": "2026-09-06 13:19:47+00:00",
+  "parks_counts": {
+    "eligible": 17,
+    "cancelled_or_registration_closed": 1,
+    "ambiguous_or_nonpark_location": 3,
+    "restricted_or_age_program": 9
+  },
+  "parks_coffee_keyword_hits": 0,
+  "parks_eligible": [
+    {
+      "title": "Summer on the Hudson: Tai Chi",
+      "source_url": "http://www.nycgovparks.org/events/2026/09/20/summer-on-the-hudson-tai-chi",
+      "starts_at": "2026-09-20 08:00:00-04:00",
+      "ends_at": "2026-09-20 09:30:00-04:00",
+      "category": "wellness",
+      "venue_name": "Soldiers' and Sailors' Monument (in Riverside Park)"
+    },
+    {
+      "title": "Celebrate 50 Years Through the Five Boroughs with Open Run: Conference House Park",
+      "source_url": "http://www.nycgovparks.org/events/2026/09/20/nyrr-open-run-conference-house-park",
+      "starts_at": "2026-09-20 08:45:00-04:00",
+      "ends_at": "2026-09-20 11:00:00-04:00",
+      "category": "outdoors",
+      "venue_name": "Conference House Park"
+    },
+    {
+      "title": "NYRR Open Run: Marine Park",
+      "source_url": "http://www.nycgovparks.org/events/2026/09/20/nyrr-open-run-marine-park",
+      "starts_at": "2026-09-20 08:45:00-04:00",
+      "ends_at": "2026-09-20 11:00:00-04:00",
+      "category": "outdoors",
+      "venue_name": "Carmine Carro Community Center (in Marine Park)"
+    },
+    {
+      "title": "NYRR Open Run: Cunningham Park Back to School Chalk Challenge",
+      "source_url": "http://www.nycgovparks.org/events/2026/09/20/nyrr-open-run-cunningham-park",
+      "starts_at": "2026-09-20 09:00:00-04:00",
+      "ends_at": "2026-09-20 12:00:00-04:00",
+      "category": "outdoors",
+      "venue_name": "Cunningham Park Parking Lot (in Cunningham Park)"
+    },
+    {
+      "title": "Urban Farm Volunteers",
+      "source_url": "http://www.nycgovparks.org/events/2026/09/20/urban-farm-volunteers",
+      "starts_at": "2026-09-20 10:00:00-04:00",
+      "ends_at": "2026-09-20 13:00:00-04:00",
+      "category": "wellness",
+      "venue_name": "Urban Farm (in Randall's Island Park)"
+    },
+    {
+      "title": "Sunday Stewardship",
+      "source_url": "http://www.nycgovparks.org/events/2026/09/20/sunday-stewardship",
+      "starts_at": "2026-09-20 10:00:00-04:00",
+      "ends_at": "2026-09-20 12:00:00-04:00",
+      "category": "outdoors",
+      "venue_name": "Margaret Corbin Circle (in Fort Tryon Park)"
+    },
+    {
+      "title": "Trail Maintenance Workshop",
+      "source_url": "http://www.nycgovparks.org/events/2026/09/20/trail-maintenance-workshop",
+      "starts_at": "2026-09-20 10:00:00-04:00",
+      "ends_at": "2026-09-20 12:00:00-04:00",
+      "category": "outdoors",
+      "venue_name": "Seaman Avenue and Isham Street Entrance (in Inwood Hill Park)"
+    },
+    {
+      "title": "Yoga in the Garden",
+      "source_url": "http://www.nycgovparks.org/events/2026/09/20/yoga-in-the-garden",
+      "starts_at": "2026-09-20 10:15:00-04:00",
+      "ends_at": "2026-09-20 11:15:00-04:00",
+      "category": "wellness",
+      "venue_name": "Wave Hill"
+    },
+    {
+      "title": "Ongoing Outdoor Museum Exhibit: Alice's Terracotta Garden",
+      "source_url": "http://www.nycgovparks.org/events/2026/09/20/ongoing-outdoor-museum-exhibit-alices-terracotta-garden",
+      "starts_at": "2026-09-20 11:00:00-04:00",
+      "ends_at": "2026-09-20 15:00:00-04:00",
+      "category": "arts_culture",
+      "venue_name": "H.H. Biddle House (in Conference House Park)"
+    },
+    {
+      "title": "Raptor Fest",
+      "source_url": "http://www.nycgovparks.org/events/2026/09/20/raptor-fest",
+      "starts_at": "2026-09-20 12:00:00-04:00",
+      "ends_at": "2026-09-20 15:00:00-04:00",
+      "category": "outdoors",
+      "venue_name": "Foch Boulevard and 155th Street (in Baisley Pond Park)"
+    },
+    {
+      "title": "Summer on the Hudson: Sun Gaze Sundays",
+      "source_url": "http://www.nycgovparks.org/events/2026/09/20/summer-on-the-hudson-sun-gaze-sundays",
+      "starts_at": "2026-09-20 13:00:00-04:00",
+      "ends_at": "2026-09-20 16:00:00-04:00",
+      "category": "outdoors",
+      "venue_name": "Pier I (in Riverside Park South)"
+    },
+    {
+      "title": "Hatha Flow",
+      "source_url": "http://www.nycgovparks.org/events/2026/09/20/hatha-flow",
+      "starts_at": "2026-09-20 13:00:00-04:00",
+      "ends_at": "2026-09-20 14:00:00-04:00",
+      "category": "wellness",
+      "venue_name": "Brower Park Lawn (in Brower Park)"
+    },
+    {
+      "title": "Garden Highlights Walk",
+      "source_url": "http://www.nycgovparks.org/events/2026/09/20/garden-highlights-walk",
+      "starts_at": "2026-09-20 13:00:00-04:00",
+      "ends_at": "2026-09-20 13:45:00-04:00",
+      "category": "outdoors",
+      "venue_name": "Wave Hill"
+    },
+    {
+      "title": "Oktoberfest at The Castle",
+      "source_url": "http://www.nycgovparks.org/events/2026/09/20/oktoberfest-at-the-castle",
+      "starts_at": "2026-09-20 13:00:00-04:00",
+      "ends_at": "2026-09-20 16:00:00-04:00",
+      "category": "outdoors",
+      "venue_name": "Bayside Historical Society (in Fort Totten Park)"
+    },
+    {
+      "title": "Moli\u00e8re in the Park presents: DON JUAN",
+      "source_url": "http://www.nycgovparks.org/events/2026/09/20/molire-in-the-park-presents-don-juan1",
+      "starts_at": "2026-09-20 15:00:00-04:00",
+      "ends_at": "2026-09-20 17:00:00-04:00",
+      "category": "arts_culture",
+      "venue_name": "Lefrak Center at Lakeside (in Prospect Park)"
+    },
+    {
+      "title": "Gaga Pa'l Pueblo",
+      "source_url": "http://www.nycgovparks.org/events/2026/09/20/gaga-pal-pueblo",
+      "starts_at": "2026-09-20 15:00:00-04:00",
+      "ends_at": "2026-09-20 19:00:00-04:00",
+      "category": "entertainment",
+      "venue_name": "Anne Loftus Playground (in Fort Tryon Park)"
+    },
+    {
+      "title": "Moli\u00e8re in the Park presents: DON JUAN",
+      "source_url": "http://www.nycgovparks.org/events/2026/09/20/molire-in-the-park-presents-don-juan",
+      "starts_at": "2026-09-20 19:00:00-04:00",
+      "ends_at": "2026-09-20 21:00:00-04:00",
+      "category": "arts_culture",
+      "venue_name": "Lefrak Center at Lakeside (in Prospect Park)"
+    }
+  ]
+}
