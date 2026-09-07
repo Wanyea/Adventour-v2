@@ -11,10 +11,12 @@ if (-not (Test-Path -LiteralPath $EnvFile)) {
 }
 
 $env:ENV_FILE = (Resolve-Path -LiteralPath $EnvFile).Path
-$python = Join-Path $serverRoot "adventour-server-venv\Scripts\python.exe"
-if (-not (Test-Path -LiteralPath $python)) {
-    $python = "python"
-}
+$pythonCandidates = @(
+    (Join-Path $serverRoot ".venv\Scripts\python.exe"),
+    (Join-Path $serverRoot "adventour-server-venv\Scripts\python.exe")
+)
+$python = $pythonCandidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+if (-not $python) { $python = "python" }
 
 & $python -m remote_service --check
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
