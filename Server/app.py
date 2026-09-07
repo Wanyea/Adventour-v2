@@ -67,6 +67,7 @@ if os.getenv("GAE_ENV", "").startswith("standard"):
     }
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SERVICE_VERSION"] = os.getenv("ADVENTOUR_SERVICE_VERSION", "unversioned-development")
 db.init_app(app)
 
 # Register blueprints
@@ -101,6 +102,25 @@ def home():
     return jsonify({
         "message": "This is the Adventour API. Refer to the documentation for available endpoints."
     })
+
+@app.route('/healthz', methods=['GET'])
+def healthz():
+    """Cheap liveness probe that does not require database access."""
+    return jsonify({"status": "ok", "service": "adventour-api", "version": app.config["SERVICE_VERSION"]})
+
+@app.route('/readyz', methods=['GET'])
+def readyz():
+    """Readiness probe; report unavailable until the local database responds."""
+    try:
+        db.session.execute(text("SELECT 1"))
+        return jsonify({"status": "ready", "database": "ok", "version": app.config["SERVICE_VERSION"]})
+    except Exception:
+        db.session.rollback()
+        return jsonify({"status": "not_ready", "database": "unavailable", "version": app.config["SERVICE_VERSION"]}), 503
+
+@app.route('/version', methods=['GET'])
+def version():
+    return jsonify({"service": "adventour-api", "version": app.config["SERVICE_VERSION"]})
 
 @app.route('/api/dev/config', methods=['GET'])
 def dev_config():
@@ -889,4 +909,4 @@ def places_autocomplete():
         return jsonify({'error': str(exc)}), 503
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.getenv("PORT", "8080")))
+    app.run(host=os.getenv("ADVENTOUR_BIND_HOST", "127.0.0.1"), port=int(os.getenv("PORT", "8080")))
