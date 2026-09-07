@@ -53,10 +53,13 @@ def validate_environment(env: Mapping[str, str] | None = None) -> dict[str, str]
     """Validate the remote-service contract without importing Flask or SQLAlchemy."""
 
     values = dict(os.environ if env is None else env)
+    env_file = values.get("ENV_FILE", "").strip()
+    if not env_file or not Path(env_file).is_file():
+        raise PreflightError("ENV_FILE must point to the selected existing remote environment file")
     if not _truthy(values.get("ADVENTOUR_REMOTE_MODE")):
         raise PreflightError("ADVENTOUR_REMOTE_MODE=true is required")
-    if _truthy(values.get("ADVENTOUR_DEV_AUTH")):
-        raise PreflightError("ADVENTOUR_DEV_AUTH must be false for remote service")
+    if values.get("ADVENTOUR_DEV_AUTH", "").strip().lower() != "false":
+        raise PreflightError("ADVENTOUR_DEV_AUTH=false is required for remote service")
     if values.get("FIREBASE_AUTH_EMULATOR_HOST", "").strip() or values.get("FIREBASE_AUTH_EMULATOR_HOSTS", "").strip():
         raise PreflightError("Firebase Auth emulator host overrides are forbidden for remote service")
 
@@ -92,14 +95,16 @@ def validate_environment(env: Mapping[str, str] | None = None) -> dict[str, str]
 
 def load_environment() -> None:
     """Load the operator-selected env file before preflight, without printing it."""
-    env_file = os.getenv("ENV_FILE")
-    if env_file:
-        load_dotenv(env_file, override=True)
+    env_file = os.getenv("ENV_FILE", "").strip()
+    if not env_file or not Path(env_file).is_file():
+        raise PreflightError("ENV_FILE must point to the selected existing remote environment file")
+    load_dotenv(env_file, override=True)
 
 
 def build_app():
     """Run preflight first, then import the side-effectful Flask application."""
 
+    load_environment()
     settings = validate_environment()
     from app import app  # noqa: PLC0415 - deliberately after preflight
 
