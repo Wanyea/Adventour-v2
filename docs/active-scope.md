@@ -11,6 +11,12 @@ the UCF event pipeline, Discover cards and organizer recheck now work. Current
 evidence and unresolved quality/source gaps: [phase2-results.md](phase2-results.md).
 Runbook: [local-events.md](local-events.md). Phase 2 is not declared complete.
 
+Current event-coverage slice: owner continued Phase 2 after the NYC preview and
+remaining-work review. Connect the NYC Parks factual public dataset with recorded
+reuse/location provenance, source-specific refresh/recheck and emulator evidence.
+This extends event coverage to NYC; it does not expand the place-index ingestion
+scope or open Phase 3. Earlier NYC-preview-only limits are superseded for events.
+
 ## Phase 1 record retained for joint review
 
 Approved by the owner on 2026-09-05: "Go ahead with Phase 1."

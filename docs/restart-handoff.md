@@ -2,6 +2,18 @@
 
 ## Current checkpoint after resuming (supersedes the pause record below)
 
+Latest active slice: NYC Parks is now connected and populated (302 eligible
+occurrences / 1,198 source rows). Seven UCF events remain. The six-hour local
+worker refreshes both adapters; NYC expiry is bounded by daily publication age,
+not just fetch age. 38 tests pass; isolated real-snapshot removal passed. Actual
+emulator NYC list/source-check screens and API report are saved. See the latest
+sections in local-events.md and phase2-results.md; preview-only statements below
+are historical. No app layout/source changes in this slice.
+Current backend session88728 and worker session89057 replace the sessions/PIDs
+below; Metro9447 remains. Both need restart after reboot. Source roster has
+ucf_main and nyc_parks. Next coverage gap is Palm Coast, then source-quality and
+hours/access follow-through. Phase 2 is still active, not accepted complete.
+
 Latest label follow-up: New York city/state now have distinct typed labels;
 new-york-city-state-labels.png shows both on the emulator. Ten focused launch
 tests pass. Owner-requested NYC preview completed: 1,198 NYC Parks rows, 1,080 preliminary

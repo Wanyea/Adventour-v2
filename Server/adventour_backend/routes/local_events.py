@@ -26,14 +26,14 @@ def listing():
 @blueprint.post('/api/local-events/<source_id>/<occurrence_id>/verify')
 @require_auth
 def verify(source_id, occurrence_id):
-    from data_pipeline.ucf_events import recheck
+    from data_pipeline.event_adapters import adapter
     config = events.sources().get(source_id)
     row = db.session.execute(text('SELECT * FROM local_event WHERE source_id=:s AND occurrence_id=:o'),
                              {'s':source_id,'o':occurrence_id}).mappings().first()
     if config is None or row is None:
         return jsonify(error='Event no longer listed; refresh the list'), 404
     try:
-        checked = recheck(db, config, row)
+        checked = adapter(config).recheck(db, config, row)
     except Exception:
         db.session.rollback()
         return jsonify(error='Organizer could not be checked. Try again before leaving.'), 503

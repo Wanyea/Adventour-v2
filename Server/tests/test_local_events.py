@@ -1,6 +1,7 @@
 """Focused event freshness and cancellation contracts, using synthetic occurrences."""
 
 from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 import os
 import uuid
 
@@ -44,7 +45,8 @@ def test_event_expiry_failed_refresh_and_atomic_cancellation(monkeypatch):
             'venue_name':'Synthetic venue','entity_id':None,'latitude':28.6027,'longitude':-81.2038,
             'h3_r8':__import__('h3').latlng_to_cell(28.6027,-81.2038,8),
             'verified_at':now,'expires_at':now+timedelta(hours=2)}
-    report={'window_start':now.date().isoformat(),'window_days':14}
+    local_day=now.astimezone(ZoneInfo('America/New_York')).date()
+    report={'window_start':local_day.isoformat(),'window_days':14}
     with backend.app.app_context():
         try:
             events.replace_window(backend.db,source_id,config,[record],report,now)
@@ -62,7 +64,7 @@ def test_event_expiry_failed_refresh_and_atomic_cancellation(monkeypatch):
             monkeypatch.setattr(events,'sources',lambda:{source_id:config})
             def failed(*args,**kwargs): raise TimeoutError('synthetic outage')
             monkeypatch.setattr('data_pipeline.ucf_events.collect',failed)
-            assert refresh(backend,now.date(),14)[source_id]['freshness_renewed'] is False
+            assert refresh(backend,local_day,14)[source_id]['freshness_renewed'] is False
             verified=backend.db.session.execute(text('SELECT verified_at FROM local_event WHERE source_id=:s'),{'s':source_id}).scalar_one()
             assert verified == now
             # Complete successful snapshot without occurrence removes it immediately.

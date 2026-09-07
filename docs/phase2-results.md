@@ -4,6 +4,18 @@ Scope: features 4/6/7 and 19/20, with hours/access research for 17/18. Phase 2
 remains active; this is not final product acceptance. Phase 1's open acceptance
 items remain in active-scope.md. No Phase 3 work has started.
 
+## Latest event-coverage checkpoint
+
+NYC Parks is connected with 302 eligible occurrences from 1,198 source rows;
+seven UCF occurrences remain available around Orlando. API geography checks show
+NYC-only results for NYC, UCF-only for Orlando, and no results for Palm Coast.
+The six-hour worker runs both adapters. NYC freshness is capped by the city's
+daily publication timestamp; successful refetches cannot rejuvenate old data.
+Cancelled/restricted/ambiguous events are excluded, with exact counts and the
+factual reuse basis in [local-events.md](local-events.md). 38 backend tests pass.
+Screens: `nyc-events-screen.png`, `nyc-event-recheck.png`. Existing app layout and
+source files are unchanged. Earlier NYC-empty screenshots below are historical.
+
 ## Owner-reported launch correction
 
 Reproduced New York, NY displaying Orlando cards and UCF events. The cause was

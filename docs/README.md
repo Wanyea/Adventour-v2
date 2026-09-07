@@ -9,8 +9,10 @@ Owner-review fix: New York no longer resolves to an Orlando POI's coordinates.
 Worldwide city/address lookup is independent of indexed coverage. Events follow
 the selected launch coordinates; changing regions clears prior results;
 see the launch correction in [phase2-results.md](phase2-results.md).
-City/state labels are now distinct. A live NYC Parks source preview is recorded
-in [local-events.md](local-events.md); NYC events are not yet in the app database.
+City/state labels are now distinct. NYC Parks is connected: 302 eligible dated
+occurrences stored, shown only around NYC, alongside seven UCF dates for Orlando.
+Both sources refresh every six hours while the local worker runs. See
+[local-events.md](local-events.md) for daily-publication limits and screen evidence.
 
 Updated 2026-09-06. Read [HANDOFF.md](../HANDOFF.md) for the closed 23-feature
 product and stopping point, then [AGENTS.md](../AGENTS.md) for the working agreement.

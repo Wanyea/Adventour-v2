@@ -10,12 +10,43 @@
     "max_age_hours": 24,
     "retention": "Active-window facts only; expired rows purged on successful refresh.",
     "access_url": "https://cah.ucf.edu/events/ticketing/",
-    "locations": [{
-      "feed_name": "UCF Art Gallery",
-      "owned_name": "UCF Art Gallery",
-      "website_hosts": ["gallery.cah.ucf.edu", "cah.ucf.edu"],
-      "bbox": [-81.21, 28.60, -81.20, 28.61],
-      "access": "Public admission; free exhibition and reception. Check organizer details before leaving."
-    }]
+    "locations": [
+      {
+        "feed_name": "UCF Art Gallery",
+        "owned_name": "UCF Art Gallery",
+        "website_hosts": [
+          "gallery.cah.ucf.edu",
+          "cah.ucf.edu"
+        ],
+        "bbox": [
+          -81.21,
+          28.6,
+          -81.2,
+          28.61
+        ],
+        "access": "Public admission; free exhibition and reception. Check organizer details before leaving."
+      }
+    ]
+  },
+  "nyc_parks": {
+    "name": "NYC Parks Open Data",
+    "metro": "new_york",
+    "method": "nyc_parks_open_data",
+    "permission_url": "https://cityofnewyork.github.io/opendatatsm/LocalLaw11of2012.html",
+    "permission_checked": "2026-09-06",
+    "permission_basis": "NYC Open Data law section 23-502(d) permits use of published factual datasets; source/version/modifications recorded. Owner continued Phase 2 after NYC adapter and storage-basis work was raised. Scope: public NYC Parks dataset w3wp-dpdi, factual occurrence fields and city-published meeting-point coordinates only. No Google responses, prose, images or contacts.",
+    "dataset_url": "https://data.cityofnewyork.us/d/w3wp-dpdi",
+    "location_basis": "Coordinates and named park meeting points from the NYC Parks public dataset; single park ID and NYC bounds required. No Google Places lookup or Maps-link coordinate extraction.",
+    "refresh_hours": 6,
+    "max_age_hours": 24,
+    "publication_frequency": "daily",
+    "retention": "Active-window facts only; expired rows purged on successful refresh. Repeated fetch does not renew publication age.",
+    "access_url": "https://data.cityofnewyork.us/d/w3wp-dpdi",
+    "bbox": [
+      -74.26,
+      40.49,
+      -73.69,
+      40.92
+    ]
   }
 }

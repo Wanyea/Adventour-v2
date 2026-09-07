@@ -12,12 +12,12 @@ from sqlalchemy import text
 
 def refresh(backend, start, days):
     from adventour_backend.services import local_event_service as events
-    from data_pipeline.ucf_events import collect
+    from data_pipeline.event_adapters import adapter
     reports = {}
     with backend.app.app_context():
         for source_id, config in events.sources().items():
             try:
-                records, report = collect(backend.db, config, start, days)
+                records, report = adapter(config).collect(backend.db, config, start, days)
                 events.replace_window(backend.db, source_id, config, records, report)
                 backend.db.session.commit()
                 reports[source_id] = report

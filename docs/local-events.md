@@ -23,6 +23,58 @@ for deployment; the modest-use public endpoint is a local-development dependency
 not demonstrated production capacity. Search failures are shown separately from
 no matches, and GPS remains available.
 
+## NYC Parks connected (September 6, supersedes preview-only status below)
+
+NYC Parks is now a second configured source. The owner continued Phase 2 after
+reviewing the NYC preview and the remaining source/storage work. NYC Open Data's
+[technical standards and law, section 23-502(d)](https://cityofnewyork.github.io/opendatatsm/LocalLaw11of2012.html)
+provide the factual-dataset reuse basis. This is a specific addition for dataset
+[w3wp-dpdi](https://data.cityofnewyork.us/d/w3wp-dpdi), not a blanket change to the
+Google or social-platform data boundary. The roster records source, version,
+modifications, fields and retention. No Google API or Maps-link parsing is used.
+Named meeting points and coordinates come from the city's published dataset;
+require a single park ID, a location name and valid NYC-bounded coordinates.
+No NYC place-index acquisition or changes to the 19,385 owned places occurred.
+
+The Sept6-19 snapshot has 302 eligible dated occurrences out of 1,198 source rows.
+Disjoint exclusions: 685 restricted/age-focused programs, 109 ambiguous/nonpark
+locations, 53 cancellations/closed registration, 18 ended, 17 outside the window,
+12 unusable coordinates and two invalid durations. This source-specific yield
+counts recurring sessions separately. It does not measure all NYC events or prove
+that every admitted event suits the user. Fees, capacity and requirements remain
+organizer checks. The earlier 1,080-row preview used fewer checks and was never
+an ingestion-quality result.
+
+Both scheduled refresh and explicit event recheck now dispatch to the correct
+adapter. The existing worker refreshes UCF and NYC every six hours. NYC's public
+publication is daily: `verified_at` is its `rowsUpdatedAt`, not download time.
+At publication+24h or event end, whichever is earlier, rows disappear; repeated
+fetches of the same version do not extend expiry. Missing/stale/future metadata,
+HTTP failure, unexpected schema or a truncated feed cannot replace the snapshot
+or renew freshness. This conservative rule can leave temporary coverage gaps
+between publication expiry and a successful refresh. A successful full snapshot
+removes disappeared/cancelled occurrences. The next cycle discovers newly
+published occurrences in this configured source; it does not discover new sites.
+
+The check button re-fetches the current official dataset for that occurrence.
+It is a published-source check, not a live organizer-capacity promise; the event
+note explicitly says the calendar updates daily and to check before leaving.
+Official event links remain available. Event-page fetches were blocked in the
+research environment, so no separate page-crawl verification is claimed.
+
+Working API: NYC returns the first 50 dates from 302 stored occurrences, Orlando
+returns seven UCF dates, and Palm Coast returns zero. NYC source check returns200.
+Emulator proof: `nyc-events-screen.png` and `nyc-event-recheck.png` in
+verification/2026-09-06; machine evidence is `nyc-events-live.json`.
+All 38 backend tests pass. The real NYC snapshot was first written to the isolated
+DB, queried in NYC/Orlando, removed through a successful empty snapshot and cleaned.
+Tests cover cancellation, registration closure, location validity, stale/truncated
+source failure and publication age. A pre-existing test used a UTC date for a
+New York calendar window; that fixture now uses the calendar timezone.
+No app source, screen structure, styles or dependencies changed in this slice.
+The external Maps handoff still encountered the emulator permission-controller
+dialog; directions are not counted as visually verified by this checkpoint.
+
 ## Source and storage boundary
 
 The initial working source is UCF's documented JSON feeds. Its
@@ -149,7 +201,7 @@ this environment, so separate organizer verification was not completed. Sample
 links and diagnostics are in `verification/2026-09-06/nyc-events-preview.json`.
 No descriptions, images, contacts, or event row payloads were saved in that report.
 
-Remaining before NYC app population: implement source dispatch (the worker and
+Historical preview gaps (subsequently resolved or bounded as described above): implement source dispatch (the worker and
 organizer recheck currently assume UCF), record an approved factual-storage basis
 under AGENTS' data boundary, establish venue/coordinate provenance independently
 of Google, and demonstrate cancellation/expiry and access handling on the emulator.
