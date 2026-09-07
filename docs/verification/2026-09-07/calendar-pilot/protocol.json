@@ -1,0 +1,98 @@
+{
+  "version": "calendar_pilot_v1",
+  "approved": "Owner: 'Ok lets move forward with the pilot then.' 2026-09-07",
+  "mode": "Read-only offline acquisition diagnostics; no production data writes, paid API/model calls, browser login or source enrollment.",
+  "window": {
+    "start": "2026-09-07",
+    "end_exclusive": "2026-10-05",
+    "timezone": "America/New_York"
+  },
+  "limits": {
+    "pages_per_source": 4,
+    "event_nodes_per_source": 30,
+    "linked_leads_per_source": 12,
+    "timeout_seconds": 10,
+    "minimum_host_delay_seconds": 1.5
+  },
+  "method": "Start from the fixed calendar/organizer roots. Breadth-first follow same-host event/calendar or ticket/workshop links, event-detail paths before calendar pagination, URL lexical ties. Parse Event JSON-LD and report visible event/date signals when no structured event is extractable. Record unsupported external event links as leads, never as acquired events. Reuse robots-aware public-URL checks. No search-result event names added.",
+  "eligibility": "Parse explicit start/end, do not invent missing dates/end times. Require target-window overlap and explicit matching city/region evidence in the Event location, not a footer. Cancellation, access restrictions, missing location or timezone uncertainties are reported separately. Publicly accessible page is not public admission. Candidate facts remain review-required unless access, precise venue, source freshness and reuse are established.",
+  "pre_exposure": "NYC sources are known development leads from earlier experiments; this is repeatability/yield, not blind discovery. Supplied Last Bite link is never a seed. No claim of metro recall.",
+  "decision": "Report traversal coverage, extracted nodes, dated/in-region/review-required counts, blockers, requests/bytes/seconds and source-specific next decision. Zero events is a valid result. No broad crawler or adapter promoted solely from extraction yield.",
+  "sources": [
+    {
+      "id": "nyc_multimodal",
+      "region": "new_york",
+      "url": "https://www.multimodalroasting.com/",
+      "city_terms": [
+        "new york",
+        "long island city",
+        "queens",
+        "brooklyn",
+        "manhattan",
+        "staten island",
+        "bronx"
+      ],
+      "reuse": "Offline diagnostic only; commercial event retention not established."
+    },
+    {
+      "id": "nyc_sequoia",
+      "region": "new_york",
+      "url": "https://www.sequoiacafenyc.com/events",
+      "city_terms": [
+        "new york",
+        "staten island"
+      ],
+      "reuse": "Offline diagnostic only; commercial event retention not established."
+    },
+    {
+      "id": "nyc_corgi",
+      "region": "new_york",
+      "url": "https://luma.com/usecorginyc",
+      "city_terms": [
+        "new york",
+        "nyc",
+        "manhattan",
+        "brooklyn",
+        "queens"
+      ],
+      "reuse": "Offline diagnostic only; no platform-wide crawl permission inferred."
+    },
+    {
+      "id": "nyc_newsletter",
+      "region": "new_york",
+      "url": "https://www.nycforfree.co/events",
+      "city_terms": [
+        "new york",
+        "nyc",
+        "manhattan",
+        "brooklyn",
+        "queens",
+        "staten island",
+        "bronx"
+      ],
+      "reuse": "Offline diagnostic only; no newsletter text or images retained."
+    },
+    {
+      "id": "orlando_library",
+      "region": "orlando",
+      "url": "https://ocls.org/calendar/",
+      "city_terms": [
+        "orlando",
+        "winter garden",
+        "windermere",
+        "ocoee",
+        "apopka"
+      ],
+      "reuse": "Offline diagnostic only; library feed/retention basis must be established before ingestion."
+    },
+    {
+      "id": "palm_coast_city",
+      "region": "palm_coast",
+      "url": "https://www.palmcoast.gov/events",
+      "city_terms": [
+        "palm coast"
+      ],
+      "reuse": "Offline diagnostic only; municipal source retention basis must be established before ingestion."
+    }
+  ]
+}
