@@ -106,7 +106,9 @@ recovery while continuously open still needs verification. Exposure
 behavior under all native alerts/modals needs checking. Sampling assignment and
 caps are recorded but a full reporting command and pretest are still outstanding.
 
-Then finish GPS-driven regional acquisition on the PC, remote HTTPS/Firebase
-rehearsal, iOS configuration/signing/build and off-network iPhone validation. An
-empty region is not worldwide coverage. Keep all Phase 2 source/hour/access and
-Phase 1 acceptance gaps visible. No invitations before those readiness gates.
+Then finish GPS-driven regional acquisition on the PC and remote HTTPS/Firebase
+rehearsal. For iPhone distribution, follow the bounded [distribution
+checklist](iphone-distribution-checklist.md) for iOS configuration, signing,
+archive, TestFlight and off-network validation. An empty region is not
+worldwide coverage. Keep all Phase 2 source/hour/access and Phase 1 acceptance
+gaps visible. No invitations before those readiness gates.

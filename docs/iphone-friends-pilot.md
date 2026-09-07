@@ -37,10 +37,12 @@ but useful recommendations everywhere have not been demonstrated.
 ## iOS readiness
 
 The repo has a bare React Native iOS project and Podfile, bundle identifier
-`com.adventour.app`. No iOS build was run on this Windows machine.
+`com.adventour.app`. The release checklist is [iPhone distribution
+checklist](iphone-distribution-checklist.md). No iOS build was run on this
+Windows machine.
 
-- Location usage description in Info.plist is empty; provide a clear foreground
-  purpose and verify allow/deny behavior on an actual iPhone.
+- The foreground location usage description is now present in Info.plist;
+  verify the allow/deny behavior on an actual iPhone.
 - Firebase iOS service configuration was not found in the inspected tree;
   verify configuration and initialization with the real project on macOS.
 - Signing team is not configured in the inspected Xcode project. Apple Developer
@@ -89,8 +91,9 @@ Use existing review surfaces first; propose any additional feedback UI explicitl
    This extends the earlier seed-only ingestion boundary at the owner's request.
 3. Connect remote HTTPS access and real tester auth; verify an off-network request
    plus a persisted recommendation/feedback export. Keep the PC as the server.
-4. Build/sign on macOS, verify GPS and the same flow on iPhone, then prepare the
-   concrete TestFlight build and review information for distribution.
+4. Follow the [iPhone distribution checklist](iphone-distribution-checklist.md)
+   to build/sign on macOS, verify GPS and the same flow on iPhone, then prepare
+   the concrete TestFlight build and review information for distribution.
 
 No phase completion or global event-coverage claim follows from these checkpoints.
 Source quality, hours/access and the existing Phase 1 acceptance gaps remain visible.

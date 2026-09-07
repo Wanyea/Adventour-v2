@@ -27,6 +27,8 @@ these controls, immutable place/event study records and optional feedback, with
 an exact emulator answer/score replay and a standard-build no-study-write check.
 Unexplained rejects no longer become category dislikes (`personal_v2_ambiguous_rejects`).
 The full instrument and iPhone/distribution/coverage gates remain incomplete.
+The dependency-ordered Phase 2 ticket queue is tracked in [tickets/README.md](tickets/README.md);
+the iPhone distribution readiness slice is documented in [iphone-distribution-checklist.md](iphone-distribution-checklist.md).
 
 Owner approved the bounded follow-up event discovery experiment after reviewing
 the Sep20 miss. The [Sep26-27 results](verification/2026-09-06/event-source-experiment/README.md)

@@ -4,7 +4,10 @@ September 7: the [repeatable source pilot](verification/2026-09-07/calendar-pilo
 has run: six sources, 24 parsed pages, 11 candidates, none promoted to production.
 [iPhone friends pilot requirements](iphone-friends-pilot.md) now include GPS
 anywhere with acquisition/backend on the owner's PC, without seeded-city limits.
-Automatic coverage acquisition and iOS distribution are not yet implemented.
+Automatic coverage acquisition and iOS distribution are not yet completed. The
+[iPhone distribution checklist](iphone-distribution-checklist.md) records the
+Mac/Xcode, Firebase, HTTPS, device and TestFlight gates; no iOS build is
+claimed from this Windows workspace.
 The [pilot measurement contract](pilot-measurement-contract.md) defines the data,
 optional questions and verification required before friends testing. Its
 [first implementation slice](pilot-runbook.md) adds pilot-only feedback and study
@@ -145,3 +148,6 @@ database and review the preview before refreshing the working index.
 
 `archive/` is historical. The abandoned `codex` branch is reference only; no code
 has been ported from it.
+# Delivery queue
+
+The current ticket queue and review contract live in [tickets/README.md](tickets/README.md). It breaks the approved five-phase roadmap into dependency-ordered, reviewable slices; it does not create a second roadmap.
