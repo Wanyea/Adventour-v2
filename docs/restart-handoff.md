@@ -2,6 +2,24 @@
 
 ## Current checkpoint after resuming (supersedes the pause record below)
 
+September 7 later checkpoint: actual bounded calendar collector implemented in
+`Server/data_pipeline/calendar_pilot.py`. Six fixed sources, two preserved runs;
+run 2 parsed 24 pages, retained 11 candidates, eight passed date/region prechecks,
+zero production-ready. Manual review found a sold-out Sequoia candidate that
+JSON-LD did not flag. Four focused tests pass. Full evidence, commands and next
+bounded correction: [calendar pilot](verification/2026-09-07/calendar-pilot/README.md).
+No production DB/app/source-roster changes in this slice. Preserve the owner's
+uncommitted edit to the older event-source-experiment/review.md.
+
+Friends pilot: all testers use iPhones, must use GPS anywhere with no seeded-city
+restriction; owner's PC may host the backend/data, no app-bundled index needed.
+[Preflight and ordered checkpoints](iphone-friends-pilot.md) records this steering.
+Worldwide lookup already works, automatic regional acquisition does not. iOS
+Firebase/signing/location configuration, Mac build access and a reachable HTTPS
+backend remain unverified. No TestFlight build, remote exposure or invites made.
+The source pilot is no longer merely proposed. Next slice is recorded in its
+report; do not repeat the original hand-run search and call it the collector.
+
 September 7: owner event review received, E4=0/E1=2/E3=2/E2=1. Verbatim labels
 and interpretations are in [owner-review](verification/2026-09-06/event-source-experiment/owner-review.md).
 E1 appeals but is explicitly not cafe-relevant; E3's novelty appeals with a

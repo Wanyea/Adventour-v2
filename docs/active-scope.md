@@ -6,6 +6,15 @@ transition only. Phases 3–5 remain closed. Phase 1 acceptance gaps remain open
 
 **Resume entry point:** [restart-handoff.md](restart-handoff.md).
 
+September 7: owner authorized the repeatable source pilot, now implemented and
+run: [calendar results](verification/2026-09-07/calendar-pilot/README.md).
+The owner also requested an iPhone friends pilot with GPS anywhere, explicitly
+rejecting seeded-city restrictions, and offered their PC as the server.
+[Pilot requirements/preflight](iphone-friends-pilot.md) records the necessary
+server-side regional acquisition, remote access, build and feedback checkpoints.
+This supersedes the earlier seed-only place-ingestion restriction for that pilot;
+no worldwide coverage, remote deployment or iOS build is claimed implemented.
+
 Owner approved the bounded follow-up event discovery experiment after reviewing
 the Sep20 miss. The [Sep26-27 results](verification/2026-09-06/event-source-experiment/README.md)
 and [preference-summary assessment](preference-profile-assessment.md) preserve

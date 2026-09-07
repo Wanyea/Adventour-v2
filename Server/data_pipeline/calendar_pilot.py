@@ -93,6 +93,7 @@ def timestamp(value, zone):
     if not isinstance(value, str) or 'T' not in value:
         return None, 'missing_or_date_only'
     try:
+        value = re.sub(r'([+-]\d{2})(\d{2})$', r'\1:\2', value)
         parsed = datetime.fromisoformat(value.replace('Z', '+00:00'))
     except ValueError:
         return None, 'invalid_time'
@@ -144,24 +145,34 @@ def candidate(node, url, source, window):
             'storage_permission': 'not_established', 'precise_venue_verified': False}
 
 
-def links(page, base):
+def links(page, base, window=None):
     same, external = {}, set()
+    dated = {}
+    if window:
+        for article in re.findall(r'<article\b[^>]*>(.*?)</article>', page, re.I | re.S):
+            dates = re.findall(r'datetime=["\'](\d{4}-\d{2}-\d{2})', article, re.I)
+            if dates and window['start'] <= dates[0] < window['end_exclusive']:
+                for href, _ in LINK_RE.findall(article):
+                    dated[canonical(urljoin(base, href))] = dates[0]
     for href, anchor in LINK_RE.findall(page):
         url = canonical(urljoin(base, href.strip()))
         parsed = urlparse(url)
         if parsed.scheme not in {'http', 'https'}:
             continue
+        if re.search(r'format=ical|action=TEMPLATE|/calendar/(?:render|event)', url, re.I):
+            continue
         text = parsed.path + ' ' + visible_text(anchor)
         if not re.search(r'event|calendar|workshop|ticket', text, re.I):
             continue
         if parsed.hostname != urlparse(base).hostname:
-            external.add(url)
+            if not re.search(r'(^|\.)(google|facebook|twitter)\.com$', parsed.hostname or ''):
+                external.add(url)
             continue
         if url == canonical(base) or re.search(r'\.(pdf|jpg|png|ics)$', parsed.path, re.I):
             continue
         # Event-detail paths before collection pages, then URL lexical order.
         priority = 0 if re.search(r'/(?:events?|workshops?)/[^/]+', parsed.path, re.I) else 1
-        same[url] = priority
+        same[url] = (-1, dated[url]) if url in dated else (priority, '')
     return sorted(same, key=lambda u: (same[u], u)), sorted(external)
 
 
@@ -189,7 +200,7 @@ def run_source(source, protocol, fetcher):
                 continue
             page = response.text
             found, errors = event_nodes(page)
-            next_urls, other_urls = links(page, response.url)
+            next_urls, other_urls = links(page, response.url, protocol['window'])
             external.update(other_urls)
             queue.extend(u for u in next_urls if u not in visited and u not in queue)
             text = visible_text(page)

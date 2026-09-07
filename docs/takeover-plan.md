@@ -1,5 +1,15 @@
 # Adventour completion plan — Phase 2 approved and active
 
+**September 7 pilot steering:** the owner requested an iPhone friends pilot,
+usable from GPS wherever testers are without a seeded-city restriction, and
+offered their PC as the data/backend server. [Pilot requirements and checkpoints](iphone-friends-pilot.md)
+extend Phase 2 preparation to on-demand regional acquisition and remote testing;
+earlier seed-only pilot/ingestion limits below are superseded for this work.
+No place index needs to be bundled into the phone. The five-phase sequence and
+closed feature list remain; iOS distribution is an additional owner-requested
+pilot checkpoint, not a claim that the Android completion criteria are satisfied.
+The [bounded source pilot](verification/2026-09-07/calendar-pilot/README.md) has run.
+
 Prepared 2026-09-05 after reading HANDOFF.md completely, AGENTS.md, the references in
 HANDOFF §7, and both label files including their written answers. HANDOFF §5 is the
 closed feature list; §6 is the stopping point. This replaces the inherited scope
