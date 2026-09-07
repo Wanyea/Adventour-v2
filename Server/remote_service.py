@@ -62,6 +62,9 @@ def validate_environment(env: Mapping[str, str] | None = None) -> dict[str, str]
         raise PreflightError("ADVENTOUR_DEV_AUTH=false is required for remote service")
     if values.get("FIREBASE_AUTH_EMULATOR_HOST", "").strip() or values.get("FIREBASE_AUTH_EMULATOR_HOSTS", "").strip():
         raise PreflightError("Firebase Auth emulator host overrides are forbidden for remote service")
+    libpq_redirect_vars = {"PGHOST", "PGHOSTADDR", "PGSERVICE", "PGSERVICEFILE"}
+    if any(values.get(name, "").strip() for name in libpq_redirect_vars):
+        raise PreflightError("libpq endpoint override environment variables are forbidden for remote service")
 
     database_url = values.get("DATABASE_URL", "").strip()
     if not database_url:
