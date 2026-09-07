@@ -38,3 +38,6 @@ yarn-error.log*
 
 # Env
 adventour-server-venv/
+
+# Firebase service-account credentials
+credentials/
