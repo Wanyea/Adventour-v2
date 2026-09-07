@@ -5,6 +5,8 @@ has run: six sources, 24 parsed pages, 11 candidates, none promoted to productio
 [iPhone friends pilot requirements](iphone-friends-pilot.md) now include GPS
 anywhere with acquisition/backend on the owner's PC, without seeded-city limits.
 Automatic coverage acquisition and iOS distribution are not yet implemented.
+The [pilot measurement contract](pilot-measurement-contract.md) defines the data,
+optional questions and verification required before friends testing; design only.
 
 **Resumed after PC restart (2026-09-06).** Current checkpoint:
 [phase2-results.md](phase2-results.md), with [local-events.md](local-events.md)

@@ -54,6 +54,13 @@ backend are prerequisites; no accounts were purchased or invitations sent.
 
 ## Study trace and feedback
 
+The owner's follow-up requires consistent, useful data and low-effort feedback.
+The [measurement contract](pilot-measurement-contract.md) now defines exact
+questions/scales, automatic records, exposure/skip semantics, sampling limits,
+replay/export gates and the finite first review. This is the instrumentation
+specification for implementation; the small Discover feedback controls are
+proposed for explicit UI approval, not already built.
+
 Existing place decisions preserve rank, model, score components and user identity;
 interaction events can reference the immutable decision. Existing trip-stop
 reviews collect stars and notes. These are a useful starting point, not complete
@@ -70,6 +77,8 @@ Use existing review surfaces first; propose any additional feedback UI explicitl
 
 1. Complete the current repeatable source pilot and record its misses/yield.
    [Completed offline report](verification/2026-09-07/calendar-pilot/README.md).
+   Next implement the reviewed measurement contract and demonstrate one joined
+   place/event feedback export before inviting testers or comparing algorithms.
 2. Measure on-demand place acquisition for an unseeded location on this PC,
    including repeat requests and a failed acquisition, then show its deck/score.
    This extends the earlier seed-only ingestion boundary at the owner's request.

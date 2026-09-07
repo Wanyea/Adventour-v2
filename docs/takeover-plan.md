@@ -10,6 +10,11 @@ closed feature list remain; iOS distribution is an additional owner-requested
 pilot checkpoint, not a claim that the Android completion criteria are satisfied.
 The [bounded source pilot](verification/2026-09-07/calendar-pilot/README.md) has run.
 
+The subsequent [pilot measurement contract](pilot-measurement-contract.md) makes
+traceable collection, short optional feedback, replay/export verification and a
+finite review prerequisite to friends testing. It stays inside Phase 2; proposed
+small feedback controls still need the UI approval specified in AGENTS.md.
+
 Prepared 2026-09-05 after reading HANDOFF.md completely, AGENTS.md, the references in
 HANDOFF §7, and both label files including their written answers. HANDOFF §5 is the
 closed feature list; §6 is the stopping point. This replaces the inherited scope

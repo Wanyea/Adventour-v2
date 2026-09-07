@@ -2,6 +2,17 @@
 
 ## Current checkpoint after resuming (supersedes the pause record below)
 
+Latest owner steering: pilot must collect exact, consistent useful data while
+being friendly and encouraging optional responses. Read
+[pilot-measurement-contract.md](pilot-measurement-contract.md) before implementing
+pilot telemetry. It specifies question versions/ordinal scales, automatic request/
+candidate/decision/exposure/source snapshots, explicit missingness and retry rules,
+small optional feedback controls, pretest and seven-day review gates. Design only;
+UI approval for the proposed controls is pending. No algorithm or UI changed.
+Current ranker treats every reject as negative taste; current events lack decision
+trace; deck polls visibility at 700ms rather than measuring continuous exposure.
+These are named implementation gaps, not completed fixes. Preserve old labels.
+
 September 7 later checkpoint: actual bounded calendar collector implemented in
 `Server/data_pipeline/calendar_pilot.py`. Six fixed sources, two preserved runs;
 run 2 parsed 24 pages, retained 11 candidates, eight passed date/region prechecks,
