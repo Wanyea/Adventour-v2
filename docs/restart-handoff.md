@@ -2,6 +2,15 @@
 
 ## Current checkpoint after resuming (supersedes the pause record below)
 
+September 7: owner event review received, E4=0/E1=2/E3=2/E2=1. Verbatim labels
+and interpretations are in [owner-review](verification/2026-09-06/event-source-experiment/owner-review.md).
+E1 appeals but is explicitly not cafe-relevant; E3's novelty appeals with a
+market-style preference; E2's class/signup format is less appealing for ongoing
+community. Its dated URL now returns404; general Regalia activity page does not
+reconfirm September26. Preserve original scores/results; no model/profile/DB
+writes or master-plan amendment approval inferred. Existing uncommitted edit to
+the review.md template was left alone.
+
 Owner then approved the next event experiment and proposed a preference-summary
 idea for critique (not an instruction to replace serving). The frozen Sep26-27
 NYC comparison is in [event-source-experiment](verification/2026-09-06/event-source-experiment/README.md):

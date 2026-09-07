@@ -1,5 +1,12 @@
 # Event discovery experiment v1 — agent-run portion complete
 
+**September 7 follow-up:** the owner reviewed all four candidates: E4=0,
+E1=2, E3=2, E2=1. See [owner-review.md](owner-review.md) for the distinction
+between cafe relevance and overall appeal, and the confirmed E2 broken link.
+E2's September26 occurrence now needs re-verification. Counts and statuses below
+are the frozen September6 observations, not a current event-availability claim.
+The initial human review is received; broader independent validation is not.
+
 Owner approved the preceding comparison's next experiment. This run tests
 September 26–27, 2026 in NYC with cafe interest, using unseen event dates rather
 than tuning against the known September 20 home-cafe example.
@@ -84,4 +91,3 @@ Verification: protocol LF SHA256
 matches its pre-retrieval commit; 12/12 selected URL dispositions accounted for;
 score arithmetic checked; supplied friend URL absent from selected results.
 No application, DB, source roster or UI changes.
-

@@ -10,8 +10,12 @@ Owner approved the bounded follow-up event discovery experiment after reviewing
 the Sep20 miss. The [Sep26-27 results](verification/2026-09-06/event-source-experiment/README.md)
 and [preference-summary assessment](preference-profile-assessment.md) preserve
 that work and distinguish the owner's architectural idea from implementation
-authorization. Human taste validation is pending; no new production source or
-LLM serving path was added.
+authorization. The owner supplied four development reviews on September 7;
+[review findings](verification/2026-09-06/event-source-experiment/owner-review.md)
+separate topic relevance from appeal and flag E2's now-broken dated link.
+Broader independent validation is pending; no new production source or LLM
+serving path was added. The proposed preference-comparison amendment is not
+implicitly approved by receipt of these labels.
 Protocol: [phase2-discovery.md](phase2-discovery.md), following Phase 2 of the
 approved takeover plan. Personal ranking is demonstrated in both seed metros;
 the UCF event pipeline, Discover cards and organizer recheck now work. Current

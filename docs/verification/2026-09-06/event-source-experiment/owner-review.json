@@ -1,0 +1,91 @@
+{
+  "review_date": "2026-09-07",
+  "reviewer": "project_owner",
+  "source": "Owner message in this conversation",
+  "scenario": "NYC cafe-interest review for September 26-27, 2026",
+  "scale": {
+    "0": "not for me",
+    "1": "maybe",
+    "2": "would consider"
+  },
+  "limits": [
+    "One reviewer, four development examples.",
+    "Not Jackie or population ground truth; no user account/profile writes.",
+    "Scores were previously discussed in conversation, so a score-hidden sheet does not make this a fully blinded review.",
+    "Numeric fit reflects expressed willingness to consider; topical cafe relevance must be recorded separately.",
+    "E2 assessment affected by failed event-page access."
+  ],
+  "reviews": [
+    {
+      "id": "E4",
+      "fit": 0,
+      "verbatim": "Fit - 0, even though cafe is in the name of the event, it does not look like a cafe at all but instead its a church hosting musical artists? I totally understand why you would think it was a cafe because coffeehouse is literally in the description but they dont have a menu or any mention of coffee anywhere else which is bizzare.",
+      "interpretation": {
+        "cafe_match": "explicitly rejected",
+        "reason": "Perceived performance venue, no coffee/menu evidence.",
+        "do_not_infer": "No dislike of religion, churches, music or performers in general is established."
+      }
+    },
+    {
+      "id": "E1",
+      "fit": 2,
+      "verbatim": "Fit - 2, This is an interesting event that I would consider and appreciate that it is called it that tickets are required. Only thing is this is techically a cafe interest review and this is not a cafe but instead a food vendor event. Still a good event just not meeting the cafe interest, definitely fits in the realm of food though.",
+      "interpretation": {
+        "cafe_match": "explicitly rejected",
+        "reason": "Would consider food-vendor event; values ticket requirement disclosure.",
+        "do_not_infer": "Do not change fit to 0 or count its fit=2 as cafe-category relevance; do not infer a strict cafe query should return it."
+      }
+    },
+    {
+      "id": "E3",
+      "fit": 2,
+      "verbatim": "Fit - 2, This is interesting because its like a dance party and DJ for coffee which is unique. Its a bit out of my comfort zone but I would go. I would prefer more of a market style venue instead of something so formal and committed but still a good option.",
+      "interpretation": {
+        "cafe_match": "coffee activity acknowledged; no claim of conventional cafe setting",
+        "reason": "Open to unusual coffee/social format despite comfort-zone stretch; prefers market-style venue over perceived formality/commitment.",
+        "do_not_infer": "No blanket avoidance of DJs, dancing, crowds, formal events or new experiences."
+      }
+    },
+    {
+      "id": "E2",
+      "fit": 1,
+      "verbatim": "Fit - 1, First to note that link was broken. I could navigate to the home page and understand what the place does. It does seem like a cool opportunity to meet someone and maybe go with friends to learn but even though its every week, it seems like the sign up structure and class itself wouldn't lend itself to a community you'd meet up with every week.",
+      "interpretation": {
+        "cafe_match": "not separately rated",
+        "reason": "Some interest in learning with friends/meeting people; doubts recurring community suitability given signup/class format. Review used homepage after event link failed.",
+        "do_not_infer": "Do not infer dislike of classes or confirm weekly recurrence from this comment; recurrence is a reviewer observation, not reverified source fact."
+      }
+    }
+  ],
+  "link_recheck": {
+    "event_id": "E2",
+    "date": "2026-09-07",
+    "original_url": "https://www.multimodalroasting.com/events/regalia-community-brewing-msmaz-ghcgb",
+    "observed_result": "404 Not Found from web reader",
+    "reachable_context_url": "https://regaliacoffee.com/products/community-brewing",
+    "context_finding": "General brewing activity, listed $5 and max15 participants remain described; no September26 occurrence date confirmed on this page.",
+    "current_occurrence_status": "needs_date_reverification",
+    "not_established": [
+      "cancelled",
+      "venue closed",
+      "weekly recurrence"
+    ],
+    "historical_record": "Frozen September6 results left intact; this is a later observation."
+  },
+  "proposed_preference_summary": {
+    "status": "Reviewer-specific development hypothesis, not stored app bio",
+    "text": "Open to food markets and unusual coffee/social activities. Prefers a market-style setting over perceived formality and commitment. Interested in learning with friends, but recurring attendance alone does not establish an appealing community format. Appreciates clear ticket requirements.",
+    "evidence_ids": [
+      "E1",
+      "E3",
+      "E2"
+    ],
+    "unknowns": [
+      "noise preference",
+      "budget",
+      "crowd tolerance",
+      "desired visit duration",
+      "actual repeat attendance"
+    ]
+  }
+}
