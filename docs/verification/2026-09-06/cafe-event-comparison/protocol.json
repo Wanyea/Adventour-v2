@@ -1,0 +1,56 @@
+{
+  "version": "cafe_event_offline_v0",
+  "frozen_at": "2026-09-07T02:02:23.714596+00:00",
+  "scenario": {
+    "city": "NYC (five boroughs)",
+    "visit_date": "2026-09-20",
+    "timezone": "America/New_York",
+    "interest": "cafes",
+    "history": "none",
+    "neighborhood": "unspecified"
+  },
+  "scope": "Offline experiment only; no app, serving, source roster, user history or event DB writes.",
+  "arms": [
+    "Current production DB/date window: report availability and chronological ordering, no invented production score.",
+    "Existing NYC Parks source with visit-day override; same eligibility filters and experimental score.",
+    "Fixed public-web discovery pass with the same visit-day eligibility and experimental score."
+  ],
+  "queries": [
+    "\"New York\" \"September 20, 2026\" coffee",
+    "NYC \"September 20\" \"2026\" cafe event",
+    "Brooklyn \"September 20\" \"2026\" coffee",
+    "Manhattan \"September 20\" \"2026\" cafe",
+    "Queens \"September 20\" \"2026\" coffee event",
+    "NYC \"September 20\" \"2026\" matcha"
+  ],
+  "retrieval_limit": "First five distinct URLs returned per query, max 30 pooled URLs. Preserve order/dedupe by URL. No further search queries. Read at most 12 matching event/venue pages, following one official event link and one venue/about page if needed. Do not search event names or target a known venue.",
+  "eligibility": [
+    "Evidence of event occurrence overlapping September 20, 2026 in NYC local time.",
+    "Public listing with an identifiable NYC venue. Exclude explicit cancellation/private-only/access-incompatible events. Record fees, RSVP or uncertain access without inventing availability.",
+    "Search snippet without supporting publisher/organizer page goes to unverified leads, not confirmed ranking.",
+    "A listing of continuous daily opening hours is not an event."
+  ],
+  "score_0_100": {
+    "coffee_centered_activity": 50,
+    "verified_coffee_serving_cafe_setting": 40,
+    "explicit_social_or_participatory_activity": 10
+  },
+  "label_rules": {
+    "coffee_centered_activity": "Explicit coffee/espresso/tea/matcha tasting, brewing, cafe-drink popup or coffee social as an advertised event activity; incidental menu drinks or a business name are insufficient.",
+    "verified_coffee_serving_cafe_setting": "Publisher/venue evidence that the event setting is a coffee-serving cafe or temporary cafe. A nightclub named Cafe is insufficient.",
+    "explicit_social_or_participatory_activity": "Explicit meetup, workshop, art/vendor fair, shared game, run club, dance party or other participant interaction; passive music alone is insufficient."
+  },
+  "score_limits": "Uncalibrated, hand-specified cafe relevance points; not liking probability, authenticity, quality or safety. Unknown evidence earns zero with an uncertainty note. Date/city/access are gates, not bonus points. No proximity score without a neighborhood.",
+  "ties": "Score descending, then local start time ascending, then title alphabetically.",
+  "prior_exposure": [
+    "NYC Parks Sept20 sample",
+    "Sequoia Cafe events calendar including Storytelling Art Fair and Final Shop Day",
+    "Cafe Wha event listings",
+    "Average Socialite cafe popup listing",
+    "DJ Stakz breakfast party",
+    "SPNA samba event",
+    "Jazz in NYC cafe jam listing",
+    "The Stand, The Urban Bear"
+  ],
+  "bias_control": "Friend event identity remains unknown. Mark resurfaced previously seen leads. This is not an entirely unseen discovery benchmark; no changes to queries/weights/labels after results or owner feedback. Missing sources are misses, never fabricated zero-fit rankings."
+}
