@@ -33,6 +33,9 @@ def test_remote_preflight_accepts_local_postgres_and_real_auth(tmp_path):
     ("FIREBASE_AUTH_EMULATOR_HOSTS", "127.0.0.1:9099"),
     ("DATABASE_URL", "postgresql://pilot:secret@db.example.test:5432/adventour"),
     ("DATABASE_URL", "sqlite:///adventour.db"),
+    ("DATABASE_URL", "postgresql://pilot:secret@127.0.0.1:5432/adventour?host=db.example.test"),
+    ("DATABASE_URL", "postgresql://pilot:secret@127.0.0.1:5432/adventour?hostaddr=203.0.113.10"),
+    ("DATABASE_URL", "postgresql://pilot:secret@127.0.0.1:5432/adventour?service=remote-db"),
     ("ADVENTOUR_BIND_HOST", "0.0.0.0"),
 ])
 def test_remote_preflight_fails_closed(tmp_path, field, value):

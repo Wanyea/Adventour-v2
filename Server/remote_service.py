@@ -12,7 +12,7 @@ import ipaddress
 import os
 from pathlib import Path
 from typing import Mapping
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 from dotenv import load_dotenv
 
@@ -41,6 +41,12 @@ def _check_local_postgres(database_url: str) -> None:
         raise PreflightError("DATABASE_URL must use PostgreSQL for remote pilot service")
     if not parsed.hostname or not _is_loopback(parsed.hostname):
         raise PreflightError("DATABASE_URL must point to local-only PostgreSQL")
+    # libpq accepts these query parameters as connection-target overrides.
+    # Checking only the URL authority would otherwise allow a remote database
+    # to be selected through ?host=, ?hostaddr=, or a service definition.
+    redirect_keys = {"host", "hostaddr", "service"}
+    if redirect_keys.intersection(key.lower() for key in parse_qs(parsed.query, keep_blank_values=True)):
+        raise PreflightError("DATABASE_URL must not override the local PostgreSQL endpoint")
 
 
 def validate_environment(env: Mapping[str, str] | None = None) -> dict[str, str]:
