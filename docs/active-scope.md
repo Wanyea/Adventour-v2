@@ -1,5 +1,11 @@
 # Active scope — Phase 2 (resumed after restart)
 
+September 8: the owner approved implementation of **ADTR-25**, regional event
+acquisition and coverage, as a follow-up under **ADTR-19**, not a new phase or an
+expansion of Phase 2 acceptance. The active implementation worktree is limited to
+the [ADTR-25 contract](tickets/ADTR-25.md). Phase 2 and its remaining gates stay
+open. The separate ADTR-23 ticket owns live-location/home-city plumbing.
+
 Phase 2 approved 2026-09-06: "Lets move onto phase 2. ill do a review of both
 phases after." This overrides the Phase 1 review/merge prerequisite for this
 transition only. Phases 3–5 remain closed. Phase 1 acceptance gaps remain open.
