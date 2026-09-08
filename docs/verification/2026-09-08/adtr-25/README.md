@@ -16,7 +16,7 @@ credentials are in this packet.
 | Source | Input occurrences | Eligible | Requests | Bytes | First refresh |
 |---|---:|---:|---:|---:|---:|
 | NYC Parks | 1,271 | 309 | 2 | 1,476,096 | 2.516 s |
-| UCF ICS + category verification | 103 | 8 | 23 | 222,194 | 13.250 s |
+| UCF ICS + category verification | 104 | 8 | 23 | 222,194 | 13.250 s |
 
 Source duplicate counts were zero in this sample; repeated refresh did not grow
 the index. Cross-source duplicate collapse is tested with synthetic overlapping
@@ -74,4 +74,13 @@ Initial independent review used GPT-6 Astra with a separate GPT-5.6 Terra review
 slice. Four blocking code findings were corrected before `f7c1aba1`: ICS status
 cancellation, mixed-identity dedupe aliases, slow-stream absolute deadlines, and
 an outage test patching an obsolete adapter. Final review is recorded separately.
+Final technical approval: GPT-6 Astra approved code commit `389cb05f` after
+reproducing the distinct-entity regression. The final 37-test run passed in
+2.52 seconds; a DB-only replay of NYC/UCF/empty listing on that commit matched
+the recorded 50/8/0 result counts. The live screenshot/acquisition packet above
+was collected on `f7c1aba1`; the subsequent change only addresses overlapping
+cross-source entity identities. No blocking code findings remain.
+
+The HTTP deadline terminates the fetch worker; a short OS process-cleanup interval
+can follow the deadline. It does not leave a remote slow-stream request running.
 Real-phone verification and owner acceptance are not inferred from these tests.
