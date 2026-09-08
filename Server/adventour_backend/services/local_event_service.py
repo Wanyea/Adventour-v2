@@ -1,6 +1,6 @@
 """Owned regional event index with fail-closed query-time freshness."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, time, timedelta, timezone
 import json
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -11,6 +11,10 @@ from .local_index_service import _cells_for
 from .tag_group_service import GROUPS
 
 SOURCES = Path(__file__).resolve().parents[2] / 'data_pipeline' / 'event_sources.json'
+EVENT_COLUMNS = ('source_id', 'occurrence_id', 'series_id', 'title', 'starts_at', 'ends_at',
+                 'timezone', 'metro', 'category', 'source_url', 'official_url', 'access_note',
+                 'access_url', 'venue_name', 'entity_id', 'latitude', 'longitude', 'h3_r8',
+                 'verified_at', 'expires_at')
 DDL = """
 CREATE TABLE IF NOT EXISTS event_source (
     id text PRIMARY KEY, name text NOT NULL, metro text NOT NULL,
@@ -33,28 +37,80 @@ CREATE INDEX IF NOT EXISTS local_event_region_time_idx ON local_event(h3_r8,star
 
 
 def sources():
-    return json.loads(SOURCES.read_text(encoding='utf-8'))
+    """Return the validated operator registry, including each stable source id."""
+    from data_pipeline import event_registry
+    registry = event_registry.sources(path=SOURCES)
+    return event_registry.selected(registry=registry)
+
+
+def _aware(value, field):
+    if not isinstance(value, datetime) or value.tzinfo is None or value.utcoffset() is None:
+        raise ValueError(field+' must be timezone-aware')
+    return value
+
+
+def _window(report, config):
+    try:
+        day = datetime.fromisoformat(report['window_start']).date()
+        days = report['window_days']
+    except (KeyError, TypeError, ValueError) as exc:
+        raise ValueError('Invalid event refresh window') from exc
+    if not isinstance(days, int) or isinstance(days, bool) or not 1 <= days <= 31:
+        raise ValueError('Invalid event refresh window')
+    try:
+        zone = ZoneInfo(config.get('timezone', 'America/New_York'))
+    except (TypeError, ValueError) as exc:
+        raise ValueError('Invalid event source timezone') from exc
+    start = datetime.combine(day, time.min, tzinfo=zone)
+    return start, start+timedelta(days=days), zone
+
+
+def _validated_records(source_id, config, records, start, end, now):
+    age = config.get('max_age_hours', 24)
+    if not isinstance(age, (int, float)) or isinstance(age, bool) or not 0 < age <= 24:
+        raise ValueError('Event source max_age_hours must be between zero and 24')
+    expected = set(EVENT_COLUMNS)
+    accepted = []
+    for raw in records:
+        if not isinstance(raw, dict) or set(raw) != expected:
+            raise ValueError('Event record has unsupported or missing columns')
+        if raw['source_id'] != source_id:
+            raise ValueError('Event record source_id does not match refresh source')
+        record = dict(raw)
+        starts, ends = _aware(record['starts_at'], 'starts_at'), _aware(record['ends_at'], 'ends_at')
+        verified, expires = _aware(record['verified_at'], 'verified_at'), _aware(record['expires_at'], 'expires_at')
+        if not starts < ends or verified > now:
+            raise ValueError('Event record has invalid time bounds')
+        if not start <= starts.astimezone(start.tzinfo) < end:
+            raise ValueError('Event record falls outside refresh window')
+        record['expires_at'] = min(expires, ends, verified+timedelta(hours=age))
+        if record['expires_at'] <= now:
+            raise ValueError('Event record is already expired')
+        accepted.append(record)
+    return accepted
 
 
 def replace_window(db, source_id, config, records, report, now=None):
     now = now or datetime.now(timezone.utc)
-    start = datetime.fromisoformat(report['window_start']).replace(tzinfo=ZoneInfo('America/New_York'))
-    end = start + timedelta(days=report['window_days'])
+    _aware(now, 'now')
+    start, end, _ = _window(report, config)
+    records = _validated_records(source_id, config, records, start, end, now)
+    stored_report = {**report, 'source_config': {'parser_version': config.get('parser_version'),
+                                                   'timezone': config.get('timezone', 'America/New_York')}}
     db.session.execute(text("""INSERT INTO event_source(id,name,metro,permission_url,last_attempt,last_success,report)
         VALUES(:id,:name,:metro,:permission,:now,:now,CAST(:report AS jsonb))
         ON CONFLICT(id) DO UPDATE SET last_attempt=:now,last_success=:now,last_error=NULL,
-        report=CAST(:report AS jsonb),permission_url=:permission"""),
+        report=CAST(:report AS jsonb),permission_url=:permission,name=:name,metro=:metro"""),
         {'id': source_id, 'name': config['name'], 'metro': config['metro'],
-         'permission': config['permission_url'], 'now': now, 'report': json.dumps(report)})
+         'permission': config['permission_url'], 'now': now, 'report': json.dumps(stored_report)})
     # Atomic full-window replacement also removes disappeared/cancelled occurrences.
     db.session.execute(text("""DELETE FROM local_event WHERE source_id=:source
         AND (starts_at>=:start AND starts_at<:end OR ends_at<=:now)"""),
         {'source': source_id, 'start': start, 'end': end, 'now': now})
     for record in records:
-        columns = list(record)
-        db.session.execute(text('INSERT INTO local_event (' + ','.join(columns) + ') VALUES (' +
-                                ','.join(':'+c for c in columns) + ') ON CONFLICT(source_id,occurrence_id) DO UPDATE SET ' +
-                                ','.join(c+'=EXCLUDED.'+c for c in columns if c not in {'source_id','occurrence_id'})), record)
+        db.session.execute(text('INSERT INTO local_event (' + ','.join(EVENT_COLUMNS) + ') VALUES (' +
+                                ','.join(':'+c for c in EVENT_COLUMNS) + ') ON CONFLICT(source_id,occurrence_id) DO UPDATE SET ' +
+                                ','.join(c+'=EXCLUDED.'+c for c in EVENT_COLUMNS if c not in {'source_id','occurrence_id'})), record)
 
 
 def listing(db, latitude, longitude, radius=16000, tag='all', now=None):
@@ -76,18 +132,31 @@ def listing(db, latitude, longitude, radius=16000, tag='all', now=None):
         ORDER BY starts_at,title,source_id,occurrence_id"""),
         {'lat': latitude, 'lon': longitude, 'cells': _cells_for(latitude,longitude,radius),
          'now': now, 'oldest': now-timedelta(hours=24), 'until': now+timedelta(days=14), 'tag': tag}).mappings().all()
-    events, seen = [], {}
+    events, seen_entity, seen_fallback = [], {}, {}
     for row in rows:
         if row['distance_meters'] > radius:
             continue
         item = {k: v.isoformat() if isinstance(v,datetime) else v for k,v in row.items()}
-        venue_key = row['entity_id'] or (round(row['latitude'],5),round(row['longitude'],5),row['venue_name'].casefold())
-        key = (venue_key, row['title'].casefold(), row['starts_at'])
-        if key in seen:
-            seen[key]['sources'].append({'name': row['source_name'], 'url': row['source_url']})
+        title = ' '.join(row['title'].split()).casefold()
+        fallback = (title, row['starts_at'], round(row['latitude'], 5), round(row['longitude'], 5),
+                    ' '.join(row['venue_name'].split()).casefold())
+        entity = (title, row['starts_at'], row['entity_id']) if row['entity_id'] else None
+        prior = seen_entity.get(entity) if entity else seen_fallback.get(fallback)
+        if prior is None and entity:
+            candidate = seen_fallback.get(fallback)
+            if candidate is not None and candidate['entity_id'] is None:
+                prior = candidate
+        if prior is not None:
+            prior['sources'].append({'name': row['source_name'], 'url': row['source_url']})
+            prior['sources'].sort(key=lambda source: (source['name'], source['url']))
+            if entity:
+                seen_entity[entity] = prior
+            seen_fallback[fallback] = prior
             continue
         item['sources'] = [{'name': row['source_name'], 'url': row['source_url']}]
-        seen[key] = item
+        if entity:
+            seen_entity[entity] = item
+        seen_fallback[fallback] = item
         events.append(item)
     return {'events': events[:50], 'checked_at': now.isoformat(),
             'coverage_note': 'Limited calendar coverage. No results does not mean no local events.',

@@ -2,6 +2,9 @@
 
 
 def adapter(source):
+    if source['method'] == 'documented_ics_feed':
+        from data_pipeline import ucf_ics_events
+        return ucf_ics_events
     if source['method'] == 'documented_json_feed':
         from data_pipeline import ucf_events
         return ucf_events
