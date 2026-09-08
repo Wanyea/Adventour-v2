@@ -132,7 +132,12 @@ def listing(db, latitude, longitude, radius=16000, tag='all', now=None):
         ORDER BY starts_at,title,source_id,occurrence_id"""),
         {'lat': latitude, 'lon': longitude, 'cells': _cells_for(latitude,longitude,radius),
          'now': now, 'oldest': now-timedelta(hours=24), 'until': now+timedelta(days=14), 'tag': tag}).mappings().all()
-    events, seen_entity, seen_fallback = [], {}, {}
+    events, seen_entity, seen_fallback, representative_entities = [], {}, {}, {}
+    rows = sorted(rows, key=lambda row: (
+        row['starts_at'], ' '.join(row['title'].split()).casefold(),
+        round(row['latitude'], 5), round(row['longitude'], 5),
+        ' '.join(row['venue_name'].split()).casefold(),
+        row['entity_id'] is None, row['entity_id'] or '', row['source_id'], row['occurrence_id']))
     for row in rows:
         if row['distance_meters'] > radius:
             continue
@@ -144,19 +149,23 @@ def listing(db, latitude, longitude, radius=16000, tag='all', now=None):
         prior = seen_entity.get(entity) if entity else seen_fallback.get(fallback)
         if prior is None and entity:
             candidate = seen_fallback.get(fallback)
-            if candidate is not None and candidate['entity_id'] is None:
+            if candidate is not None and not representative_entities[id(candidate)]:
                 prior = candidate
         if prior is not None:
             prior['sources'].append({'name': row['source_name'], 'url': row['source_url']})
             prior['sources'].sort(key=lambda source: (source['name'], source['url']))
             if entity:
                 seen_entity[entity] = prior
+                representative_entities[id(prior)].add(row['entity_id'])
             seen_fallback[fallback] = prior
             continue
         item['sources'] = [{'name': row['source_name'], 'url': row['source_url']}]
         if entity:
             seen_entity[entity] = item
-        seen_fallback[fallback] = item
+            representative_entities[id(item)] = {row['entity_id']}
+        else:
+            representative_entities[id(item)] = set()
+        seen_fallback.setdefault(fallback, item)
         events.append(item)
     return {'events': events[:50], 'checked_at': now.isoformat(),
             'coverage_note': 'Limited calendar coverage. No results does not mean no local events.',

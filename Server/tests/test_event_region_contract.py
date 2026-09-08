@@ -72,23 +72,29 @@ def test_replace_is_idempotent_and_records_config_provenance():
 def test_listing_collapses_equivalent_sources_and_does_not_touch_http(monkeypatch):
     backend, events = _backend()
     from sqlalchemy import text
-    left, right, third, now = ('region-'+uuid.uuid4().hex, 'region-'+uuid.uuid4().hex,
-                               'region-'+uuid.uuid4().hex, datetime.now(timezone.utc))
+    unique = uuid.uuid4().hex
+    left, right, third, fourth, now = ('region-a-'+unique, 'region-b-'+unique,
+                                       'region-c-'+unique, 'region-d-'+unique,
+                                       datetime.now(timezone.utc))
     report = {'window_start': now.astimezone(ZoneInfo('America/New_York')).date().isoformat(), 'window_days': 14}
     with backend.app.app_context():
         try:
             events.replace_window(backend.db, left, _config('First'), [_record(left, 'one', now, entity_id=None)], report, now)
-            events.replace_window(backend.db, right, _config('Second'), [_record(right, 'two', now, title=' Community Run ')], report, now)
+            events.replace_window(backend.db, right, _config('Second'), [_record(right, 'two', now, title='Community Run  ')], report, now)
             events.replace_window(backend.db, third, _config('Third'), [_record(third, 'three', now,
                                   latitude=28.53831, longitude=-81.37921)], report, now)
+            events.replace_window(backend.db, fourth, _config('Fourth'), [_record(fourth, 'four', now,
+                                  entity_id='park-2')], report, now)
             backend.db.session.commit()
             monkeypatch.setattr(events, 'sources', lambda: (_ for _ in ()).throw(AssertionError('listing requested source input')))
             result = events.listing(backend.db, 28.5383, -81.3792, radius=1000, now=now)
-            assert len(result['events']) == 1 and [s['name'] for s in result['events'][0]['sources']] == ['First', 'Second', 'Third']
+            assert len(result['events']) == 2
+            assert [s['name'] for s in result['events'][0]['sources']] == ['First', 'Second', 'Third']
+            assert [s['name'] for s in result['events'][1]['sources']] == ['Fourth']
             assert events.listing(backend.db, 0, 0, radius=1000, now=now)['events'] == []
         finally:
             backend.db.session.rollback()
-            for source in (left, right, third):
+            for source in (left, right, third, fourth):
                 backend.db.session.execute(text('DELETE FROM local_event WHERE source_id=:id'), {'id': source})
                 backend.db.session.execute(text('DELETE FROM event_source WHERE id=:id'), {'id': source})
             backend.db.session.commit()
