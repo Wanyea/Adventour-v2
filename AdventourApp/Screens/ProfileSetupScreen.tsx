@@ -112,9 +112,13 @@ const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ user, onComplet
   const [homeCity, setHomeCity] = useState(user.home_city || '');
   const [submitting, setSubmitting] = useState(false);
   const mounted = useRef(true);
+  const saveInFlight = useRef(false);
 
-  useEffect(() => () => {
-    mounted.current = false;
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
   }, []);
 
   const trimmedDisplayName = displayName.trim();
@@ -129,10 +133,11 @@ const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ user, onComplet
   };
 
   const saveProfile = async () => {
-    if (!canContinue || !parsedBirthdate) {
+    if (!canContinue || !parsedBirthdate || saveInFlight.current) {
       return;
     }
 
+    saveInFlight.current = true;
     setSubmitting(true);
     try {
       const normalizedHomeCity = homeCity.trim() || null;
@@ -164,6 +169,7 @@ const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ user, onComplet
       const message = error?.response?.data?.error || 'Unable to save your passport details. Please try again.';
       Alert.alert('Setup failed', message);
     } finally {
+      saveInFlight.current = false;
       if (mounted.current) {
         setSubmitting(false);
       }
@@ -194,6 +200,7 @@ const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ user, onComplet
             autoCapitalize="words"
             autoCorrect={false}
             maxLength={40}
+            editable={!submitting}
           />
           {!trimmedDisplayName ? (
             <Text style={styles.validationText}>Choose a display name for your passport.</Text>
@@ -208,6 +215,7 @@ const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ user, onComplet
               onChangeText={handleBirthdateChange}
               keyboardType="number-pad"
               maxLength={10}
+              editable={!submitting}
             />
             {zodiac ? (
               <View style={styles.zodiacPill}>
@@ -234,6 +242,7 @@ const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ user, onComplet
             autoCapitalize="words"
             autoCorrect={false}
             maxLength={160}
+            editable={!submitting}
           />
           <Text style={styles.helperText}>Optional. Add a region or country when useful; no street address needed.</Text>
 

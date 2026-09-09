@@ -23,9 +23,13 @@ const HomeCityEditor: React.FC<HomeCityEditorProps> = ({ userId, homeCity, onUse
   const [draft, setDraft] = useState(homeCity || '');
   const [saving, setSaving] = useState(false);
   const mounted = useRef(true);
+  const saveInFlight = useRef(false);
 
-  useEffect(() => () => {
-    mounted.current = false;
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -40,6 +44,10 @@ const HomeCityEditor: React.FC<HomeCityEditorProps> = ({ userId, homeCity, onUse
   };
 
   const save = async () => {
+    if (saveInFlight.current) {
+      return;
+    }
+    saveInFlight.current = true;
     const requestedHomeCity = normalizedHomeCity(draft);
     setSaving(true);
     try {
@@ -53,10 +61,16 @@ const HomeCityEditor: React.FC<HomeCityEditorProps> = ({ userId, homeCity, onUse
       onUserUpdated?.(updatedUser);
       setEditing(false);
     } catch (error) {
+      if (!mounted.current) {
+        return;
+      }
       console.error('Error saving home city:', error);
       Alert.alert('Unable to save home base', 'Your home city or town could not be saved. Please try again.');
     } finally {
-      setSaving(false);
+      saveInFlight.current = false;
+      if (mounted.current) {
+        setSaving(false);
+      }
     }
   };
 
@@ -83,6 +97,7 @@ const HomeCityEditor: React.FC<HomeCityEditorProps> = ({ userId, homeCity, onUse
             autoCapitalize="words"
             autoCorrect={false}
             maxLength={160}
+            editable={!saving}
             accessibilityLabel="Home city or town"
           />
           <View style={styles.actions}>

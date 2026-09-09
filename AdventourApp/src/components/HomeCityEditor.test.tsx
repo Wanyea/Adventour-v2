@@ -83,3 +83,18 @@ test('keeps the draft open and reports an error when saving fails', async () => 
   expect(view.root.findByType(TextInput).props.value).toBe('Kumasi, Ghana');
   expect(Alert.alert).toHaveBeenCalledWith('Unable to save home base', 'Your home city or town could not be saved. Please try again.');
 });
+
+test('keeps the draft open when an older backend does not echo home_city', async () => {
+  jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
+  jest.mocked(AuthService.updateProfile).mockResolvedValue({ ...updatedUser, home_city: undefined });
+  const onUserUpdated = jest.fn();
+  const view = renderer.create(<HomeCityEditor userId={1} homeCity="Accra, Ghana" onUserUpdated={onUserUpdated} />);
+
+  act(() => pressText(view, 'Edit'));
+  act(() => view.root.findByType(TextInput).props.onChangeText('Kumasi, Ghana'));
+  await act(async () => pressText(view, 'Save'));
+
+  expect(onUserUpdated).not.toHaveBeenCalled();
+  expect(view.root.findByType(TextInput).props.value).toBe('Kumasi, Ghana');
+  expect(Alert.alert).toHaveBeenCalledWith('Unable to save home base', 'Your home city or town could not be saved. Please try again.');
+});
