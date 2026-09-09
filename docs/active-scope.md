@@ -1,6 +1,8 @@
 # Active scope — Phase 2 (resumed after restart)
 
-September 8: ADTR-25 merged into `codex-astra` at `82a958ee`. The owner approved
+September 9: ADTR-22 merged into codex-astra at 5155249c. The owner approved ADTR-23 implementation: foreground location, transient home fallback and manual precedence, under ADTR-19. The approved contract is [ADTR-23 implementation plan](adtr-23-implementation-plan.md). No usable location means no event queries and existing launch guidance. Physical iPhone verification remains a Mac gate. Phase 2 remains open.
+
+Historical September 8: ADTR-25 merged into `codex-astra` at `82a958ee`. The owner approved
 implementing **ADTR-22** first, followed by ADTR-23 after its prerequisite merges.
 The active worktree is limited to the [ADTR-22 contract](tickets/ADTR-22.md):
 optional home city/town capture and editing in the existing onboarding/Profile

@@ -4,7 +4,7 @@ import { Place } from '../types/Place';
 import { tagGroupIdsForPlace } from '../placeTagGroups';
 
 export type Coordinates = { latitude: number; longitude: number };
-export type LocationMode = 'none' | 'gps' | 'manual';
+export type LocationMode = 'none' | 'gps' | 'home' | 'manual';
 export type RequestStep = 'geocode' | 'recommendations';
 export type RadiusOption = {
   id: 'walkable' | 'nearby' | 'explore' | 'wide';

@@ -3,7 +3,6 @@ import {
   Animated,
   View,
   Text,
-  TextInput,
   Alert,
   TouchableOpacity,
   Image,
@@ -22,9 +21,8 @@ import LocationAutocompleteInput from './src/components/LocationAutocompleteInpu
 import Config from './src/Config';
 import { flushPilot, pilotConfig } from './src/pilot/PilotService';
 import { recordPlaceEvent } from './src/services/PlaceEventService';
-import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
-import { AppState, PermissionsAndroid, Platform } from 'react-native';
+import { AppState } from 'react-native';
 import { Place } from './src/types/Place';
 import { AdventourSession, AdventourStop } from './src/types/Adventour';
 import { TAG_GROUPS, tagGroupDisplayLabel } from './src/placeTagGroups';
@@ -32,6 +30,7 @@ import AdventourService from './src/services/AdventourService';
 import { User } from './src/services/AuthService';
 
 import { Coordinates, LocationMode, RequestStep, RadiusOption, RADIUS_OPTIONS, describeAxiosError, placeFromRecommendation } from './src/home/homeUtils';
+import useForegroundLocation from './src/home/useForegroundLocation';
 
 type HomeScreenProps = {
   user?: User | null;
@@ -60,7 +59,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [city, setCity] = useState<string>(''); 
+  const [city, setCity] = useState<string>('');
   const [currentCoords, setCurrentCoords] = useState<Coordinates | null>(null);
   const [locationMode, setLocationMode] = useState<LocationMode>('none');
   const [launchError, setLaunchError] = useState('');
@@ -331,13 +330,45 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
     return version;
   };
 
+  const commitAutomaticLocation = (coordinates: Coordinates, label: string, origin: 'gps' | 'home') => {
+    clearLaunchResults();
+    setCity(label);
+    setCurrentCoords(coordinates);
+    setLocationMode(origin);
+    setEmptyMessage('');
+  };
+
+  const clearAutomaticLocation = () => {
+    clearLaunchResults();
+    setCity('');
+    setLocationMode('none');
+    setEmptyMessage('Choose a launch point to discover places and local events.');
+  };
+
+  const { retry: retryCurrentLocation, invalidate: invalidateAutomaticLocation, acquiring: automaticLocationRefreshing } = useForegroundLocation({
+    userId: user?.id,
+    homeCity: user?.home_city,
+    onResolved: ({ coordinates, label, origin }) => commitAutomaticLocation(coordinates, label, origin),
+    onUnavailable: clearAutomaticLocation,
+    onAcquiring: clearAutomaticLocation,
+  });
+
+  const useCurrentLocation = () => {
+    clearLaunchResults();
+    setCity('');
+    setLocationMode('none');
+    retryCurrentLocation();
+  };
+
   const handleCityChange = (text: string) => {
+    invalidateAutomaticLocation(true);
     clearLaunchResults();
     setCity(text);
     setLocationMode(text.trim() ? 'manual' : 'none');
   };
 
   const handleSuggestionSelect = (suggestion: LaunchSuggestion) => {
+    invalidateAutomaticLocation(true);
     clearLaunchResults();
     Keyboard.dismiss();
     setCity(suggestion.description);
@@ -386,17 +417,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
         },
       }, await pilotConfig());
 
-      if (locationMode === 'gps' && currentCoords) {
+      if ((locationMode === 'gps' || locationMode === 'home' || locationMode === 'manual') && currentCoords) {
         step = 'recommendations';
-        console.log('Finding places using GPS coordinates:', currentCoords);
-        recommendationResponse = await requestRecommendations(currentCoords);
-      } else if (locationMode === 'manual' && currentCoords) {
-        step = 'recommendations';
-        console.log('Finding places using saved manual destination:', currentCoords);
         recommendationResponse = await requestRecommendations(currentCoords);
       } else if (city.trim()) {
         step = 'geocode';
-        console.log('Resolving manual destination:', city.trim());
         const geocodeResponse = await axios.get(`${Config.BACKEND_BASE_URL}/geocode`, {
           params: { address: city.trim() },
         });
@@ -411,7 +436,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
         setCurrentCoords(resolvedLocation);
         setLocationMode('manual');
         step = 'recommendations';
-        console.log('Finding places using resolved destination:', resolvedLocation);
         recommendationResponse = await requestRecommendations(resolvedLocation);
       } else {
         if (!quiet) {
@@ -495,64 +519,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
   const handleRecommendationDeckExhausted = useCallback(() => {
     loadRecommendations({ append: true, quiet: true });
   }, [loadRecommendations]);
-
-  const requestLocationPermission = async () => {
-    if (Platform.OS === 'android') {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        {
-          title: "Location Permission",
-          message: "Adventour needs access to your location.",
-          buttonPositive: "OK"
-        }
-      );
-      return granted === PermissionsAndroid.RESULTS.GRANTED;
-    }
-    return true;
-  };
-
-  const useCurrentLocation = async () => {
-    const version = clearLaunchResults();
-    const granted = await requestLocationPermission();
-    if (version !== launchVersion.current) return;
-    if (!granted) {
-      Alert.alert("Permission Denied", "Location access is required.");
-      return;
-    }
-
-    Geolocation.getCurrentPosition(
-      async (position) => {
-        if (version !== launchVersion.current) return;
-        const { latitude, longitude } = position.coords;
-        setCurrentCoords({ latitude, longitude });
-        setLocationMode('gps');
-
-        try {
-          const response = await axios.get(`${Config.BACKEND_BASE_URL}/geocode`, {
-            params: { latitude, longitude },
-          });
-          if (version !== launchVersion.current) return;
-
-          const { city, state } = response.data;
-          if (city && state) {
-            setCity(`${city}, ${state}`);
-          } else {
-            Alert.alert('Error', 'Unable to resolve location to a city and state.');
-          }
-        } catch (error) {
-          if (version !== launchVersion.current) return;
-          console.error('Error fetching geocoded location:', error);
-          setCity(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
-        }
-      },
-      (error) => {
-        if (version !== launchVersion.current) return;
-        console.error('Geolocation error:', error);
-        Alert.alert("Location Error", error.message);
-      },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-    );
-  };
 
   return (
     <View style={styles.screen}>
@@ -766,7 +732,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
             <Text style={styles.emptyText}>{emptyMessage}</Text>
           )}
         </View>
-        {currentCoords ? <LocalEventsSection key={`${currentCoords.latitude}/${currentCoords.longitude}`} coordinates={currentCoords} /> : null}
+        {currentCoords && (locationMode === 'manual' || !automaticLocationRefreshing) ? (
+          <LocalEventsSection
+            key={`${currentCoords.latitude}/${currentCoords.longitude}`}
+            coordinates={currentCoords}
+            refreshOnResume={locationMode === 'manual'}
+          />
+        ) : null}
       </ScrollView>
       <PlaceDetailsModal
         onClosedReport={handleClosedReport}

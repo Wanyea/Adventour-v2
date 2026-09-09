@@ -15,6 +15,8 @@ type LocalEvent = {
   verified_at: string; expires_at: string;
 };
 
+const invalidateEventRequests = (requestId: React.MutableRefObject<number>) => { requestId.current += 1; };
+
 function EventCard({ event, children }: { event: LocalEvent; children: React.ReactNode }) {
   const cardRef = useRef<View>(null);
   if (!Config.PILOT_BUILD || !event.pilot_decision_id) { return <View style={styles.event}>{children}</View>; }
@@ -33,7 +35,7 @@ const when = (event: LocalEvent) => {
   return `${date} · ${time(event.starts_at)}–${time(event.ends_at)}`;
 };
 
-const LocalEventsSection = ({ coordinates }: { coordinates: Coordinates }) => {
+const LocalEventsSection = ({ coordinates, refreshOnResume = true }: { coordinates: Coordinates; refreshOnResume?: boolean }) => {
   const [events, setEvents] = useState<LocalEvent[]>([]);
   const [expanded, setExpanded] = useState(false);
   const [error, setError] = useState('');
@@ -44,6 +46,7 @@ const LocalEventsSection = ({ coordinates }: { coordinates: Coordinates }) => {
   const focused = useIsFocused();
   const requestId = useRef(0);
   const mounted = useRef(true);
+  const foreground = useRef(AppState.currentState === 'active');
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   const load = useCallback(async (capture = false) => {
     const id = ++requestId.current;
@@ -51,7 +54,7 @@ const LocalEventsSection = ({ coordinates }: { coordinates: Coordinates }) => {
     try {
       const result = await axios.get(`${Config.BACKEND_BASE_URL}/api/local-events`, {
         ...(capture ? await pilotConfig() : {}),
-        params: { ...coordinates, radius_meters: 50000 }, timeout: 15000,
+        params: { latitude: coordinates.latitude, longitude: coordinates.longitude, radius_meters: 50000 }, timeout: 15000,
       });
       if (id !== requestId.current) return;
       serverOffset.current = Date.parse(result.data.checked_at) - Date.now();
@@ -80,14 +83,15 @@ const LocalEventsSection = ({ coordinates }: { coordinates: Coordinates }) => {
     setExpanded(false);
     if (focused) load(true);
     const refresh = setInterval(() => {
-      if (focused && AppState.currentState === 'active') load();
+      if (focused && foreground.current) load();
     }, 60000);
     const tick = setInterval(() => setClock(Date.now() + serverOffset.current), 1000);
     const subscription = AppState.addEventListener('change', state => {
-      if (state === 'active' && focused) load();
+      foreground.current = state === 'active';
+      if (state === 'active' && focused && refreshOnResume) load();
     });
-    return () => { ++requestId.current; clearInterval(refresh); clearInterval(tick); subscription.remove(); };
-  }, [load, focused]);
+    return () => { invalidateEventRequests(requestId); clearInterval(refresh); clearInterval(tick); subscription.remove(); };
+  }, [load, focused, refreshOnResume]);
 
   const open = async (event: LocalEvent) => {
     setChecking(event.occurrence_id);
