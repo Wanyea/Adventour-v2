@@ -20,3 +20,5 @@ The checked-in baseline remains the previously recorded worldwide launch run: Or
 ## Gate result
 
 ADTR-26 acceptance evidence is still blocked. The queue and worker boundary are implemented, but the approved connector discovery/admission function has not yet been integrated, and no cold San Francisco, held-out-town, no-owned-venues, restart, or physical-device acquisition run has been completed. The worker accepts an injected acquisition function intentionally; it does not invent a provider or persist unapproved provider content. No provider or participant data was added.
+
+The branch also includes a bounded first-party discovery primitive: HTTPS-only same-host traversal, Event JSON-LD extraction, date-window checks, locality checks, and external links retained only as leads. Its focused tests pass. It is deliberately not auto-registered as a production connector because no arbitrary-location source roots currently have verified access/retention policy. The worker therefore remains injection-based until that policy gate is satisfied.
