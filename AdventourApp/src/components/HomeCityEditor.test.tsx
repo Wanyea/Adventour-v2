@@ -2,6 +2,7 @@ import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 import { Alert, TextInput, TouchableOpacity } from 'react-native';
 import HomeCityEditor from './HomeCityEditor';
+import { splitLocationDescription } from './LocationAutocompleteInput';
 import AuthService from '../services/AuthService';
 
 const mockFetchSuggestions = jest.fn();
@@ -25,7 +26,10 @@ const updatedUser = {
 };
 
 const pressText = (view: renderer.ReactTestRenderer, label: string) => {
-  const button = view.root.findAllByType(TouchableOpacity).find((item) => item.findAllByType('Text' as any).some((text: any) => text.props.children === label));
+  const textContent = (children: any): string => Array.isArray(children)
+    ? children.map(textContent).join('')
+    : typeof children === 'string' ? children : '';
+  const button = view.root.findAllByType(TouchableOpacity).find((item) => item.findAllByType('Text' as any).some((text: any) => textContent(text.props.children).includes(label)));
   if (!button) {
     throw new Error(`Missing ${label} button`);
   }
@@ -41,7 +45,7 @@ beforeEach(() => {
 
 test('selects an autocomplete result before saving', async () => {
   mockFetchSuggestions.mockResolvedValue([{
-    description: 'São Paulo, Brazil',
+    description: 'São Paulo, Brazil (City)',
     latitude: -23.5505,
     longitude: -46.6333,
     suggestion_id: 'sao-paulo',
@@ -57,10 +61,21 @@ test('selects an autocomplete result before saving', async () => {
     await Promise.resolve();
   });
 
-  expect(view.root.findAllByType('Text' as any).some((text: any) => text.props.children === 'São Paulo, Brazil')).toBe(true);
+  expect(view.root.findAllByType('Text' as any).some((text: any) => text.props.children?.toString().includes('São Paulo, Brazil'))).toBe(true);
   act(() => pressText(view, 'São Paulo, Brazil'));
   expect(view.root.findByType(TextInput).props.value).toBe('São Paulo, Brazil');
   view.unmount();
+});
+
+test('keeps a location kind tag outside the editable place value', () => {
+  expect(splitLocationDescription('São Paulo, Brazil (City)')).toEqual({
+    place: 'São Paulo, Brazil',
+    kind: 'City',
+  });
+  expect(splitLocationDescription('Springfield, Illinois')).toEqual({
+    place: 'Springfield, Illinois',
+    kind: null,
+  });
 });
 
 afterEach(() => {

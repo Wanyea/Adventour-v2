@@ -21,6 +21,13 @@ type LocationAutocompleteInputProps = Omit<TextInputProps, 'value' | 'onChangeTe
   onSearchError?: (message: string) => void;
 };
 
+const LOCATION_KIND_PATTERN = /^(.*)\s+\((City|Town|Village|Hamlet|Neighborhood|State|Country|District|Locality|County|Street)\)$/;
+
+export const splitLocationDescription = (description: string) => {
+  const match = description.match(LOCATION_KIND_PATTERN);
+  return match ? { place: match[1], kind: match[2] } : { place: description, kind: null };
+};
+
 const LocationAutocompleteInput: React.FC<LocationAutocompleteInputProps> = ({
   value,
   onChangeText,
@@ -86,7 +93,8 @@ const LocationAutocompleteInput: React.FC<LocationAutocompleteInputProps> = ({
     Keyboard.dismiss();
     setSuggestions([]);
     onSearchError?.('');
-    onSelectSuggestion(suggestion);
+    const { place } = splitLocationDescription(suggestion.description);
+    onSelectSuggestion({ ...suggestion, description: place });
   };
 
   return (
@@ -111,7 +119,12 @@ const LocationAutocompleteInput: React.FC<LocationAutocompleteInputProps> = ({
               onPress={() => handleSelect(suggestion)}
               disabled={!editable}
             >
-              <Text style={styles.suggestionText}>{suggestion.description}</Text>
+              <Text style={styles.suggestionText}>
+                {splitLocationDescription(suggestion.description).place}
+                {splitLocationDescription(suggestion.description).kind ? (
+                  <Text style={styles.suggestionKind}> ({splitLocationDescription(suggestion.description).kind})</Text>
+                ) : null}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -133,6 +146,7 @@ const styles = StyleSheet.create({
   },
   suggestionItem: { borderBottomColor: '#d8edf2', borderBottomWidth: 1, paddingHorizontal: 12, paddingVertical: 10 },
   suggestionText: { color: '#123c69', fontSize: 13 },
+  suggestionKind: { color: '#6b7280', fontSize: 12, fontWeight: '800' },
 });
 
 export default LocationAutocompleteInput;
