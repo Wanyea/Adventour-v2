@@ -53,7 +53,7 @@ test('selects an autocomplete result before saving', async () => {
   act(() => pressText(view, 'Edit'));
   act(() => view.root.findByType(TextInput).props.onChangeText('São'));
   await act(async () => {
-    jest.advanceTimersByTime(650);
+    jest.advanceTimersByTime(300);
     await Promise.resolve();
   });
 

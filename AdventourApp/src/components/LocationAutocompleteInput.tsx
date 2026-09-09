@@ -35,6 +35,7 @@ const LocationAutocompleteInput: React.FC<LocationAutocompleteInputProps> = ({
   const [suggestions, setSuggestions] = useState<LaunchSuggestion[]>([]);
   const requestVersion = useRef(0);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const suggestionCache = useRef(new Map<string, LaunchSuggestion[]>());
 
   useEffect(() => () => {
     if (timer.current) {
@@ -45,19 +46,28 @@ const LocationAutocompleteInput: React.FC<LocationAutocompleteInputProps> = ({
   const handleChange = (text: string) => {
     onChangeText(text);
     const version = ++requestVersion.current;
+    const normalizedInput = text.trim();
     if (timer.current) {
       clearTimeout(timer.current);
     }
-    if (text.trim().length < 3) {
+    if (normalizedInput.length < 3) {
       setSuggestions([]);
       onSearchError?.('');
       return;
     }
 
+    const cachedMatches = suggestionCache.current.get(normalizedInput.toLowerCase());
+    if (cachedMatches) {
+      setSuggestions(cachedMatches);
+      onSearchError?.(cachedMatches.length ? '' : 'No matching location found. Try a more specific city or town.');
+      return;
+    }
+
     timer.current = setTimeout(async () => {
       try {
-        const matches = await LaunchLocationService.fetchAutocompleteSuggestions(text);
+        const matches = await LaunchLocationService.fetchAutocompleteSuggestions(normalizedInput);
         if (version !== requestVersion.current) return;
+        suggestionCache.current.set(normalizedInput.toLowerCase(), matches);
         setSuggestions(matches);
         onSearchError?.(matches.length ? '' : 'No matching location found. Try a more specific city or town.');
       } catch {
@@ -65,7 +75,7 @@ const LocationAutocompleteInput: React.FC<LocationAutocompleteInputProps> = ({
         setSuggestions([]);
         onSearchError?.('Location search is temporarily unavailable. Try again later.');
       }
-    }, 650);
+    }, 300);
   };
 
   const handleSelect = (suggestion: LaunchSuggestion) => {
