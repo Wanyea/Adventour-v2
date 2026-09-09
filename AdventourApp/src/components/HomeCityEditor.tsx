@@ -4,11 +4,11 @@ import {
   Alert,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
 import AuthService, { User } from '../services/AuthService';
+import LocationAutocompleteInput from './LocationAutocompleteInput';
 
 type HomeCityEditorProps = {
   userId: number;
@@ -89,8 +89,8 @@ const HomeCityEditor: React.FC<HomeCityEditorProps> = ({ userId, homeCity, onUse
       </View>
       {editing ? (
         <>
-          <TextInput
-            style={styles.input}
+          <LocationAutocompleteInput
+            inputStyle={styles.input}
             value={draft}
             onChangeText={setDraft}
             placeholder="City or town, region, country"
@@ -99,6 +99,7 @@ const HomeCityEditor: React.FC<HomeCityEditorProps> = ({ userId, homeCity, onUse
             maxLength={160}
             editable={!saving}
             accessibilityLabel="Home city or town"
+            onSelectSuggestion={(suggestion) => setDraft(suggestion.description)}
           />
           <View style={styles.actions}>
             <TouchableOpacity onPress={() => setDraft('')} disabled={saving}>

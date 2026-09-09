@@ -4,9 +4,15 @@ import { Alert, TextInput, TouchableOpacity } from 'react-native';
 import HomeCityEditor from './HomeCityEditor';
 import AuthService from '../services/AuthService';
 
+const mockFetchSuggestions = jest.fn();
+
 jest.mock('../services/AuthService', () => ({
   __esModule: true,
   default: { updateProfile: jest.fn() },
+}));
+jest.mock('../LaunchLocationService', () => ({
+  __esModule: true,
+  default: { fetchAutocompleteSuggestions: (...args: unknown[]) => mockFetchSuggestions(...args) },
 }));
 
 const updatedUser = {
@@ -28,10 +34,39 @@ const pressText = (view: renderer.ReactTestRenderer, label: string) => {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  jest.useFakeTimers();
+  mockFetchSuggestions.mockResolvedValue([]);
   jest.spyOn(console, 'error').mockImplementation(() => undefined);
 });
 
-afterEach(() => jest.restoreAllMocks());
+test('selects an autocomplete result before saving', async () => {
+  mockFetchSuggestions.mockResolvedValue([{
+    description: 'São Paulo, Brazil',
+    latitude: -23.5505,
+    longitude: -46.6333,
+    suggestion_id: 'sao-paulo',
+    source: 'owned',
+  }]);
+  jest.mocked(AuthService.updateProfile).mockResolvedValue({ ...updatedUser, home_city: 'São Paulo, Brazil' });
+  const view = renderer.create(<HomeCityEditor userId={1} homeCity={null} />);
+
+  act(() => pressText(view, 'Edit'));
+  act(() => view.root.findByType(TextInput).props.onChangeText('São'));
+  await act(async () => {
+    jest.advanceTimersByTime(650);
+    await Promise.resolve();
+  });
+
+  expect(view.root.findAllByType('Text' as any).some((text: any) => text.props.children === 'São Paulo, Brazil')).toBe(true);
+  act(() => pressText(view, 'São Paulo, Brazil'));
+  expect(view.root.findByType(TextInput).props.value).toBe('São Paulo, Brazil');
+  view.unmount();
+});
+
+afterEach(() => {
+  jest.useRealTimers();
+  jest.restoreAllMocks();
+});
 
 test('saves a trimmed Unicode home city only after the server confirms it', async () => {
   const onUserUpdated = jest.fn();

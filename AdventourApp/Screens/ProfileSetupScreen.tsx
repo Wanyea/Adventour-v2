@@ -11,6 +11,8 @@ import {
   View,
 } from 'react-native';
 import AnimatedClouds from '../src/components/AnimatedClouds';
+import LocationAutocompleteInput from '../src/components/LocationAutocompleteInput';
+import type { LaunchSuggestion } from '../src/LaunchLocationService';
 import AuthService, { User } from '../src/services/AuthService';
 
 const wordmark = require('../src/assets/brand/adventour-wordmark.png');
@@ -234,8 +236,8 @@ const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ user, onComplet
           ) : null}
 
           <Text style={styles.label}>Home city or town</Text>
-          <TextInput
-            style={styles.input}
+          <LocationAutocompleteInput
+            inputStyle={styles.input}
             placeholder="City or town, region, country"
             value={homeCity}
             onChangeText={setHomeCity}
@@ -243,6 +245,7 @@ const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ user, onComplet
             autoCorrect={false}
             maxLength={160}
             editable={!submitting}
+            onSelectSuggestion={(suggestion: LaunchSuggestion) => setHomeCity(suggestion.description)}
           />
           <Text style={styles.helperText}>Optional. Add a region or country when useful; no street address needed.</Text>
 
