@@ -4,9 +4,10 @@
 **Date:** 2026-09-09
 **Scope:** background discovery of public local-event sources for an arbitrary launch location
 
-This packet freezes the decision that a lower-cost implementer must implement. It is a
-documentation and offline comparison deliverable. It does not authorize a paid plan,
-production crawling, or storage of provider content.
+This packet freezes the decision and implementation contract for ADTR-26. The ticket owns
+the connector decision, backend implementation, and acceptance evidence needed for an
+arbitrary launch location to enter automatic acquisition. It does not authorize a paid
+plan or storage of provider content.
 
 ## Decision
 
@@ -35,10 +36,9 @@ access and retention basis are separately admitted.
 
 ## Offline comparison and evidence boundary
 
-The comparison uses evidence already collected in ADTR-25 and the source documentation linked
-below. It does not claim that either path has produced new San Francisco or held-out-town
-events. That requires the bounded implementation experiment in ADTR-27 and must be measured
-from a frozen reference set.
+The comparison starts from evidence already collected in ADTR-25 and the source documentation
+linked below. ADTR-26 must complete the bounded implementation experiment below before its PR
+can be approved; it may not defer the required acquisition evidence to another ticket.
 
 | Path | Evidence available now | Expected value | Decision |
 |---|---|---|---|
@@ -137,16 +137,27 @@ maximum age, or a shorter source retention limit.
 
 ## Implementation handoff and stop conditions
 
-The implementer may extend ADTR-25's registry, bounded transport, adapter, atomic replacement,
-locking, and duplicate-collapse code. They may not select another vendor, enable paid access,
-weaken expiry, add a manual city allowlist, or change UI/navigation.
+The implementation extends ADTR-25's registry, bounded transport, adapters, atomic replacement,
+locking, and duplicate-collapse code. It adds arbitrary-location demand mapping, bounded
+bootstrap lead discovery, policy-gated source admission, durable refresh scheduling, and
+coverage/acquisition state on the existing local-events response. The worker owns all outbound
+connector work; Home and the swipe deck remain index reads. It may not select another vendor,
+enable paid access, weaken expiry, add a manual city allowlist, or change UI/navigation.
+
+The implementation must demonstrate the full path: a normal launch selection for a cold region
+creates one bounded demand job; the worker discovers permitted first-party leads (using the
+selected connector only as a lead source), admits supported sources, fetches and normalizes
+eligible occurrences, and atomically publishes them to the existing index. Repeated requests
+coalesce, a restart recovers a lease, stale or failed work never masquerades as fresh, and a
+location change cannot display the previous region's events. The API must return explicit
+coverage/acquisition states while this work is pending.
 
 Stop and return a review disposition if the connector cannot establish access/retention
 rights, if the parser cannot prove locality or time, if the reference gate misses, or if the
 budget is exceeded. Valid dispositions are `access_blocked`, `leads_missed`,
 `parsing_unsupported`, `facts_insufficient`, `freshness_inadequate`, and `budget_insufficient`.
-After one comparison and one bounded repair run, unresolved gaps are blockers for the next
-owner decision rather than an invitation to create an unbounded phase.
+After one comparison and one bounded repair run, unresolved gaps block ADTR-26; they are not
+silently moved into another ticket or product phase.
 
 ## Official sources
 
