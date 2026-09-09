@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -11,6 +11,8 @@ import {
   View,
 } from 'react-native';
 import AnimatedClouds from '../src/components/AnimatedClouds';
+import LocationAutocompleteInput from '../src/components/LocationAutocompleteInput';
+import type { LaunchSuggestion } from '../src/LaunchLocationService';
 import AuthService, { User } from '../src/services/AuthService';
 
 const wordmark = require('../src/assets/brand/adventour-wordmark.png');
@@ -109,7 +111,17 @@ const birthdateToInput = (value?: string) => {
 const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ user, onComplete }) => {
   const [displayName, setDisplayName] = useState(user.display_name || '');
   const [birthdateText, setBirthdateText] = useState(birthdateToInput(user.date_of_birth));
+  const [homeCity, setHomeCity] = useState(user.home_city || '');
   const [submitting, setSubmitting] = useState(false);
+  const mounted = useRef(true);
+  const saveInFlight = useRef(false);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   const trimmedDisplayName = displayName.trim();
   const parsedBirthdate = useMemo(() => parseBirthdateInput(birthdateText), [birthdateText]);
@@ -123,16 +135,26 @@ const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ user, onComplet
   };
 
   const saveProfile = async () => {
-    if (!canContinue || !parsedBirthdate) {
+    if (!canContinue || !parsedBirthdate || saveInFlight.current) {
       return;
     }
 
+    saveInFlight.current = true;
     setSubmitting(true);
     try {
+      const normalizedHomeCity = homeCity.trim() || null;
       const updatedUser = await AuthService.updateProfile({
         display_name: trimmedDisplayName,
         date_of_birth: parsedBirthdate.iso,
+        home_city: normalizedHomeCity,
       });
+      if (!mounted.current) {
+        return;
+      }
+      if (updatedUser.id !== user.id || updatedUser.home_city !== normalizedHomeCity) {
+        Alert.alert('Setup did not save', 'Your home base was not confirmed. Please try again.');
+        return;
+      }
       if (!updatedUser.profile_complete && !(updatedUser.display_name && updatedUser.date_of_birth)) {
         Alert.alert(
           'Setup did not save',
@@ -142,11 +164,17 @@ const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ user, onComplet
       }
       onComplete(updatedUser);
     } catch (error: any) {
+      if (!mounted.current) {
+        return;
+      }
       console.error('Profile setup error:', error);
       const message = error?.response?.data?.error || 'Unable to save your passport details. Please try again.';
       Alert.alert('Setup failed', message);
     } finally {
-      setSubmitting(false);
+      saveInFlight.current = false;
+      if (mounted.current) {
+        setSubmitting(false);
+      }
     }
   };
 
@@ -174,6 +202,7 @@ const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ user, onComplet
             autoCapitalize="words"
             autoCorrect={false}
             maxLength={40}
+            editable={!submitting}
           />
           {!trimmedDisplayName ? (
             <Text style={styles.validationText}>Choose a display name for your passport.</Text>
@@ -188,6 +217,7 @@ const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ user, onComplet
               onChangeText={handleBirthdateChange}
               keyboardType="number-pad"
               maxLength={10}
+              editable={!submitting}
             />
             {zodiac ? (
               <View style={styles.zodiacPill}>
@@ -204,6 +234,20 @@ const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ user, onComplet
           {parsedBirthdate && isOldEnough ? (
             <Text style={styles.helperText}>Looks good. Age check passed.</Text>
           ) : null}
+
+          <Text style={styles.label}>Home city or town</Text>
+          <LocationAutocompleteInput
+            inputStyle={styles.input}
+            placeholder="City or town, region, country"
+            value={homeCity}
+            onChangeText={setHomeCity}
+            autoCapitalize="words"
+            autoCorrect={false}
+            maxLength={160}
+            editable={!submitting}
+            onSelectSuggestion={(suggestion: LaunchSuggestion) => setHomeCity(suggestion.description)}
+          />
+          <Text style={styles.helperText}>Optional. Add a region or country when useful; no street address needed.</Text>
 
           <TouchableOpacity
             style={[styles.button, !canContinue && styles.buttonDisabled]}
