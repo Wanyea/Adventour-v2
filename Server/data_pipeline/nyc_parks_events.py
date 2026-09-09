@@ -14,7 +14,8 @@ from urllib.parse import urlparse
 from zoneinfo import ZoneInfo
 
 import h3
-import requests
+
+from data_pipeline.event_http import BoundedSession
 
 DATASET = 'https://data.cityofnewyork.us/d/w3wp-dpdi'
 API = 'https://data.cityofnewyork.us/resource/w3wp-dpdi.json'
@@ -26,8 +27,9 @@ EXCLUDED_CATEGORIES = {'Best for Kids', 'Recreation Center Programming', 'Sports
                        'Summer Sports Experience', 'Afterschool Programs', 'Seniors'}
 
 
-def session_for_source():
-    session = requests.Session()
+def session_for_source(source):
+    """Create the bounded production session for this registered source."""
+    session = BoundedSession(source['network'])
     session.headers.update({'User-Agent': 'Adventour/0.2 (NYC Parks Open Data consumer)'})
     return session
 
@@ -123,37 +125,46 @@ def normalize(raw, source, published, now):
 def collect(db, source, start_day, days=14, session=None):
     if not 1 <= days <= 14:
         raise ValueError('NYC publication covers at most 14 days')
-    session = session or session_for_source()
-    now = datetime.now(timezone.utc)
-    published = publication(session, now)
-    rows = read_rows(session)
-    records, seen, counts = [], set(), Counter()
-    for raw in rows:
-        counts['source_occurrences'] += 1
-        result, reason = normalize(raw, source, published, now)
-        if result and not start_day <= result['starts_at'].date() < start_day+timedelta(days=days):
-            result, reason = None, 'outside_window'
-        if result and result['occurrence_id'] in seen:
-            result, reason = None, 'duplicate_occurrence'
-        counts[reason or 'eligible'] += 1
-        if result:
-            seen.add(result['occurrence_id'])
-            records.append(result)
-    return records, {'window_start': start_day.isoformat(), 'window_days': days,
-        'fetched_at': now.isoformat(), 'verified_at': published.isoformat(), 'counts': dict(counts),
-        'dataset': DATASET, 'dataset_version': published.isoformat(),
-        'modifications': 'Factual subset; geographic/time/access filters; category mapping; no prose/images/contacts.',
-        'coverage_limit': 'NYC Parks public park listings only; excludes child-focused/restricted and ambiguous locations. Daily publication.'}
+    owned = session is None
+    session = session or session_for_source(source)
+    try:
+        now = datetime.now(timezone.utc)
+        published = publication(session, now)
+        rows = read_rows(session)
+        records, seen, counts = [], set(), Counter()
+        for raw in rows:
+            counts['source_occurrences'] += 1
+            result, reason = normalize(raw, source, published, now)
+            if result and not start_day <= result['starts_at'].date() < start_day+timedelta(days=days):
+                result, reason = None, 'outside_window'
+            if result and result['occurrence_id'] in seen:
+                result, reason = None, 'duplicate_occurrence'
+            counts[reason or 'eligible'] += 1
+            if result:
+                seen.add(result['occurrence_id'])
+                records.append(result)
+        return records, {'window_start': start_day.isoformat(), 'window_days': days,
+            'fetched_at': now.isoformat(), 'verified_at': published.isoformat(), 'counts': dict(counts),
+            'dataset': DATASET, 'dataset_version': published.isoformat(),
+            'modifications': 'Factual subset; geographic/time/access filters; category mapping; no prose/images/contacts.',
+            'coverage_limit': 'NYC Parks public park listings only; excludes child-focused/restricted and ambiguous locations. Daily publication.'}
+    finally:
+        if owned and callable(getattr(session, 'close', None)):
+            session.close()
 
 
 def recheck(db, source, event):
     identity = event['occurrence_id']
     if not re.fullmatch(r'\d{1,20}', identity):
         raise ValueError('Invalid NYC occurrence identity')
-    session = session_for_source()
-    now = datetime.now(timezone.utc)
-    published = publication(session, now)
-    rows = read_rows(session, guid=identity)
-    if len(rows) > 1:
-        raise ValueError('Ambiguous NYC occurrence')
-    return normalize(rows[0], source, published, now)[0] if rows else None
+    session = session_for_source(source)
+    try:
+        now = datetime.now(timezone.utc)
+        published = publication(session, now)
+        rows = read_rows(session, guid=identity)
+        if len(rows) > 1:
+            raise ValueError('Ambiguous NYC occurrence')
+        return normalize(rows[0], source, published, now)[0] if rows else None
+    finally:
+        if callable(getattr(session, 'close', None)):
+            session.close()

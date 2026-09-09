@@ -22,6 +22,7 @@ import { tagGroupIdsForPlace, tagGroupMeta } from '../src/placeTagGroups';
 import AuthService from '../src/services/AuthService';
 import { User } from '../src/services/AuthService';
 import { recordPlaceEvent } from '../src/services/PlaceEventService';
+import HomeCityEditor from '../src/components/HomeCityEditor';
 
 const passportCard = require('../src/assets/profile/passport-card.png');
 const ticketCard = require('../src/assets/cards/ticket-card.png');
@@ -87,6 +88,7 @@ type ProfilePayload = {
     username?: string;
     display_name?: string;
     profile_picture?: string;
+    home_city?: string | null;
     preferences: string[];
   };
   places: HistoryPlace[];
@@ -435,6 +437,18 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onSignOut, onAccountDelet
             </View>
           ) : null}
         </View>
+
+        <HomeCityEditor
+          userId={profile?.user.id || 0}
+          homeCity={profile?.user.home_city}
+          onUserUpdated={(updatedUser) => {
+            onUserUpdated?.(updatedUser);
+            setProfile((currentProfile) => currentProfile ? {
+              ...currentProfile,
+              user: { ...currentProfile.user, home_city: updatedUser.home_city },
+            } : currentProfile);
+          }}
+        />
 
         {topAcceptedTags.length ? (
           <View style={styles.tagPanel}>

@@ -2,10 +2,27 @@
 
 import os
 import uuid
+import logging
 
 import pytest
 from sqlalchemy import text
 from sqlalchemy.engine import make_url
+
+
+def test_access_log_is_bounded(monkeypatch, caplog):
+    if os.getenv("ENV_FILE") != ".env.ingest-check":
+        pytest.skip("Run with ENV_FILE=.env.ingest-check against the isolated ingestion database")
+    import app as backend
+    client = backend.app.test_client()
+    with caplog.at_level(logging.INFO, logger="app"):
+        response = client.get("/healthz?secret=must-not-be-logged", headers={"Authorization": "Bearer secret"})
+    assert response.status_code == 200
+    records = [record.getMessage() for record in caplog.records if record.name == "app" and record.getMessage().startswith("request ")]
+    assert records
+    assert "method=GET" in records[-1]
+    assert "path=/healthz" in records[-1]
+    assert "status=200" in records[-1]
+    assert "secret" not in records[-1]
 
 
 def test_served_snapshot_owned_stop_and_trip_lifecycle(monkeypatch):

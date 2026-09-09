@@ -1,13 +1,22 @@
 {
   "ucf_main": {
+    "source_id": "ucf_main",
     "name": "UCF Events",
     "metro": "orlando",
-    "method": "documented_json_feed",
+    "method": "documented_ics_feed",
+    "timezone": "America/New_York",
+    "parser_version": "ucf_ics_v1",
     "permission_url": "https://events.ucf.edu/help/",
     "permission_checked": "2026-09-06",
     "permission_basis": "UCF documents consuming its feeds in custom applications. Retain factual occurrence fields only; no descriptions, images or contacts.",
     "refresh_hours": 6,
     "max_age_hours": 24,
+    "network": {
+      "allowed_hosts": ["events.ucf.edu", "cah.ucf.edu", "gallery.cah.ucf.edu"],
+      "max_requests": 40, "max_pages": 40, "max_bytes": 2000000,
+      "min_interval_seconds": 0.2, "connect_timeout_seconds": 5,
+      "read_timeout_seconds": 20, "total_timeout_seconds": 60
+    },
     "retention": "Active-window facts only; expired rows purged on successful refresh.",
     "access_url": "https://cah.ucf.edu/events/ticketing/",
     "locations": [
@@ -29,9 +38,12 @@
     ]
   },
   "nyc_parks": {
+    "source_id": "nyc_parks",
     "name": "NYC Parks Open Data",
     "metro": "new_york",
     "method": "nyc_parks_open_data",
+    "timezone": "America/New_York",
+    "parser_version": "nyc_parks_socrata_v1",
     "permission_url": "https://cityofnewyork.github.io/opendatatsm/LocalLaw11of2012.html",
     "permission_checked": "2026-09-06",
     "permission_basis": "NYC Open Data law section 23-502(d) permits use of published factual datasets; source/version/modifications recorded. Owner continued Phase 2 after NYC adapter and storage-basis work was raised. Scope: public NYC Parks dataset w3wp-dpdi, factual occurrence fields and city-published meeting-point coordinates only. No Google responses, prose, images or contacts.",
@@ -39,6 +51,12 @@
     "location_basis": "Coordinates and named park meeting points from the NYC Parks public dataset; single park ID and NYC bounds required. No Google Places lookup or Maps-link coordinate extraction.",
     "refresh_hours": 6,
     "max_age_hours": 24,
+    "network": {
+      "allowed_hosts": ["data.cityofnewyork.us"],
+      "max_requests": 4, "max_pages": 2, "max_bytes": 8000000,
+      "min_interval_seconds": 0.2, "connect_timeout_seconds": 5,
+      "read_timeout_seconds": 25, "total_timeout_seconds": 60
+    },
     "publication_frequency": "daily",
     "retention": "Active-window facts only; expired rows purged on successful refresh. Repeated fetch does not renew publication age.",
     "access_url": "https://data.cityofnewyork.us/d/w3wp-dpdi",

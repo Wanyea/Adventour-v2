@@ -42,6 +42,64 @@ const profileImageForUser = (authUser: User | null) => {
   return imageId && profileImages[imageId] ? profileImages[imageId] : profileImages.wanyea;
 };
 
+type MainTabsProps = {
+  user: User | null;
+  onSignOut: () => Promise<void>;
+  onAccountDeleted: () => Promise<void>;
+  onUserUpdated: (user: User) => void;
+};
+
+const MainTabs: React.FC<MainTabsProps> = ({ user, onSignOut, onAccountDeleted, onUserUpdated }) => (
+  <Tab.Navigator
+    screenOptions={({ route, navigation }) => ({
+      headerStyle: { backgroundColor: '#bfeaf4', shadowColor: 'transparent', elevation: 0 },
+      headerTintColor: '#123c69',
+      headerTitleStyle: { fontWeight: '900' },
+      headerRight: () => (
+        <TouchableOpacity
+          style={styles.headerAvatarButton}
+          onPress={() => navigation.navigate('Profile')}
+          activeOpacity={0.82}
+          accessibilityLabel="Open profile"
+        >
+          <Image source={profileImageForUser(user)} style={styles.headerAvatarImage} />
+        </TouchableOpacity>
+      ),
+      tabBarStyle: { backgroundColor: '#123c69', borderTopColor: '#0b2a49' },
+      tabBarActiveTintColor: '#ff9f1c',
+      tabBarInactiveTintColor: '#dff6f2',
+      tabBarIcon: ({ color, focused }) => (
+        <Image
+          source={tabIcons[route.name as keyof typeof tabIcons]}
+          resizeMode="contain"
+          style={{
+            width: route.name === 'Social' ? 25 : 28,
+            height: route.name === 'Social' ? 25 : 28,
+            tintColor: focused ? '#ff4b47' : color,
+          }}
+        />
+      ),
+    })}
+  >
+    <Tab.Screen name="Home" options={{ title: 'Discover' }}>
+      {() => <HomeScreen user={user} />}
+    </Tab.Screen>
+    <Tab.Screen name="Social" component={SocialScreen} options={{ title: 'Friends & Trips' }} />
+    <Tab.Screen
+      name="Profile"
+      options={{ title: 'Profile', tabBarButton: () => null, tabBarItemStyle: { display: 'none' } }}
+    >
+      {() => (
+        <ProfileScreen
+          onSignOut={onSignOut}
+          onAccountDeleted={onAccountDeleted}
+          onUserUpdated={onUserUpdated}
+        />
+      )}
+    </Tab.Screen>
+  </Tab.Navigator>
+);
+
 const AppNavigator = () => {
   const [user, setUser] = useState<User | null>(null);
   const [profileComplete, setProfileComplete] = useState<boolean>(false);
@@ -114,80 +172,6 @@ const AppNavigator = () => {
     setProfileComplete(Boolean(updatedUser.profile_complete || (updatedUser.display_name && updatedUser.date_of_birth)));
   };
 
-  const MainTabs = () => {
-    const HomeTab = () => <HomeScreen user={user} />;
-    const ProfileTab = () => (
-      <ProfileScreen
-        onSignOut={handleSignOut}
-        onAccountDeleted={handleAccountDeleted}
-        onUserUpdated={setUser}
-      />
-    );
-
-    return (
-      <Tab.Navigator
-        screenOptions={({ route, navigation }) => ({
-          headerStyle: {
-            backgroundColor: '#bfeaf4',
-            shadowColor: 'transparent',
-            elevation: 0,
-          },
-          headerTintColor: '#123c69',
-          headerTitleStyle: {
-            fontWeight: '900',
-          },
-          headerRight: () => (
-            <TouchableOpacity
-              style={styles.headerAvatarButton}
-              onPress={() => navigation.navigate('Profile')}
-              activeOpacity={0.82}
-              accessibilityLabel="Open profile"
-            >
-              <Image source={profileImageForUser(user)} style={styles.headerAvatarImage} />
-            </TouchableOpacity>
-          ),
-          tabBarStyle: {
-            backgroundColor: '#123c69',
-            borderTopColor: '#0b2a49',
-          },
-          tabBarActiveTintColor: '#ff9f1c',
-          tabBarInactiveTintColor: '#dff6f2',
-          tabBarIcon: ({ color, focused }) => (
-            <Image
-              source={tabIcons[route.name as keyof typeof tabIcons]}
-              resizeMode="contain"
-              style={{
-                width: route.name === 'Social' ? 25 : 28,
-                height: route.name === 'Social' ? 25 : 28,
-                tintColor: focused ? '#ff4b47' : color,
-              }}
-            />
-          ),
-        })}
-      >
-        <Tab.Screen
-          name="Home"
-          component={HomeTab}
-          options={{ title: 'Discover' }}
-        />
-        <Tab.Screen
-          name="Social"
-          component={SocialScreen}
-          options={{ title: 'Friends & Trips' }}
-        />
-        <Tab.Screen
-          name="Profile"
-          component={ProfileTab}
-          options={{
-            title: 'Profile',
-            tabBarButton: () => null,
-            tabBarItemStyle: { display: 'none' },
-          }}
-        />
-      </Tab.Navigator>
-    );
-  };
-
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -215,7 +199,16 @@ const AppNavigator = () => {
             {(props) => <OnboardingScreen {...props} onComplete={() => setOnboarded(true)} />}
           </Stack.Screen>
         ) : (
-          <Stack.Screen name="Main" component={MainTabs} />
+          <Stack.Screen name="Main">
+            {() => (
+              <MainTabs
+                user={user}
+                onSignOut={handleSignOut}
+                onAccountDeleted={handleAccountDeleted}
+                onUserUpdated={setUser}
+              />
+            )}
+          </Stack.Screen>
         )}
       </Stack.Navigator>
     </NavigationContainer>

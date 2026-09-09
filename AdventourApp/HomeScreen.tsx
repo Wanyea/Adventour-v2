@@ -17,7 +17,8 @@ import PlaceDetailsModal from './src/components/PlaceDetailsModal';
 import AdventourJourneyPanel from './src/components/AdventourJourneyPanel';
 import AdventourLaunchHero from './src/components/AdventourLaunchHero';
 import LocalEventsSection from './src/components/LocalEventsSection';
-import LaunchLocationService, { LaunchSuggestion } from './src/LaunchLocationService';
+import { LaunchSuggestion } from './src/LaunchLocationService';
+import LocationAutocompleteInput from './src/components/LocationAutocompleteInput';
 import Config from './src/Config';
 import { flushPilot, pilotConfig } from './src/pilot/PilotService';
 import { recordPlaceEvent } from './src/services/PlaceEventService';
@@ -62,7 +63,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
   const [city, setCity] = useState<string>(''); 
   const [currentCoords, setCurrentCoords] = useState<Coordinates | null>(null);
   const [locationMode, setLocationMode] = useState<LocationMode>('none');
-  const [suggestions, setSuggestions] = useState<LaunchSuggestion[]>([]);
   const [launchError, setLaunchError] = useState('');
   const launchVersion = useRef(0);
   const [emptyMessage, setEmptyMessage] = useState<string>('');
@@ -76,7 +76,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const [activeAdventour, setActiveAdventour] = useState<AdventourSession | null>(null);
   const [journeyLoading, setJourneyLoading] = useState(false);
-  const autocompleteTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scrollRef = useRef<ScrollView>(null);
   const filterPanelAnim = useRef(new Animated.Value(0)).current;
   const recentlyDecidedPlaceIds = useRef(new Set<string>());
@@ -315,36 +314,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
     }
   };
 
-  const fetchSuggestions = async (input: string) => {
-    const version = launchVersion.current;
-    if (autocompleteTimer.current) {
-      clearTimeout(autocompleteTimer.current);
-    }
-
-    if (input.length <= 2) {
-      setSuggestions([]);
-      return;
-    }
-
-    autocompleteTimer.current = setTimeout(async () => {
-      try {
-        const matches = await LaunchLocationService.fetchAutocompleteSuggestions(input);
-        if (version !== launchVersion.current) return;
-        setSuggestions(matches);
-        setLaunchError(matches.length ? '' : 'No matching location found. Try a more specific city or address.');
-      } catch {
-        if (version !== launchVersion.current) return;
-        setSuggestions([]);
-        setLaunchError('Location search is temporarily unavailable. Try again or use GPS.');
-      }
-    }, 650);
-  };
-
   const clearLaunchResults = () => {
     const version = ++launchVersion.current;
-    if (autocompleteTimer.current) clearTimeout(autocompleteTimer.current);
     setCurrentCoords(null);
-    setSuggestions([]);
     setLaunchError('');
     setPlaces([]);
     setSelectedPlace(null);
@@ -363,7 +335,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
     clearLaunchResults();
     setCity(text);
     setLocationMode(text.trim() ? 'manual' : 'none');
-    fetchSuggestions(text);
   };
 
   const handleSuggestionSelect = (suggestion: LaunchSuggestion) => {
@@ -372,7 +343,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
     setCity(suggestion.description);
     setLocationMode('manual');
     setCurrentCoords(null);
-    setSuggestions([]);
 
     const { latitude, longitude } = suggestion;
     if (Number.isFinite(latitude) && Math.abs(latitude) <= 90 && Number.isFinite(longitude) && Math.abs(longitude) <= 180) {
@@ -603,50 +573,43 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
             </Text>
           </View>
           <View style={styles.locationContainer}>
-            <TextInput
-              style={[styles.cityInput, !hasLaunchPoint && styles.cityInputRequired]}
+            <LocationAutocompleteInput
               placeholder="City, neighborhood, or place"
               value={city}
               onChangeText={handleCityChange}
               placeholderTextColor="#6b8aa3"
+              inputStyle={[styles.cityInput, !hasLaunchPoint && styles.cityInputRequired]}
+              onSelectSuggestion={handleSuggestionSelect}
+              onSearchError={setLaunchError}
+              trailingContent={(
+                <>
+                  <TouchableOpacity style={styles.locationButton} onPress={useCurrentLocation}>
+                    <Image
+                      source={{ uri: 'https://img.icons8.com/ios-filled/50/ffffff/marker.png' }}
+                      style={styles.locationIcon}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.locationButton, styles.filterIconButton, filtersOpen && styles.filterIconButtonActive]}
+                    onPress={() => setFiltersOpen((open) => !open)}
+                    activeOpacity={0.82}
+                    accessibilityLabel="Open filters"
+                  >
+                    <View style={styles.filterGlyph}>
+                      <View style={[styles.filterGlyphLine, styles.filterGlyphLineTop]} />
+                      <View style={[styles.filterGlyphLine, styles.filterGlyphLineMiddle]} />
+                      <View style={[styles.filterGlyphLine, styles.filterGlyphLineBottom]} />
+                    </View>
+                  </TouchableOpacity>
+                </>
+              )}
             />
-            <TouchableOpacity style={styles.locationButton} onPress={useCurrentLocation}>
-              <Image
-                source={{ uri: 'https://img.icons8.com/ios-filled/50/ffffff/marker.png' }}
-                style={styles.locationIcon}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.locationButton, styles.filterIconButton, filtersOpen && styles.filterIconButtonActive]}
-              onPress={() => setFiltersOpen((open) => !open)}
-              activeOpacity={0.82}
-              accessibilityLabel="Open filters"
-            >
-              <View style={styles.filterGlyph}>
-                <View style={[styles.filterGlyphLine, styles.filterGlyphLineTop]} />
-                <View style={[styles.filterGlyphLine, styles.filterGlyphLineMiddle]} />
-                <View style={[styles.filterGlyphLine, styles.filterGlyphLineBottom]} />
-              </View>
-            </TouchableOpacity>
           </View>
           {launchError ? <Text style={styles.suggestionText}>{launchError}</Text> : null}
           <Text style={styles.suggestionText} onPress={() => Linking.openURL('https://www.openstreetmap.org/copyright')}>
             Location search: © OpenStreetMap contributors
           </Text>
         </View>
-        {suggestions.length > 0 && (
-          <View style={styles.suggestionsList}>
-            {suggestions.map((item) => (
-              <TouchableOpacity
-                key={item.suggestion_id}
-                style={styles.suggestionItem}
-                onPress={() => handleSuggestionSelect(item)}
-              >
-                <Text style={styles.suggestionText}>{item.description}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
         {filtersOpen ? (
           <View style={styles.filterSection}>
             <Animated.View style={[styles.filterPanel, filterPanelStyle]}>

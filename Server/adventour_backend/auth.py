@@ -52,6 +52,8 @@ else:
     print("Warning: firebase-admin is not installed. Only ADVENTOUR_DEV_AUTH=true tokens will work.")
 
 FIREBASE_CERTS_URL = "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com"
+# Firebase recommends a small tolerance for clock differences between clients and servers.
+FIREBASE_CLOCK_SKEW_SECONDS = 60
 _firebase_public_certs = None
 _firebase_public_certs_expires_at = 0
 
@@ -118,6 +120,7 @@ def _verify_firebase_token_with_public_certs(token):
             algorithms=["RS256"],
             audience=project_id,
             issuer=f"https://securetoken.google.com/{project_id}",
+            leeway=FIREBASE_CLOCK_SKEW_SECONDS,
         )
         decoded["uid"] = decoded.get("uid") or decoded.get("user_id") or decoded.get("sub")
 
@@ -142,7 +145,7 @@ def verify_firebase_token(token):
         return _verify_firebase_token_with_public_certs(token)
 
     try:
-        return auth.verify_id_token(token)
+        return auth.verify_id_token(token, clock_skew_seconds=FIREBASE_CLOCK_SKEW_SECONDS)
     except Exception as e:
         print(f"Token verification failed via Firebase Admin SDK: {e}")
         return _verify_firebase_token_with_public_certs(token)

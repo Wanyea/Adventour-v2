@@ -4,6 +4,7 @@ Flask-SQLAlchemy==3.1.1
 requests==2.32.3
 python-dotenv
 gunicorn
+waitress==3.0.2
 PyMySQL
 firebase-admin==6.4.0
 PyJWT==2.8.0

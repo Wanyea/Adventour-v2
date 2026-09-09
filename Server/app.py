@@ -17,14 +17,16 @@ from adventour_backend.services.account_service import delete_user_account_data
 from adventour_backend.services import tag_group_service, local_index_service
 from adventour_backend.services import place_event_service
 from adventour_backend.services import decision_service, index_schema_service, launch_service
+from adventour_backend.services.profile_service import ensure_user_profile_columns, normalize_home_city
 
 from dotenv import load_dotenv
 from urllib.parse import quote_plus
 from datetime import date, datetime, timezone
-from sqlalchemy import func, inspect, text
+from sqlalchemy import func, text
 import os
 import logging
 import json
+import time
 
 env_file = os.getenv("ENV_FILE")
 if env_file:
@@ -67,7 +69,28 @@ if os.getenv("GAE_ENV", "").startswith("standard"):
     }
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SERVICE_VERSION"] = os.getenv("ADVENTOUR_SERVICE_VERSION", "unversioned-development")
 db.init_app(app)
+
+
+@app.after_request
+def log_request(response):
+    """Emit bounded access telemetry without logging request data or credentials."""
+    started = getattr(g, "request_started_at", None)
+    elapsed_ms = (time.perf_counter() - started) * 1000 if started is not None else None
+    logger.info(
+        "request method=%s path=%s status=%s duration_ms=%s",
+        request.method,
+        request.path,
+        response.status_code,
+        f"{elapsed_ms:.1f}" if elapsed_ms is not None else "unknown",
+    )
+    return response
+
+
+@app.before_request
+def mark_request_start():
+    g.request_started_at = time.perf_counter()
 
 # Register blueprints
 app.register_blueprint(social_bp, url_prefix='/api')
@@ -77,14 +100,7 @@ app.register_blueprint(pilot_bp)
 
 def ensure_local_schema():
     """Keep existing local dev databases usable until proper migrations land."""
-    inspector = inspect(db.engine)
-    user_columns = {column["name"] for column in inspector.get_columns(User.__tablename__)}
-    if "date_of_birth" in user_columns:
-        return
-
-    table_name = db.engine.dialect.identifier_preparer.quote(User.__tablename__)
-    with db.engine.begin() as connection:
-        connection.execute(text(f"ALTER TABLE {table_name} ADD COLUMN date_of_birth DATE"))
+    ensure_user_profile_columns(db.engine, User.__tablename__)
 
 
 # Initialize the database
@@ -101,6 +117,25 @@ def home():
     return jsonify({
         "message": "This is the Adventour API. Refer to the documentation for available endpoints."
     })
+
+@app.route('/healthz', methods=['GET'])
+def healthz():
+    """Cheap liveness probe that does not require database access."""
+    return jsonify({"status": "ok", "service": "adventour-api", "version": app.config["SERVICE_VERSION"]})
+
+@app.route('/readyz', methods=['GET'])
+def readyz():
+    """Readiness probe; report unavailable until the local database responds."""
+    try:
+        db.session.execute(text("SELECT 1"))
+        return jsonify({"status": "ready", "database": "ok", "version": app.config["SERVICE_VERSION"]})
+    except Exception:
+        db.session.rollback()
+        return jsonify({"status": "not_ready", "database": "unavailable", "version": app.config["SERVICE_VERSION"]}), 503
+
+@app.route('/version', methods=['GET'])
+def version():
+    return jsonify({"service": "adventour-api", "version": app.config["SERVICE_VERSION"]})
 
 @app.route('/api/dev/config', methods=['GET'])
 def dev_config():
@@ -174,6 +209,7 @@ def serialize_user(user):
         "username": user.username,
         "display_name": user.display_name,
         "date_of_birth": date_or_none(user.date_of_birth),
+        "home_city": user.home_city,
         "profile_picture": user.profile_picture,
         "preferences": preferences,
         "profile_complete": bool(user.display_name and user.date_of_birth),
@@ -272,7 +308,17 @@ def get_user_info(user_id):
 def create_user():
     """Create a new user from Firebase data"""
     data = request.json
+    if not isinstance(data, dict):
+        return jsonify({"error": "Request body must be a JSON object"}), 400
     user = g.current_user
+
+    if "home_city" in data:
+        try:
+            home_city = normalize_home_city(data["home_city"])
+        except ValueError as exc:
+            return jsonify({"error": str(exc)}), 400
+    else:
+        home_city = None
     
     # Update user with provided data
     if data.get('display_name'):
@@ -291,6 +337,8 @@ def create_user():
         if not is_at_least_13(birthdate):
             return jsonify({"error": "You must be at least 13 to use Adventour"}), 400
         user.date_of_birth = birthdate
+    if "home_city" in data:
+        user.home_city = home_city
     
     db.session.commit()
     
@@ -336,7 +384,17 @@ def create_dev_user():
 def update_user_profile():
     """Update user profile"""
     data = request.json
+    if not isinstance(data, dict):
+        return jsonify({"error": "Request body must be a JSON object"}), 400
     user = g.current_user
+
+    if "home_city" in data:
+        try:
+            home_city = normalize_home_city(data["home_city"])
+        except ValueError as exc:
+            return jsonify({"error": str(exc)}), 400
+    else:
+        home_city = None
     
     if data.get('display_name'):
         display_name = data['display_name'].strip()
@@ -354,6 +412,8 @@ def update_user_profile():
         if not is_at_least_13(birthdate):
             return jsonify({"error": "You must be at least 13 to use Adventour"}), 400
         user.date_of_birth = birthdate
+    if "home_city" in data:
+        user.home_city = home_city
     
     db.session.commit()
     
@@ -750,6 +810,7 @@ def profile_history():
             "username": user.username,
             "display_name": user.display_name,
             "date_of_birth": date_or_none(user.date_of_birth),
+            "home_city": user.home_city,
             "profile_picture": user.profile_picture,
             "preferences": user.preferences.split(",") if user.preferences else [],
         },
@@ -889,4 +950,4 @@ def places_autocomplete():
         return jsonify({'error': str(exc)}), 503
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.getenv("PORT", "8080")))
+    app.run(host=os.getenv("ADVENTOUR_BIND_HOST", "127.0.0.1"), port=int(os.getenv("PORT", "8080")))

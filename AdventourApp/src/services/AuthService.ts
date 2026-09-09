@@ -14,12 +14,26 @@ export interface User {
   profile_picture?: string;
   preferences?: string[];
   profile_complete?: boolean;
+  home_city?: string | null;
 }
 
 class AuthService {
   private currentUser: User | null = null;
+  private sessionVersion = 0;
   private authStateListener: (() => void) | null = null;
   private isDevAuth = Config.API_AUTH_MODE === 'dev';
+
+  private setCurrentUser(user: User | null, newSession = false) {
+    const identityChanged = this.currentUser?.firebase_uid !== user?.firebase_uid;
+    this.currentUser = user;
+    if (identityChanged || newSession) {
+      this.sessionVersion += 1;
+    }
+  }
+
+  private isCurrentSession(version: number, firebaseUid?: string) {
+    return this.sessionVersion === version && this.currentUser?.firebase_uid === firebaseUid;
+  }
 
   constructor() {
     if (Config.GOOGLE_WEB_CLIENT_ID) {
@@ -47,13 +61,13 @@ class AuthService {
     try {
       if (this.isDevAuth) {
         const user = await this.getDevUser(undefined, email);
-        this.currentUser = user;
+        this.setCurrentUser(user);
         return user;
       }
 
       const userCredential = await auth().signInWithEmailAndPassword(email, password);
       const user = await this.getOrCreateUser(userCredential.user);
-      this.currentUser = user;
+      this.setCurrentUser(user);
       return user;
     } catch (error) {
       console.error('Sign in error:', error);
@@ -65,7 +79,7 @@ class AuthService {
     try {
       if (this.isDevAuth) {
         const user = await this.getDevUser(displayName, email);
-        this.currentUser = user;
+        this.setCurrentUser(user);
         return user;
       }
 
@@ -80,7 +94,7 @@ class AuthService {
       }
 
       const user = await this.getOrCreateUser(userCredential.user);
-      this.currentUser = user;
+      this.setCurrentUser(user);
       return user;
     } catch (error) {
       console.error('Sign up error:', error);
@@ -92,7 +106,7 @@ class AuthService {
     try {
       if (this.isDevAuth) {
         const user = await this.getDevUser(displayName || 'Google Dev User', 'google-dev@adventour.local');
-        this.currentUser = user;
+        this.setCurrentUser(user);
         return user;
       }
 
@@ -113,10 +127,10 @@ class AuthService {
       let user = await this.getOrCreateUser(userCredential.user);
       const trimmedDisplayName = displayName?.trim();
       if (trimmedDisplayName && trimmedDisplayName !== user.display_name) {
-        this.currentUser = user;
+        this.setCurrentUser(user);
         user = await this.updateProfile({ display_name: trimmedDisplayName });
       }
-      this.currentUser = user;
+      this.setCurrentUser(user);
       return user;
     } catch (error: any) {
       if (error?.code === statusCodes.SIGN_IN_CANCELLED) {
@@ -136,7 +150,7 @@ class AuthService {
         }
         await auth().signOut();
       }
-      this.currentUser = null;
+      this.setCurrentUser(null);
       if (this.isDevAuth) {
         await AsyncStorage.setItem('dev_auth_email', '__signed_out__');
       }
@@ -175,7 +189,7 @@ class AuthService {
         }
       }
 
-      this.currentUser = null;
+      this.setCurrentUser(null);
       await AsyncStorage.removeItem('user_id');
       await AsyncStorage.removeItem('auth_token');
     } catch (error) {
@@ -213,7 +227,7 @@ class AuthService {
           return null;
         }
         const user = await this.getDevUser();
-        this.currentUser = user;
+        this.setCurrentUser(user);
         return user;
       } catch (error) {
         console.error('Get dev user error:', error);
@@ -225,7 +239,7 @@ class AuthService {
     if (currentFirebaseUser) {
       try {
         const user = await this.getOrCreateUser(currentFirebaseUser);
-        this.currentUser = user;
+        this.setCurrentUser(user);
         return user;
       } catch (error) {
         console.error('Get current user error:', error);
@@ -286,7 +300,7 @@ class AuthService {
           if (!active) {
             return;
           }
-          this.currentUser = user;
+          this.setCurrentUser(user);
           callback(user);
         })
         .catch((error) => {
@@ -307,14 +321,14 @@ class AuthService {
       if (firebaseUser) {
         try {
           const user = await this.getOrCreateUser(firebaseUser);
-          this.currentUser = user;
+          this.setCurrentUser(user);
           callback(user);
         } catch (error) {
           console.error('Auth state change error:', error);
           callback(null);
         }
       } else {
-        this.currentUser = null;
+        this.setCurrentUser(null);
         callback(null);
       }
     });
@@ -336,11 +350,16 @@ class AuthService {
     }
   }
 
-  async updateProfile(updates: { display_name?: string; date_of_birth?: string; profile_picture?: string }): Promise<User> {
+  async updateProfile(updates: { display_name?: string; date_of_birth?: string; profile_picture?: string; home_city?: string | null }): Promise<User> {
     try {
+      const sessionVersion = this.sessionVersion;
+      const firebaseUid = this.currentUser?.firebase_uid;
       const token = await this.getIdToken();
       if (!token) {
         throw new Error('No authentication token');
+      }
+      if (!this.isCurrentSession(sessionVersion, firebaseUid)) {
+        throw new Error('Your account changed before the profile update could be sent.');
       }
 
       const response = await axios.put(`${Config.BACKEND_BASE_URL}/user/profile`, updates, {
@@ -350,7 +369,10 @@ class AuthService {
       });
 
       const updatedUser = response.data.user;
-      this.currentUser = updatedUser;
+      if (!this.isCurrentSession(sessionVersion, firebaseUid) || updatedUser.firebase_uid !== firebaseUid) {
+        throw new Error('Your account changed before the profile update completed.');
+      }
+      this.setCurrentUser(updatedUser);
       return updatedUser;
     } catch (error) {
       console.error('Update profile error:', error);

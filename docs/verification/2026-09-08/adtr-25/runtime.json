@@ -1,0 +1,183 @@
+{
+  "acquisitions": {
+    "new_york": {
+      "nyc_parks": {
+        "window_start": "2026-09-08",
+        "window_days": 14,
+        "fetched_at": "2026-09-08T19:55:50.831711+00:00",
+        "verified_at": "2026-09-08T13:03:11+00:00",
+        "counts": {
+          "source_occurrences": 1271,
+          "eligible": 309,
+          "cancelled_or_registration_closed": 47,
+          "ended": 10,
+          "restricted_or_age_program": 751,
+          "ambiguous_or_nonpark_location": 125,
+          "unusable_location": 12,
+          "invalid_time": 2,
+          "outside_window": 15
+        },
+        "dataset": "https://data.cityofnewyork.us/d/w3wp-dpdi",
+        "dataset_version": "2026-09-08T13:03:11+00:00",
+        "modifications": "Factual subset; geographic/time/access filters; category mapping; no prose/images/contacts.",
+        "coverage_limit": "NYC Parks public park listings only; excludes child-focused/restricted and ambiguous locations. Daily publication.",
+        "network": {
+          "requests": 2,
+          "bytes": 1476096,
+          "elapsed_seconds": 2.5160000000614673
+        },
+        "status": "refreshed",
+        "source_id": "nyc_parks",
+        "records": 309,
+        "parser_version": "nyc_parks_socrata_v1",
+        "timezone": "America/New_York"
+      }
+    },
+    "orlando": {
+      "ucf_main": {
+        "window_start": "2026-09-08",
+        "window_days": 14,
+        "verified_at": "2026-09-08T19:55:57.025711+00:00",
+        "counts": {
+          "source_occurrences": 104,
+          "public_access_or_location_not_verified": 96,
+          "eligible": 8
+        },
+        "coverage_limit": "UCF main ICS feed; only the independently verified public gallery location and Arts Exhibit category are enabled. Not metro-wide coverage.",
+        "network": {
+          "requests": 23,
+          "bytes": 222194,
+          "elapsed_seconds": 13.25
+        },
+        "status": "refreshed",
+        "source_id": "ucf_main",
+        "records": 8,
+        "parser_version": "ucf_ics_v1",
+        "timezone": "America/New_York"
+      }
+    }
+  },
+  "repeat": {
+    "new_york": {
+      "nyc_parks": {
+        "window_start": "2026-09-08",
+        "window_days": 14,
+        "fetched_at": "2026-09-08T19:55:53.533531+00:00",
+        "verified_at": "2026-09-08T13:03:11+00:00",
+        "counts": {
+          "source_occurrences": 1271,
+          "eligible": 309,
+          "cancelled_or_registration_closed": 47,
+          "ended": 10,
+          "restricted_or_age_program": 751,
+          "ambiguous_or_nonpark_location": 125,
+          "unusable_location": 12,
+          "invalid_time": 2,
+          "outside_window": 15
+        },
+        "dataset": "https://data.cityofnewyork.us/d/w3wp-dpdi",
+        "dataset_version": "2026-09-08T13:03:11+00:00",
+        "modifications": "Factual subset; geographic/time/access filters; category mapping; no prose/images/contacts.",
+        "coverage_limit": "NYC Parks public park listings only; excludes child-focused/restricted and ambiguous locations. Daily publication.",
+        "network": {
+          "requests": 2,
+          "bytes": 1476096,
+          "elapsed_seconds": 2.875
+        },
+        "status": "refreshed",
+        "source_id": "nyc_parks",
+        "records": 309,
+        "parser_version": "nyc_parks_socrata_v1",
+        "timezone": "America/New_York"
+      }
+    },
+    "orlando": {
+      "ucf_main": {
+        "window_start": "2026-09-08",
+        "window_days": 14,
+        "verified_at": "2026-09-08T19:56:10.302060+00:00",
+        "counts": {
+          "source_occurrences": 104,
+          "public_access_or_location_not_verified": 96,
+          "eligible": 8
+        },
+        "coverage_limit": "UCF main ICS feed; only the independently verified public gallery location and Arts Exhibit category are enabled. Not metro-wide coverage.",
+        "network": {
+          "requests": 23,
+          "bytes": 222194,
+          "elapsed_seconds": 12.515999999945052
+        },
+        "status": "refreshed",
+        "source_id": "ucf_main",
+        "records": 8,
+        "parser_version": "ucf_ics_v1",
+        "timezone": "America/New_York"
+      }
+    }
+  },
+  "listing": {
+    "nyc": {
+      "returned": 50,
+      "latency_ms": 205.88,
+      "provider_calls": 0,
+      "source_ids": [
+        "nyc_parks"
+      ],
+      "sample_titles": [
+        "Open House at Ocean Breeze Athletic Complex",
+        "Bootcamp with Speakeasy of Strength",
+        "Folk Jams in Greeley Square Park"
+      ],
+      "coverage_note": "Limited calendar coverage. No results does not mean no local events."
+    },
+    "ucf": {
+      "returned": 8,
+      "latency_ms": 195.74,
+      "provider_calls": 0,
+      "source_ids": [
+        "ucf_main"
+      ],
+      "sample_titles": [
+        "Opening Reception and Artist Talk | Connective Tissue by Hanna Washburn",
+        "Connective Tissue by Hanna Washburn",
+        "Connective Tissue by Hanna Washburn"
+      ],
+      "coverage_note": "Limited calendar coverage. No results does not mean no local events."
+    },
+    "empty": {
+      "returned": 0,
+      "latency_ms": 227.06,
+      "provider_calls": 0,
+      "source_ids": [],
+      "sample_titles": [],
+      "coverage_note": "Limited calendar coverage. No results does not mean no local events."
+    }
+  },
+  "unconfigured": {
+    "_selection": {
+      "region": "seattle",
+      "source": null,
+      "status": "no_configured_source",
+      "sources": 0,
+      "network": {
+        "requests": 0,
+        "bytes": 0,
+        "elapsed_seconds": 0
+      }
+    }
+  },
+  "stored_counts": {
+    "nyc_parks": 309,
+    "ucf_main": 8
+  },
+  "rechecks": {
+    "ucf_main": {
+      "matched_occurrence": true,
+      "elapsed_seconds": 1.499
+    },
+    "nyc_parks": {
+      "matched_occurrence": true,
+      "elapsed_seconds": 1.829
+    }
+  }
+}

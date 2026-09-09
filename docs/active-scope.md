@@ -1,5 +1,15 @@
 # Active scope — Phase 2 (resumed after restart)
 
+September 8: ADTR-25 merged into `codex-astra` at `82a958ee`. The owner approved
+implementing **ADTR-22** first, followed by ADTR-23 after its prerequisite merges.
+The active worktree is limited to the [ADTR-22 contract](tickets/ADTR-22.md):
+optional home city/town capture and editing in the existing onboarding/Profile
+surfaces, with authenticated persistence. This is an explicitly approved narrow
+UI follow-up under **ADTR-19**, not a new phase or expanded Phase 2 acceptance.
+ADTR-23 owns foreground location, home resolution and manual-launch precedence.
+With no usable GPS, home, or manual launch, it must skip event queries and prompt
+for a launch point; it must never fall back to a seeded city. Phase 2 stays open.
+
 Phase 2 approved 2026-09-06: "Lets move onto phase 2. ill do a review of both
 phases after." This overrides the Phase 1 review/merge prerequisite for this
 transition only. Phases 3–5 remain closed. Phase 1 acceptance gaps remain open.
