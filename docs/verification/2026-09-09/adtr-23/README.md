@@ -14,9 +14,11 @@ gate.
   Pixel 7 API 30 emulator, using isolated backend port 8082 and database
   `adventour_ingest_check_20260905`. Runtime observations are synthetic test
   activity.
-- A fresh Android build is currently blocked on Windows by the CMake 260
-  character-path failure, after the Gradle cache workaround. This is a local
-  build-environment failure, not a claimed passing fresh build.
+- A fresh Android debug build succeeded from a short `X:` drive mapping of this
+  worktree. Gradle completed 308 actionable tasks in 9m25s and installed the
+  APK on the Pixel 7 API 30 emulator. The short mapping resolves the Windows
+  CMake 260-character path limit; it is a build-environment workaround, not an
+  application change.
 
 ## Observed runtime behavior
 
@@ -29,6 +31,7 @@ gate.
 | Manual precedence and resume | A manually selected New York city remained the launch point across background/foreground; local-events requests used the manual destination. |
 | Deck request and screen | St. Augustine response served 20 cards with zero provider calls in 96.8 ms. The viewed emulator screen showed 20 cards; its first card was St. Augustine Coffee House at 411 m with Fit `0.774`. The events section truthfully showed no verified events in the region. |
 | NYC empty deck | NYC returned an empty POI deck from the limited isolated test index. This is not a recommendation-quality pass. |
+| Fresh native install | The newly built APK launched on the Pixel 7 after `app:installDebug`; the Home launch-point guidance rendered and the package declared fine/coarse location permissions. |
 
 Screenshots remain in `%TEMP%` because the default profile asset is personal and
 is not suitable for publication in the repository.
@@ -45,10 +48,10 @@ then returned to St. Augustine from that manual New York state.
 
 ## Pending gates
 
-- Fresh Android build after resolving the Windows CMake path-length failure.
 - Physical iPhone verification from the exact reviewed commit: first grant,
   denial/restriction, reduced/coarse precision, disabled services, cold relaunch,
   settings-return permission changes, saved-home fallback, manual override race,
   and no-home behavior.
-- Independent review and owner review remain required. ADTR-23 and Phase 2 are
-  not complete or accepted.
+- Independent review found no remaining source blockers. Owner review and the
+  physical-iPhone gate remain required; ADTR-23 and Phase 2 are not complete or
+  accepted.

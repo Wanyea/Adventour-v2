@@ -51,10 +51,8 @@ in temporary local storage; this reviewer has not independently viewed them.
 ## Disposition
 
 No remaining blocking source finding at the implementation head above. Overall
-acceptance remains pending, with medium blocking device/evidence gaps:
+acceptance remains pending, with one medium blocking device/evidence gap:
 
-- Fresh Android native build is blocked by the Windows CMake path-length error;
-  current runtime evidence uses the installed native wrapper with updated JS.
 - Physical-iPhone verification of the exact committed revision is still required,
   including foreground permissions, restriction/reduced precision, settings
   return, manual races and no-location behavior.

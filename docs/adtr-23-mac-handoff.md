@@ -26,9 +26,11 @@ Android-only checkpoint as a public-pilot deployment authorization.
   (`interest=0.5`, `distance=0.174313`, `local_policy=0.1`, `feedback=0`,
   `repeat=0`) and structural score `0.9936`.
 
-The fresh Android build is not green: Windows CMake currently fails at its
-260-character path limit after the Gradle cache workaround. Android runtime
-evidence came from the installed debug wrapper.
+The fresh Android debug build is green when the worktree is mapped to a short
+`X:` drive: Gradle completed 308 actionable tasks in 9m25s and installed the
+APK on the Pixel 7. The short mapping avoids Windows CMake's 260-character
+path limit. The Mac session still needs to build and install the exact reviewed
+commit on a physical iPhone.
 
 ## Required physical-iPhone checklist
 
