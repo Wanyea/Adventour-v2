@@ -864,7 +864,7 @@ def create_recommendations():
             'radius_meters': int(data.get('radius_meters', 3200)),
             'tag_group': (data.get('constraints') or {}).get('tag_group', 'all'),
             'interests': (user.preferences or '').split(','),
-            'location_origin': data.get('location_origin') if data.get('location_origin') in ('gps','manual') else 'unknown',
+            'location_origin': data.get('location_origin') if data.get('location_origin') in ('gps', 'home', 'manual') else 'unknown',
             'date_context': 'spontaneous_now', 'surface': 'place_deck',
         })
         with deck_boundary():
@@ -930,9 +930,10 @@ def get_place_ratings(place_id):
 def geocode():
     try:
         if request.args.get('address'):
-            result = launch_service.resolve(request.args['address'])
+            resolver = launch_service.resolve_locality if request.args.get('locality_only') == 'true' else launch_service.resolve
+            result = resolver(request.args['address'])
         else:
-            result = launch_service.coordinates(request.args.get('latitude'), request.args.get('longitude'))
+            result = launch_service.reverse_coordinates(request.args.get('latitude'), request.args.get('longitude'))
         return jsonify(result)
     except (ValueError, TypeError) as exc:
         return jsonify({'error': str(exc)}), 400
