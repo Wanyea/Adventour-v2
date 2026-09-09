@@ -14,6 +14,7 @@ export interface User {
   profile_picture?: string;
   preferences?: string[];
   profile_complete?: boolean;
+  home_city?: string | null;
 }
 
 class AuthService {
@@ -336,7 +337,7 @@ class AuthService {
     }
   }
 
-  async updateProfile(updates: { display_name?: string; date_of_birth?: string; profile_picture?: string }): Promise<User> {
+  async updateProfile(updates: { display_name?: string; date_of_birth?: string; profile_picture?: string; home_city?: string | null }): Promise<User> {
     try {
       const token = await this.getIdToken();
       if (!token) {

@@ -1,10 +1,14 @@
 # Active scope — Phase 2 (resumed after restart)
 
-September 8: the owner approved implementation of **ADTR-25**, regional event
-acquisition and coverage, as a follow-up under **ADTR-19**, not a new phase or an
-expansion of Phase 2 acceptance. The active implementation worktree is limited to
-the [ADTR-25 contract](tickets/ADTR-25.md). Phase 2 and its remaining gates stay
-open. The separate ADTR-23 ticket owns live-location/home-city plumbing.
+September 8: ADTR-25 merged into `codex-astra` at `82a958ee`. The owner approved
+implementing **ADTR-22** first, followed by ADTR-23 after its prerequisite merges.
+The active worktree is limited to the [ADTR-22 contract](tickets/ADTR-22.md):
+optional home city/town capture and editing in the existing onboarding/Profile
+surfaces, with authenticated persistence. This is an explicitly approved narrow
+UI follow-up under **ADTR-19**, not a new phase or expanded Phase 2 acceptance.
+ADTR-23 owns foreground location, home resolution and manual-launch precedence.
+With no usable GPS, home, or manual launch, it must skip event queries and prompt
+for a launch point; it must never fall back to a seeded city. Phase 2 stays open.
 
 Phase 2 approved 2026-09-06: "Lets move onto phase 2. ill do a review of both
 phases after." This overrides the Phase 1 review/merge prerequisite for this

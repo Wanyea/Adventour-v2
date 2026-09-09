@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -109,7 +109,13 @@ const birthdateToInput = (value?: string) => {
 const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ user, onComplete }) => {
   const [displayName, setDisplayName] = useState(user.display_name || '');
   const [birthdateText, setBirthdateText] = useState(birthdateToInput(user.date_of_birth));
+  const [homeCity, setHomeCity] = useState(user.home_city || '');
   const [submitting, setSubmitting] = useState(false);
+  const mounted = useRef(true);
+
+  useEffect(() => () => {
+    mounted.current = false;
+  }, []);
 
   const trimmedDisplayName = displayName.trim();
   const parsedBirthdate = useMemo(() => parseBirthdateInput(birthdateText), [birthdateText]);
@@ -129,10 +135,19 @@ const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ user, onComplet
 
     setSubmitting(true);
     try {
+      const normalizedHomeCity = homeCity.trim() || null;
       const updatedUser = await AuthService.updateProfile({
         display_name: trimmedDisplayName,
         date_of_birth: parsedBirthdate.iso,
+        home_city: normalizedHomeCity,
       });
+      if (!mounted.current) {
+        return;
+      }
+      if (updatedUser.id !== user.id || updatedUser.home_city !== normalizedHomeCity) {
+        Alert.alert('Setup did not save', 'Your home base was not confirmed. Please try again.');
+        return;
+      }
       if (!updatedUser.profile_complete && !(updatedUser.display_name && updatedUser.date_of_birth)) {
         Alert.alert(
           'Setup did not save',
@@ -142,11 +157,16 @@ const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ user, onComplet
       }
       onComplete(updatedUser);
     } catch (error: any) {
+      if (!mounted.current) {
+        return;
+      }
       console.error('Profile setup error:', error);
       const message = error?.response?.data?.error || 'Unable to save your passport details. Please try again.';
       Alert.alert('Setup failed', message);
     } finally {
-      setSubmitting(false);
+      if (mounted.current) {
+        setSubmitting(false);
+      }
     }
   };
 
@@ -204,6 +224,18 @@ const ProfileSetupScreen: React.FC<ProfileSetupScreenProps> = ({ user, onComplet
           {parsedBirthdate && isOldEnough ? (
             <Text style={styles.helperText}>Looks good. Age check passed.</Text>
           ) : null}
+
+          <Text style={styles.label}>Home city or town</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="City or town, region, country"
+            value={homeCity}
+            onChangeText={setHomeCity}
+            autoCapitalize="words"
+            autoCorrect={false}
+            maxLength={160}
+          />
+          <Text style={styles.helperText}>Optional. Add a region or country when useful; no street address needed.</Text>
 
           <TouchableOpacity
             style={[styles.button, !canContinue && styles.buttonDisabled]}
