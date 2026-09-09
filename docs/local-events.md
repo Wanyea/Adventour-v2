@@ -1,5 +1,61 @@
 # Local events — initial Phase 2 implementation
 
+## ADTR-25: configured regional acquisition (September 8)
+
+The current registry supports `new_york` (NYC Parks structured public data) and
+`orlando` (UCF's documented ICS calendar, with gallery category confirmation from
+its event JSON). This supersedes the older JSON-only worker instructions below.
+The source boundaries remain NYC Parks and UCF public gallery exhibitions;
+neither represents all events in its city.
+
+From `Server/`, using a private local environment file and the installed venv:
+
+```powershell
+$env:ENV_FILE='.env.local'
+.venv\Scripts\python.exe -m data_pipeline.refresh_events --region new_york --dry-run
+.venv\Scripts\python.exe -m data_pipeline.refresh_events --region new_york
+.venv\Scripts\python.exe -m data_pipeline.refresh_events --region orlando --due
+.venv\Scripts\python.exe -m data_pipeline.refresh_events --watch
+```
+
+`--dry-run` fetches and reports without changing event/source records. A normal
+one-shot command forces a refresh; `--due` and `--watch` honor source-specific
+intervals and failed-attempt backoff. `--source ucf_main` narrows further.
+An unknown region reports `no_configured_source` and zero network requests;
+it never triggers a different region's refresh. The watcher must be running;
+this ticket does not install an operating-system service or scheduled task.
+
+The registry records source identity, parser version, timezone, permission and
+retention basis, interval, and network limits. Limits apply independently per
+source: UCF has 40 requests/pages and 2 MB; NYC has four requests, two pages,
+and 8 MB; both have a 60-second acquisition budget. A limit breach, malformed
+or incomplete calendar, and failed freshness validation preserve the previous
+snapshot without renewing verification. Concurrent refreshes of the same source
+are excluded by a Postgres advisory lock. Errors store the exception class only.
+
+UCF ICS lacks categories, so only gallery candidates receive an additional JSON
+category check. Numeric event IDs are preserved across the format switch.
+Descriptions remain transient. Cancelled ICS occurrences and unsupported
+recurrences or ambiguous times are excluded/rejected instead of guessed.
+UCF's observed feeds supplied neither ETag nor Last-Modified; no conditional
+bandwidth savings are claimed. A 304 cannot replace a snapshot with empty data or
+renew event freshness in this implementation.
+
+To onboard another region, first record a permitted source, factual fields,
+timezone, verified public access and location provenance, retention and budgets.
+Reuse an adapter only if the source actually has its supported schema; otherwise
+an adapter and observed-fixture checks are required. Then dry-run, inspect yield
+and exclusions, and run the regional refresh. Adding a metro label alone does not
+discover its events. No user location is persisted by this command.
+
+**Scope limit:** this is operator-configured acquisition, not automatic discovery
+for arbitrary GPS locations. ADTR-23 supplies the chosen location. Listing stays
+database-only; unconfigured or stale regions remain honestly empty. Automatic
+source discovery/demand scheduling is not claimed by ADTR-25.
+
+Current measurement: [ADTR-25 runtime evidence](verification/2026-09-08/adtr-25/runtime.json).
+The following sections preserve earlier Phase 2 evidence and limitations.
+
 The approved surface is a dated section below the swipe deck in Discover. Events
 are queried around the selected launch point (50 km, next 14 days), independently
 of the phone GPS. The regular place deck and navigation tabs remain unchanged.

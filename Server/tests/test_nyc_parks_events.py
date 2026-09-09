@@ -61,8 +61,8 @@ def test_stale_publication_or_truncated_feed_does_not_renew_freshness():
 
 def test_recheck_uses_city_source_and_removes_missing_or_cancelled(monkeypatch):
     assert adapter(SOURCE) is nyc
-    session = object()
-    monkeypatch.setattr(nyc, 'session_for_source', lambda: session)
+    session = SimpleNamespace(close=lambda: None)
+    monkeypatch.setattr(nyc, 'session_for_source', lambda source: session)
     monkeypatch.setattr(nyc, 'publication', lambda s, now: now)
     def read(s, **params):
         assert s is session and params == {'guid': '123'}
