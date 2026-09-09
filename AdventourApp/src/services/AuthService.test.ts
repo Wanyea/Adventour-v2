@@ -39,10 +39,13 @@ test('a deferred profile response cannot replace a newer account session or its 
   (AuthService as any).setCurrentUser(user('a'));
 
   const updatingA = AuthService.updateProfile({ home_city: 'Accra, Ghana' });
+  await Promise.resolve();
+  await Promise.resolve();
+  expect(axios.put).toHaveBeenCalledTimes(1);
   (AuthService as any).setCurrentUser(user('b'));
   response.resolve({ data: { user: { ...user('a'), home_city: 'Accra, Ghana' } } });
 
-  await expect(updatingA).rejects.toThrow('account changed');
+  await expect(updatingA).rejects.toThrow('completed');
   expect(await AuthService.getCurrentUser()).toEqual(user('b'));
   await expect(AuthService.getIdToken()).resolves.toBe('dev:b@example.com');
 });
