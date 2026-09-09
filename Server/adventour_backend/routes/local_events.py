@@ -6,6 +6,7 @@ from sqlalchemy import text
 from adventour_backend.models import db
 from adventour_backend.services import local_event_service as events
 from adventour_backend.services import pilot_service as pilot
+from adventour_backend.services import event_demand_service as demand
 from adventour_backend.auth import require_auth
 
 blueprint = Blueprint('local_events', __name__)
@@ -22,8 +23,11 @@ def listing():
             'interests': (g.current_user.preferences or '').split(','),
             'surface': 'local_events', 'date_context': 'next_14_days',
         })
-        result = events.listing(db, float(request.args['latitude']), float(request.args['longitude']),
-                                float(request.args.get('radius_meters', 50000)), request.args.get('tag_group','all'))
+        latitude, longitude = float(request.args['latitude']), float(request.args['longitude'])
+        radius = float(request.args.get('radius_meters', 50000))
+        demand.enqueue(db, latitude, longitude, radius)
+        result = events.listing(db, latitude, longitude, radius, request.args.get('tag_group','all'))
+        result.update(demand.state(db, latitude, longitude))
         if capture:
             capture['trace'].update({'model': 'event_chronological_v1', 'personalized': False,
                                     'checked_at': result['checked_at'], 'provider_calls': 0,
