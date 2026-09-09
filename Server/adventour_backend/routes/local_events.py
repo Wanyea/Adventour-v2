@@ -34,6 +34,10 @@ def listing():
                                     'limitation': 'Returned occurrence facts only; full pre-filter event inventory not snapshotted.'})
             pilot.attach(db, capture, result['events'], 'event')
             db.session.commit()
+        else:
+            # Demand is operational state and must survive ordinary index reads;
+            # it is independent of optional pilot instrumentation.
+            db.session.commit()
         response = jsonify(result)
         response.headers['Cache-Control'] = 'no-store'
         return response

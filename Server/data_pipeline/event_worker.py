@@ -7,6 +7,13 @@ from adventour_backend.services import event_demand_service as demand
 
 
 def run_once(backend, acquire, now=None):
+    """Claim one job and invoke ``acquire(job)`` outside the DB transaction.
+
+    ``acquire`` is deliberately injected: this foundation performs no connector
+    discovery and cannot write provider facts. It must publish through the
+    approved event refresh path and return only after its bounded work finishes.
+    Its result is ignored; lease fencing controls the completion update.
+    """
     with backend.app.app_context():
         job = demand.claim(backend.db, now)
         if job is None:
