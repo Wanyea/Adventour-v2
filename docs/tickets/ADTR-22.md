@@ -85,3 +85,21 @@ either, skip event requests and encourage the user to set a launch point. Home
 alone is not a guaranteed fallback. Preserve manual launch selection over late
 automatic resolution. This requirement is recorded for the next ticket; ADTR-22
 does not begin automatic location selection.
+
+## Implementation and review record
+
+PR: https://github.com/Wanyea/Adventour-v2/pull/4 (draft, base `codex-astra`).
+Implementation: `c08ad7a9`; review corrections: `5e9eb983`; focused response-race
+test correction: `0f2e2b14`. Ten focused backend checks passed on isolated
+PostgreSQL, and seven app tests across two suites plus TypeScript passed.
+
+Independent GPT-6 Astra review with a GPT-5.6 Terra backend audit found two
+blocking app issues: stale-account profile-response caching and navigator
+remounts after saving. Both were corrected; the reviewer found no remaining
+blocking source issue at `5e9eb983`. The final test-only correction explicitly
+waits for the outbound request before switching accounts. Device evidence and
+ticket acceptance remain separate from that source review.
+
+[Mac handoff](../adtr-22-mac-handoff.md) contains the build and physical-iPhone
+walkthrough. No native dependency/configuration change is required by this diff.
+The public Windows pilot has not been deployed from this feature branch.
