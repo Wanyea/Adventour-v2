@@ -135,6 +135,104 @@ fresh result, an honest empty/no-source result, a failed refresh preserving the
 last good snapshot, cancellation/expiry removal, deduplication, and concurrent
 requests producing one upstream fetch.
 
+## Astra review amendments (2026-09-09)
+
+The architecture above is approved as the direction, but it is not ready to
+hand to an implementation agent until the following contracts are added. The
+product requirement is location-independent acquisition: a valid launch point
+must enter the same discovery process without an operator adding that city to a
+roster. This does not promise that every town has public events or that every
+source is legally reusable; those limits must be measured and exposed.
+
+### Cold-region bootstrap and source admission
+
+Before implementation, freeze one concrete bootstrap connector and its access
+policy. The lead sequence is: active sources intersecting the radius; owned
+venue/organizer links; then a permitted regional catalog or search connector for
+municipal, library, university, venue and community calendars. The decision
+packet must name the connector, access requirements, price and limits, query
+templates, geographic inputs, link-retention rights and output contract. Search
+results are leads, never canonical event facts. A cross-host link is a new lead
+that requires its own policy.
+
+Source records move through `discovered`, `policy_pending`, `eligible` and
+`active`, with explicit `rejected`, `paused` and `failed` states. Automatic
+activation requires an already approved collection/retention policy, a
+supported parser, a verified geographic footprint and one complete valid
+collection. Ambiguous rights, locality or parsing remain quarantined for
+operator review. Review applies to a new source or policy, not to every user or
+town; measure how often a region still needs manual intervention. Do not add a
+US-only runtime allowlist.
+
+The first design ticket must run one bounded dry-run comparing low-cost
+first-party/catalog discovery with at most one viable licensed option. It must
+use a cold San Francisco region and a held-out small town with independently
+verified public events, including a no-owned-venues case. It must report each
+stage of the lead-to-eligible funnel and stop after one comparison and one
+bounded repair run. Unresolved access or yield is a named blocker, not another
+open-ended phase.
+
+### Durable demand and freshness contract
+
+Keep `/api/local-events` free of outbound acquisition. It may upsert one cheap
+demand record keyed by a coarse geographic bucket and the existing 14-day
+horizon; the worker consumes that demand. Jobs need a unique work key, state,
+due time, attempts, lease expiry, fencing token and bounded error class. Claim
+in a short Postgres transaction, fetch outside the transaction, and commit only
+when the lease/token still owns the job. Expired leases must recover after a
+restart. Coalesce neighboring demand onto one source-global canonical window,
+rather than fetching for each slightly different GPS request.
+
+Return events with separate `data_state` (`fresh`, `empty`, `expired`) and
+`acquisition_state` (`idle`, `queued`, `running`, `backoff`, `policy_pending`,
+`budget_limited`, `failed`), plus snapshot version, checked time, next check
+time and bounded reason codes. A valid conditional 304 may revalidate a live
+representation when the source policy allows it, but it cannot advance a
+publisher's publication clock. Only a complete snapshot may delete absent
+occurrences; a partial or parse-collapsed response cannot clear the prior
+snapshot. Cancellation evidence must prevent an old duplicate source from
+reviving an occurrence.
+
+Proposed starting safety bounds, to validate in the design ticket: one worker,
+one active fetch per host, two new-region discovery jobs per minute, 100 queued
+regions, 2,000 upstream requests per day, at most 20 hosts and 40 pages per
+discovery job, 10 MiB downloaded and five minutes of work per job. Reserve
+capacity for active near-term sources. Paid calls remain disabled until a
+specific connector and hard dollar cap are approved; moving a call to a worker
+does not make it free or permit it on the swipe-deck/Home path.
+
+### Event facts and pilot acceptance
+
+Preserve factual activity, setting, format, access/booking and evidence
+provenance where permitted. Do not infer a cafe menu or community character
+from a title such as “coffeehouse”; retain unknown facets and an exclusion
+reason for missing time, physical location or public access. Recurrence must
+honor timezone, exceptions and cancellations with bounded expansion.
+
+The implementation must prove acquisition, not only empty-state correctness:
+normal launch selection in cold San Francisco must automatically produce at
+least five eligible distinct occurrences across three venues/organizers, and a
+held-out town must produce at least two across two venues/organizers, within the
+existing radius and 14-day window. The town is selected before knowing whether
+our collector succeeds. Inspect every displayed event against its official
+source and report precision, source-relative and reference-set recall, unique
+organizers, freshness, latency, compute, bytes, charges and operator minutes.
+If the gate fails, classify the failure as access blocked, leads missed,
+unsupported parsing, insufficient facts, inadequate freshness or insufficient
+budget. Queue, schema and empty-result tests alone do not pass the ticket.
+
+### Bounded work tickets
+
+Keep this as one ADTR-19 follow-up with five reviewable tickets, not five new
+product phases: (1) connector/access decision and frozen benchmark, (2) automatic
+source discovery and admission, (3) durable demand scheduling and freshness,
+(4) verified normalization and reusable extraction, and (5) Home acquisition
+feedback and iPhone pilot acceptance. Tickets 2–4 depend on ticket 1; ticket 5
+depends on all three. Reuse ADTR-25's registry, transport, locking, atomic
+replacement, dispatch and duplicate-collapse work. The lower-cost implementer
+may not select a vendor, weaken expiry, expand source rights or invent coverage
+targets.
+
 ## Sources
 
 1. Ticketmaster, [Discovery API](https://developer.ticketmaster.com/products-and-docs/apis/discovery-api/v2/), coverage, sources and rate limits.
